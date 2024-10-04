@@ -4,10 +4,13 @@
 #include "GameFramework/Actor.h"
 #include "../../Pawns/Player/Components/Interactable.h"
 #include "../../Pawns/Unit/BaseUnit.h"
+#include "../../Macros/EventDelegate.h"
 #include <Blueprint/UserWidget.h>
 #include "Piece.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnPieceChangeDelegate);
+DECLARE_MULTICAST_DELEGATE(FPieceEventDelegate);
+
+#define ADD_PIECE_EVENT_DELEGATE(name) TEMPLATE_EVENT_DELEGATE(FPieceEventDelegate, name)
 
 UCLASS()
 class GAME1812_API APiece : public AActor, public IInteractable
@@ -20,7 +23,10 @@ public:
 
 protected:
 
-	//Scene Components
+	//
+	// Scene Components
+	//
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxCollisionComponent;
 
@@ -30,7 +36,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* PieceFigureMeshComponent;
 
-	///
+	//
+	// Actor Components
+	//
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPieceMapMarkerComponent* MapMarkerComponent;
@@ -43,6 +51,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPieceOutlineComponent* OutlineComponent;
+
 	//
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -60,28 +69,31 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	bool bIsDead;
 
-#define ADD_PIECE_CHANGE_DELEGATE(name) \
-	protected: FOnPieceChangeDelegate On##name; \
-	public: void AddOn##name##Handler(const FOnPieceChangeDelegate::FDelegate& Handler) { On##name##.Add(Handler); }; \
-	protected:
+	// 
+	// Delegates
+	//
 
-	ADD_PIECE_CHANGE_DELEGATE(UnitSpawn)
-	ADD_PIECE_CHANGE_DELEGATE(UnitDeath)
+	ADD_PIECE_EVENT_DELEGATE(UnitSpawn);
+	ADD_PIECE_EVENT_DELEGATE(UnitDeath);
 
-	ADD_PIECE_CHANGE_DELEGATE(OrderAssign)
+	ADD_PIECE_EVENT_DELEGATE(OrderAssign);
 
-	ADD_PIECE_CHANGE_DELEGATE(MapHit)
-	ADD_PIECE_CHANGE_DELEGATE(MapHitWasDragged)
-	ADD_PIECE_CHANGE_DELEGATE(RemovedFromMap)
+	ADD_PIECE_EVENT_DELEGATE(MapHit);
+	ADD_PIECE_EVENT_DELEGATE(MapHitWasDragged);
+	ADD_PIECE_EVENT_DELEGATE(RemovedFromMap);
 
-	ADD_PIECE_CHANGE_DELEGATE(StartDragging)
-	ADD_PIECE_CHANGE_DELEGATE(StopDragging)
-	ADD_PIECE_CHANGE_DELEGATE(StartCursorHover)
-	ADD_PIECE_CHANGE_DELEGATE(StopCursorHover)
-	ADD_PIECE_CHANGE_DELEGATE(StartGroupSelectionHover)
-	ADD_PIECE_CHANGE_DELEGATE(StopGroupSelectionHover)
-	ADD_PIECE_CHANGE_DELEGATE(Selected)
-	ADD_PIECE_CHANGE_DELEGATE(SelectionRemoved)
+	// Delegates - Interaction
+
+	ADD_PIECE_EVENT_DELEGATE(StartDragging);
+	ADD_PIECE_EVENT_DELEGATE(StopDragging);
+	ADD_PIECE_EVENT_DELEGATE(StartCursorHover);
+	ADD_PIECE_EVENT_DELEGATE(StopCursorHover);
+	ADD_PIECE_EVENT_DELEGATE(StartGroupSelectionHover);
+	ADD_PIECE_EVENT_DELEGATE(StopGroupSelectionHover);
+	ADD_PIECE_EVENT_DELEGATE(Selected);
+	ADD_PIECE_EVENT_DELEGATE(SelectionRemoved);
+
+	//
 
 	virtual void BeginPlay() override;
 

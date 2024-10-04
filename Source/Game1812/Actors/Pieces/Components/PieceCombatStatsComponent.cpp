@@ -24,7 +24,7 @@ void UPieceCombatStatsComponent::BeginPlay()
 	if (!OwnerPiece)
 		return DestroyComponent();
 
-	OwnerPiece->AddOnUnitSpawnHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceCombatStatsComponent::OnUnitSpawn));
+	OwnerPiece->AddOnUnitSpawnHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceCombatStatsComponent::OnUnitSpawn));
 }
 
 void UPieceCombatStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

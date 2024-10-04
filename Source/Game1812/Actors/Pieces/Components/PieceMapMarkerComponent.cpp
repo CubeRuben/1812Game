@@ -27,12 +27,12 @@ void UPieceMapMarkerComponent::BeginPlay()
 	if (gameInstance)
 		SetMaterial(0, gameInstance->GetPieceMapMarkerMaterial());
 
-	OwnerPiece->AddOnStartDraggingHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnEnable));
-	OwnerPiece->AddOnSelectedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnEnable));
+	OwnerPiece->AddOnStartDraggingHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnEnable));
+	OwnerPiece->AddOnSelectedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnEnable));
 
-	OwnerPiece->AddOnSelectionRemovedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
-	OwnerPiece->AddOnOrderAssignHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
-	OwnerPiece->AddOnUnitDeathHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
+	OwnerPiece->AddOnSelectionRemovedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
+	OwnerPiece->AddOnOrderAssignHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
+	OwnerPiece->AddOnUnitDeathHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceMapMarkerComponent::OnDisable));
 }
 
 void UPieceMapMarkerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

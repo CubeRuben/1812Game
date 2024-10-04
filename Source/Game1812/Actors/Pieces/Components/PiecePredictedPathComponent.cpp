@@ -23,13 +23,13 @@ void UPiecePredictedPathComponent::BeginPlay()
 	if (!OwnerPiece)
 		return DestroyComponent();
 
-	OwnerPiece->AddOnStartDraggingHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::SpawnArrow));
+	OwnerPiece->AddOnStartDraggingHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::SpawnArrow));
 
-	OwnerPiece->AddOnMapHitWasDraggedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::BuildArrow));
-	OwnerPiece->AddOnRemovedFromMapHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::DestroyArrow));
+	OwnerPiece->AddOnMapHitWasDraggedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::BuildArrow));
+	OwnerPiece->AddOnRemovedFromMapHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::DestroyArrow));
 	
-	OwnerPiece->AddOnOrderAssignHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::ApplyArrow));
-	OwnerPiece->AddOnUnitDeathHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::DestroyArrow));
+	OwnerPiece->AddOnOrderAssignHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::ApplyArrow));
+	OwnerPiece->AddOnUnitDeathHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::DestroyArrow));
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UPiecePredictedPathComponent::InitStartPoint));
 }
@@ -144,6 +144,6 @@ void UPiecePredictedPathComponent::SetScout(bool NewScout)
 	if (!scoutPiece)
 		return;
 
-	scoutPiece->AddOnOrderPointAddHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::ScoutBuildArrow));
+	scoutPiece->AddOnOrderPointAddHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::ScoutBuildArrow));
 }
 

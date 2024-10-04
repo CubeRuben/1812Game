@@ -83,12 +83,12 @@ void APiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	if (bIsDead)
 		return;
 
-	OnMapHit.Broadcast();
+	OnMapHitEvent.Broadcast();
 
 	if (bWasDragged) 
 	{
 		bWasDragged = false;
-		OnMapHitWasDragged.Broadcast();
+		OnMapHitWasDraggedEvent.Broadcast();
 	}
 	
 	if (!bCanSpawnUnit)
@@ -103,7 +103,7 @@ void APiece::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	if (!OtherComp->ComponentTags.Contains("MapBorder"))
 		return;
 
-	OnRemovedFromMap.Broadcast();
+	OnRemovedFromMapEvent.Broadcast();
 }
 
 void APiece::SpawnUnit()
@@ -116,14 +116,14 @@ void APiece::SpawnUnit()
 
 	OnSpawnUnit();
 
-	OnUnitSpawn.Broadcast();
+	OnUnitSpawnEvent.Broadcast();
 }
 
 void APiece::OnSpawnUnit() { }
 
 void APiece::AssignOrder(UUnitOrder* UnitOrder)
 {
-	OnOrderAssign.Broadcast();
+	OnOrderAssignEvent.Broadcast();
 }
 
 FRotator APiece::GetResetRotation()
@@ -153,12 +153,12 @@ void APiece::OnDeathUnit()
 	PieceFoundationMeshComponent->SetMaterial(0, gameInstance->GetDeadPieceMaterial());
 	PieceFigureMeshComponent->SetMaterial(0, gameInstance->GetDeadPieceMaterial());
 
-	OnUnitDeath.Broadcast();
+	OnUnitDeathEvent.Broadcast();
 }
 
 void APiece::StartDragging()
 {
-	OnStartDragging.Broadcast();
+	OnStartDraggingEvent.Broadcast();
 
 	PlaySoundStartDragging();
 
@@ -171,7 +171,7 @@ void APiece::StartDragging()
 
 void APiece::StopDragging()
 {
-	OnStopDragging.Broadcast();
+	OnStopDraggingEvent.Broadcast();
 
 	BoxCollisionComponent->SetSimulatePhysics(true);
 	BoxCollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -186,34 +186,34 @@ void APiece::StopDragging()
 
 void APiece::StartCursorHover()
 {
-	OnStartCursorHover.Broadcast();
+	OnStartCursorHoverEvent.Broadcast();
 }
 
 void APiece::StopCursorHover()
 {
-	OnStopCursorHover.Broadcast();
+	OnStopCursorHoverEvent.Broadcast();
 }
 
 void APiece::StartGroupSelectionHover()
 {
-	OnStartGroupSelectionHover.Broadcast();
+	OnStartGroupSelectionHoverEvent.Broadcast();
 }
 
 void APiece::StopGroupSelectionHover()
 {
-	OnStopGroupSelectionHover.Broadcast();
+	OnStopGroupSelectionHoverEvent.Broadcast();
 }
 
 void APiece::Selected()
 {
-	OnSelected.Broadcast();
+	OnSelectedEvent.Broadcast();
 
 	PlaySoundSelected();
 }
 
 void APiece::SelectionRemoved()
 {
-	OnSelectionRemoved.Broadcast();
+	OnSelectionRemovedEvent.Broadcast();
 }
 
 FVector APiece::GetDragOffset()

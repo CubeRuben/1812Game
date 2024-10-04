@@ -21,15 +21,15 @@ void UPieceOutlineComponent::BeginPlay()
 	if (!OwnerPiece)
 		return DestroyComponent();
 
-	OwnerPiece->AddOnStartCursorHoverHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnCursorHoverStart));
-	OwnerPiece->AddOnStartGroupSelectionHoverHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnGroupSelectionHoverStart));
-	OwnerPiece->AddOnStartDraggingHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnDragStart));
-	OwnerPiece->AddOnSelectedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnSelected));
+	OwnerPiece->AddOnStartCursorHoverHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnCursorHoverStart));
+	OwnerPiece->AddOnStartGroupSelectionHoverHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnGroupSelectionHoverStart));
+	OwnerPiece->AddOnStartDraggingHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnDragStart));
+	OwnerPiece->AddOnSelectedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnSelected));
 
-	OwnerPiece->AddOnStopCursorHoverHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnCursorHoverStop));
-	OwnerPiece->AddOnStopGroupSelectionHoverHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnGroupSelectionHoverStop));
-	OwnerPiece->AddOnStopDraggingHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnDragStop));
-	OwnerPiece->AddOnSelectionRemovedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnSelectionRemoved));
+	OwnerPiece->AddOnStopCursorHoverHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnCursorHoverStop));
+	OwnerPiece->AddOnStopGroupSelectionHoverHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnGroupSelectionHoverStop));
+	OwnerPiece->AddOnStopDraggingHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnDragStop));
+	OwnerPiece->AddOnSelectionRemovedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOutlineComponent::OnSelectionRemoved));
 }
 
 void UPieceOutlineComponent::OnCursorHoverStart()

@@ -15,7 +15,7 @@ public:
 
 protected:
 
-	FOnPieceChangeDelegate OnOrderPointAdd;
+	FPieceEventDelegate OnOrderPointAdd;
 
 public:
 
@@ -26,5 +26,5 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnOrderPointAdded();
 
-	void AddOnOrderPointAddHandler(const FOnPieceChangeDelegate::FDelegate& Handler) { OnOrderPointAdd.Add(Handler); };
+	void AddOnOrderPointAddHandler(const FPieceEventDelegate::FDelegate& Handler) { OnOrderPointAdd.Add(Handler); };
 };

@@ -23,11 +23,11 @@ void UPieceOrderWidgetComponent::BeginPlay()
 	if (!OwnerPiece)
 		return DestroyComponent();
 
-	OwnerPiece->AddOnSelectedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnEnable));
+	OwnerPiece->AddOnSelectedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnEnable));
 
-	OwnerPiece->AddOnSelectionRemovedHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
-	OwnerPiece->AddOnOrderAssignHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
-	OwnerPiece->AddOnUnitDeathHandler(FOnPieceChangeDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
+	OwnerPiece->AddOnSelectionRemovedHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
+	OwnerPiece->AddOnOrderAssignHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
+	OwnerPiece->AddOnUnitDeathHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPieceOrderWidgetComponent::OnDisable));
 
 	UBaseOrderWidget* orderWidget = Cast<UBaseOrderWidget>(GetWidget());
 
