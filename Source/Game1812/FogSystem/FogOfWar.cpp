@@ -1,4 +1,4 @@
-#include "FogOfWar.h"
+	#include "FogOfWar.h"
 
 #include "FogAffected.h"
 #include "../Actors/HeadQuarters.h"

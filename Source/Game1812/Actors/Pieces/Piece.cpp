@@ -70,8 +70,6 @@ void APiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	if (!OtherActor) 
 		return;
 
-	PlaySoundHit(NormalImpulse.SizeSquared());
-
 	APaperMap* map = Cast<APaperMap>(OtherActor);
 
 	if (!map) 
@@ -114,12 +112,8 @@ void APiece::SpawnUnit()
 	Unit = AHeadQuarters::GetInstance()->SpawnUnit(UnitClass);
 	Unit->SetOwnerPiece(this);
 
-	OnSpawnUnit();
-
 	OnUnitSpawnEvent.Broadcast();
 }
-
-void APiece::OnSpawnUnit() { }
 
 void APiece::AssignOrder(UUnitOrder* UnitOrder)
 {
@@ -143,7 +137,7 @@ void APiece::OnDeathUnit()
 {
 	bIsDead = true;
 
-	PlaySoundDeath();
+	PlaySound(EPieceSoundType::Death);
 
 	UCossacksGameInstance* gameInstance = GetWorld()->GetGameInstance<UCossacksGameInstance>();
 
@@ -160,7 +154,7 @@ void APiece::StartDragging()
 {
 	OnStartDraggingEvent.Broadcast();
 
-	PlaySoundStartDragging();
+	PlaySound(EPieceSoundType::StartDragging);
 
 	BoxCollisionComponent->SetSimulatePhysics(false);
 	BoxCollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -208,7 +202,7 @@ void APiece::Selected()
 {
 	OnSelectedEvent.Broadcast();
 
-	PlaySoundSelected();
+	PlaySound(EPieceSoundType::Selected);
 }
 
 void APiece::SelectionRemoved()

@@ -13,14 +13,9 @@ ACombatPiece::ACombatPiece()
 	StatsComponent = CreateDefaultSubobject<UPieceCombatStatsComponent>(TEXT("Combat Stats Display"));
 }
 
-void ACombatPiece::BeginPlay()
+void ACombatPiece::SpawnUnit()
 {
-	Super::BeginPlay();
-}
-
-void ACombatPiece::OnSpawnUnit()
-{
-	Super::OnSpawnUnit();
+	Super::SpawnUnit();
 
 	ACombatUnit* combatUnit = Cast<ACombatUnit>(Unit);
 

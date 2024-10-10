@@ -12,6 +12,14 @@ DECLARE_MULTICAST_DELEGATE(FPieceEventDelegate);
 
 #define ADD_PIECE_EVENT_DELEGATE(name) TEMPLATE_EVENT_DELEGATE(FPieceEventDelegate, name)
 
+UENUM(BlueprintType)
+enum class EPieceSoundType : uint8 
+{
+	StartDragging,
+	Selected,
+	Death
+};
+
 UCLASS()
 class GAME1812_API APiece : public AActor, public IInteractable
 {
@@ -103,21 +111,10 @@ protected:
 	UFUNCTION()
 	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	void SpawnUnit();
-
-	virtual void OnSpawnUnit();
+	virtual void SpawnUnit();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void PlaySoundStartDragging();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PlaySoundSelected();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PlaySoundHit(float Force);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PlaySoundDeath();
+	void PlaySound(EPieceSoundType SoundType);
 
 public:
 
@@ -141,7 +138,9 @@ public:
 	FRotator GetResetRotation();
 	void ResetRotation();
 
-	//IDraggable Interface
+	//
+	// IDraggable Interface
+	//
 	virtual void StartDragging() override;
 	virtual void StopDragging() override;
 
@@ -157,4 +156,5 @@ public:
 	FVector GetDragOffset() override;
 
 	virtual bool CanBeGrouped() override { return true; }
+	//
 };

@@ -40,6 +40,8 @@ void UUnitTerrainModifiersComponent::UpdateModifiers()
 	
 	Modifiers.Reset(50.f);
 
+	const ECombatUnitType unitType = OwnerUnit->GetUnitType();
+
 	for (ATerrainPropertyVolume* terrain : OverlappedTerrainVolumes) 
 	{
 		const UTerrainPropertyDataAsset* data = terrain->GetTerrainPropertyDataAsset();
@@ -47,9 +49,9 @@ void UUnitTerrainModifiersComponent::UpdateModifiers()
 		if (!data)
 			continue;
 
-		Modifiers.MovementSpeedModifier = FMath::Min(Modifiers.MovementSpeedModifier, data->GetMovementSpeedModifier(OwnerUnit->GetUnitType()));
-		Modifiers.RotationSpeedModifier = FMath::Min(Modifiers.RotationSpeedModifier, data->GetRotationSpeedModifier(OwnerUnit->GetUnitType()));
-		Modifiers.DamageModifier = FMath::Min(Modifiers.DamageModifier, data->GetDamageModifier(OwnerUnit->GetUnitType()));
+		Modifiers.MovementSpeedModifier = FMath::Min(Modifiers.MovementSpeedModifier, data->GetMovementSpeedModifier(unitType));
+		Modifiers.RotationSpeedModifier = FMath::Min(Modifiers.RotationSpeedModifier, data->GetRotationSpeedModifier(unitType));
+		Modifiers.DamageModifier = FMath::Min(Modifiers.DamageModifier, data->GetDamageModifier(unitType));
 	}
 }
 

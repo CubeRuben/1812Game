@@ -157,7 +157,7 @@ float ACombatUnit::ApplyDamage(IDamageable* Attacker, float Amount)
 
 ECombatUnitType ACombatUnit::GetUnitType() const
 {
-	return GetCombatUnitStats()->GetUnitType();
+	return GetCombatUnitStats() ? GetCombatUnitStats()->GetUnitType() : ECombatUnitType::None;
 }
 
 FVector ACombatUnit::GetLocation()

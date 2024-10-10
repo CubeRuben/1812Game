@@ -21,9 +21,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCombatUnitDataAsset* CombatUnitData;
 
-	virtual void BeginPlay() override;
-
-	void OnSpawnUnit() override;
+	void SpawnUnit() override;
 
 	void UpdatePieceMesh();
 
