@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Piece.h"
+#include "../../Pawns/Player/Components/InteractableSortable.h"
 #include "CombatPiece.generated.h"
 
 UCLASS()
-class GAME1812_API ACombatPiece : public APiece
+class GAME1812_API ACombatPiece : public APiece, public IInteractableSortable
 {
 	GENERATED_BODY()
 	
@@ -31,4 +32,12 @@ public:
 	void SetCombatUnitData(class UCombatUnitDataAsset* NewCombatUnitData);
 
 	virtual void AssignOrder(class UUnitOrder* UnitOrder) override;
+
+	//
+	// IInteractableSortable Interface
+	//
+	
+	int GetPriority() const override { return 0; };
+
+	//
 };

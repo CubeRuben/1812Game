@@ -139,7 +139,7 @@ public:
 	void ResetRotation();
 
 	//
-	// IDraggable Interface
+	// IInteractable Interface
 	//
 	virtual void StartDragging() override;
 	virtual void StopDragging() override;

@@ -90,13 +90,13 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	if (MapState != EPlayerCameraState::OutOfMap) 
 	{
-		if (PlayerPawn->GetPlayerInput()->LookAtMap)
+		if (PlayerPawn->GetPlayerInput().LookAtMap)
 		{
 			MapState = EPlayerCameraState::OutOfMap;
-			PlayerPawn->GetPlayerInput()->LookAtMap = false;
+			PlayerPawn->GetPlayerInput().LookAtMap = false;
 
-			PlayerPawn->GetPlayerInput()->MoveLeft = false;
-			PlayerPawn->GetPlayerInput()->MoveRight = false;
+			PlayerPawn->GetPlayerInput().MoveLeft = false;
+			PlayerPawn->GetPlayerInput().MoveRight = false;
 		}
 		else 
 		{
@@ -112,11 +112,11 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	}
 	else 
 	{
-		if (PlayerPawn->GetPlayerInput()->LookAtMap || PlayerPawn->GetPlayerInput()->MoveForward)
+		if (PlayerPawn->GetPlayerInput().LookAtMap || PlayerPawn->GetPlayerInput().MoveForward)
 		{
 			MapState = EPlayerCameraState::MovingToMap;
-			PlayerPawn->GetPlayerInput()->LookAtMap = false;
-			PlayerPawn->GetPlayerInput()->MoveForward = false;
+			PlayerPawn->GetPlayerInput().LookAtMap = false;
+			PlayerPawn->GetPlayerInput().MoveForward = false;
 		}
 		else
 		{
@@ -128,18 +128,18 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UPlayerMovementComponent::UpdateCameraSpot()
 {
-	if (PlayerPawn->GetPlayerInput()->MoveLeft)
+	if (PlayerPawn->GetPlayerInput().MoveLeft)
 	{
 		ChangeCameraSpot(-1);
 
-		PlayerPawn->GetPlayerInput()->MoveLeft = false;
+		PlayerPawn->GetPlayerInput().MoveLeft = false;
 	}
 
-	if (PlayerPawn->GetPlayerInput()->MoveRight)
+	if (PlayerPawn->GetPlayerInput().MoveRight)
 	{
 		ChangeCameraSpot(1);
 
-		PlayerPawn->GetPlayerInput()->MoveRight = false;
+		PlayerPawn->GetPlayerInput().MoveRight = false;
 	}
 }
 
@@ -160,7 +160,7 @@ void UPlayerMovementComponent::UpdateMovementOnMap(float DeltaTime)
 
 	TargetLocation = ApplyBoundsToPoint(TargetLocation);
 
-	const float ScrollDelta = PlayerPawn->GetCameraArmComponent()->AddTargetLength(-PlayerPawn->GetPlayerInput()->MouseScroll * 120);
+	const float ScrollDelta = PlayerPawn->GetCameraArmComponent()->AddTargetLength(-PlayerPawn->GetPlayerInput().MouseScroll * 120);
 
 	if (ScrollDelta != 0.0f)
 	{
@@ -175,7 +175,7 @@ void UPlayerMovementComponent::UpdateMovementOnMap(float DeltaTime)
 		TargetLocation += FVector2D(delta);
 	}
 
-	PlayerPawn->GetPlayerInput()->MouseScroll = 0;
+	PlayerPawn->GetPlayerInput().MouseScroll = 0;
 
 	const FVector2D NewLocation = FMath::Vector2DInterpTo(FVector2D(PlayerPawn->GetCameraArmComponent()->GetRelativeLocation()), TargetLocation, DeltaTime, MovementInterpSpeed);
 	PlayerPawn->GetCameraArmComponent()->SetRelativeLocation(FVector(NewLocation, PlayerPawn->GetCameraArmComponent()->GetRelativeLocation().Z));
@@ -226,10 +226,10 @@ FVector2D UPlayerMovementComponent::GetInputDirection()
 	FVector direction(0);
 
 	//Keyboard movement
-	if (PlayerPawn->GetPlayerInput()->MoveForward) direction += PlayerPawn->GetActorForwardVector();
-	if (PlayerPawn->GetPlayerInput()->MoveBack) direction -= PlayerPawn->GetActorForwardVector();
-	if (PlayerPawn->GetPlayerInput()->MoveRight) direction += PlayerPawn->GetActorRightVector();
-	if (PlayerPawn->GetPlayerInput()->MoveLeft) direction -= PlayerPawn->GetActorRightVector();
+	if (PlayerPawn->GetPlayerInput().MoveForward) direction += PlayerPawn->GetActorForwardVector();
+	if (PlayerPawn->GetPlayerInput().MoveBack) direction -= PlayerPawn->GetActorForwardVector();
+	if (PlayerPawn->GetPlayerInput().MoveRight) direction += PlayerPawn->GetActorRightVector();
+	if (PlayerPawn->GetPlayerInput().MoveLeft) direction -= PlayerPawn->GetActorRightVector();
 
 	APlayerController* playerController = PlayerPawn->GetController<APlayerController>();
 

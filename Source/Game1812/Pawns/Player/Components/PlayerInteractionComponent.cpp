@@ -46,18 +46,20 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 		return;
 	}
 
+	FPlayerInput& playerInput = PlayerPawn->GetPlayerInput();
+
 	AActor* interactableActor = nullptr;
 	IInteractable* interactable = nullptr;
 
 	FindInteractableAtCursor(interactableActor, interactable);
 
-	if (PlayerPawn->GetPlayerInput()->MouseLeftClick || PlayerPawn->GetPlayerInput()->MouseRightClick)
+	if ((interactable != nullptr) && (playerInput.MouseLeftClick || playerInput.MouseRightClick))
 	{
 		if (!CurrentDraggable) 
 		{
-			if (PlayerPawn->GetPlayerInput()->LeftShift) 
+			if (playerInput.LeftShift) 
 			{
-				PlayerPawn->GetPlayerInput()->MouseLeftClick = false;
+				playerInput.MouseLeftClick = false;
 
 				if (InteractableActorsSelectedGroup.Contains(interactableActor))
 				{
@@ -77,16 +79,16 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 		}
 	}
 
-	if ((interactable == nullptr) && PlayerPawn->GetPlayerInput()->MouseLeftClick)
+	if ((interactable == nullptr) && playerInput.MouseLeftClick)
 	{
-		PlayerPawn->GetPlayerInput()->MouseLeftClick = false;
+		playerInput.MouseLeftClick = false;
 
 		bIsMultipleSelection = true;
 		OnMultipleSelectionStart.Broadcast();
 
 	}
 
-	if (bIsMultipleSelection && !PlayerPawn->GetPlayerInput()->MouseLeftHold)
+	if (bIsMultipleSelection && !playerInput.MouseLeftHold)
 	{
 		bIsMultipleSelection = false;
 		OnMultipleSelectionEnd.Broadcast();
@@ -94,8 +96,10 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 	if (CurrentDraggable)
 	{
-		if (PlayerPawn->GetPlayerInput()->MouseLeftHold && !PlayerPawn->GetMovementComponent()->IsInGlobalMap()) 
+		if (playerInput.MouseLeftHold && !PlayerPawn->GetMovementComponent()->IsInGlobalMap()) 
 		{
+			
+
 			FHitResult hit = SingleCursorTrace(true);
 			AActor* draggableActor = Cast<AActor>(CurrentDraggable);
 
@@ -117,7 +121,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 				el->AddActorWorldOffset(deltaLocation);
 			}
 
-			const bool altDragging = PlayerPawn->GetPlayerInput()->MouseRightHold;
+			const bool altDragging = playerInput.MouseRightHold;
 			const float draggingHeight = altDragging ? (AltDraggingHeight) : (DraggingHeight);
 
 			{
@@ -138,7 +142,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 				el->SetActorLocation(newVerticalLocation);
 			}
 
-			const float rotationDirection = (-(float)PlayerPawn->GetPlayerInput()->RotateLeft + (float)PlayerPawn->GetPlayerInput()->RotateRight);
+			const float rotationDirection = (-(float)playerInput.RotateLeft + (float)playerInput.RotateRight);
 			const float rotationDelta = rotationDirection * RotateSpeed * DeltaTime;
 
 			draggableActor->AddActorWorldRotation(FRotator(0.0f, rotationDelta, 0.0f));
@@ -162,16 +166,16 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	}
 	else
 	{
-		if (PlayerPawn->GetPlayerInput()->MouseLeftClick) 
+		if (playerInput.MouseLeftClick) 
 		{
-			PlayerPawn->GetPlayerInput()->MouseLeftClick = false;
+			playerInput.MouseLeftClick = false;
 
 			if (interactable)
 				SetCurrentDraggable(interactable);
 		}
-		else if (PlayerPawn->GetPlayerInput()->MouseRightClick)
+		else if (playerInput.MouseRightClick)
 		{
-			PlayerPawn->GetPlayerInput()->MouseRightClick = false;
+			playerInput.MouseRightClick = false;
 
 			if (CurrentSelected == interactable)
 			{

@@ -6,6 +6,12 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMultipleSelectionDelegate);
 
+UENUM()
+enum class EUnitsFormation : uint8
+{
+	Lines
+};
+
 UCLASS()
 class GAME1812_API UPlayerInteractionComponent : public UActorComponent
 {

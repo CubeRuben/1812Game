@@ -32,6 +32,11 @@ public:
 
 	bool RotateLeft;
 	bool RotateRight;
+
+	bool MakeFormation1;
+	bool MakeFormation2;
+	bool MakeFormation3;
+	bool MakeFormation4;
 };
 
 UCLASS()
@@ -85,6 +90,10 @@ protected:
 	void LeftShift(const struct FInputActionValue& Value);
 	void RotateLeft(const struct FInputActionValue& Value);
 	void RotateRight(const struct FInputActionValue& Value);
+	void MakeFormation1(const struct FInputActionValue& Value);
+	void MakeFormation2(const struct FInputActionValue& Value);
+	void MakeFormation3(const struct FInputActionValue& Value);
+	void MakeFormation4(const struct FInputActionValue& Value);
 
 public:
 
@@ -96,7 +105,7 @@ public:
 	class UPlayerInteractionComponent* GetInteractionComponent() { return InteractionComponent; }
 	USceneComponent* GetCameraArmPoint() { return CameraArmPoint; }
 
-	FPlayerInput* GetPlayerInput() { return &PlayerInput; }
+	FPlayerInput& GetPlayerInput() { return PlayerInput; }
 
 	virtual void Tick(float DeltaTime) override;
 

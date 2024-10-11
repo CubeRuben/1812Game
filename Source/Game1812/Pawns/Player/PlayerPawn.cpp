@@ -62,6 +62,10 @@ void APlayerPawn::LookAtMap(const FInputActionValue& Value) { PlayerInput.LookAt
 void APlayerPawn::LeftShift(const FInputActionValue& Value) { PlayerInput.LeftShift = Value.Get<bool>(); };
 void APlayerPawn::RotateLeft(const FInputActionValue& Value) { PlayerInput.RotateLeft = Value.Get<bool>(); };
 void APlayerPawn::RotateRight(const FInputActionValue& Value) { PlayerInput.RotateRight = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation1(const FInputActionValue& Value) { PlayerInput.MakeFormation1 = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation2(const FInputActionValue& Value) { PlayerInput.MakeFormation2 = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation3(const FInputActionValue& Value) { PlayerInput.MakeFormation3 = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation4(const FInputActionValue& Value) { PlayerInput.MakeFormation4 = Value.Get<bool>(); };
 
 void APlayerPawn::BeginPlay()
 {
@@ -115,5 +119,10 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerEnhancedInputComponent->BindAction(InputConfig->RotateLeft, ETriggerEvent::Triggered, this, &APlayerPawn::RotateLeft);
 	PlayerEnhancedInputComponent->BindAction(InputConfig->RotateRight, ETriggerEvent::Triggered, this, &APlayerPawn::RotateRight);
+	
+	PlayerEnhancedInputComponent->BindAction(InputConfig->MakeFormation1, ETriggerEvent::Triggered, this, &APlayerPawn::MakeFormation1);
+	PlayerEnhancedInputComponent->BindAction(InputConfig->MakeFormation2, ETriggerEvent::Triggered, this, &APlayerPawn::MakeFormation2);
+	PlayerEnhancedInputComponent->BindAction(InputConfig->MakeFormation3, ETriggerEvent::Triggered, this, &APlayerPawn::MakeFormation3);
+	PlayerEnhancedInputComponent->BindAction(InputConfig->MakeFormation4, ETriggerEvent::Triggered, this, &APlayerPawn::MakeFormation4);
 }
 
