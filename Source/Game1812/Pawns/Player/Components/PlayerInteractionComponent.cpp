@@ -96,7 +96,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	{
 		if (PlayerPawn->GetPlayerInput()->MouseLeftHold && !PlayerPawn->GetMovementComponent()->IsInGlobalMap()) 
 		{
-			FHitResult hit = SingleCursorTrace();
+			FHitResult hit = SingleCursorTrace(true);
 			AActor* draggableActor = Cast<AActor>(CurrentDraggable);
 
 			if (!draggableActor)
@@ -276,7 +276,7 @@ void UPlayerInteractionComponent::SetCurrentSelected(IInteractable* NewSelected)
 	CurrentSelected = NewSelected;
 }
 
-FHitResult UPlayerInteractionComponent::SingleCursorTrace()
+FHitResult UPlayerInteractionComponent::SingleCursorTrace(bool IgnoreGroup)
 {
 	FVector cursorLocation, cursorDirection;
 	PlayerPawn->GetLocalViewingPlayerController()->DeprojectMousePositionToWorld(cursorLocation, cursorDirection);
@@ -290,6 +290,9 @@ FHitResult UPlayerInteractionComponent::SingleCursorTrace()
 
 	if (draggableActor)
 		collisionParams.AddIgnoredActor(draggableActor);
+
+	if (IgnoreGroup)
+		collisionParams.AddIgnoredActors(InteractableActorsSelectedGroup);
 	
 	GetWorld()->LineTraceSingleByChannel(hit, cursorLocation, cursorLocation + cursorDirection * InteractionDistance, ECC_Visibility, collisionParams);
 

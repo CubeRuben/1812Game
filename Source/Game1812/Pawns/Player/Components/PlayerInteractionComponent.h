@@ -53,7 +53,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	FHitResult SingleCursorTrace();
+	FHitResult SingleCursorTrace(bool IgnoreGroup = false);
 	void FindInteractableAtCursor(AActor*& Actor, class IInteractable*& Interactable);
 
 	FVector GetSurfaceUnderActor(AActor* Actor);
