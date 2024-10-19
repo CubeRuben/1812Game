@@ -37,7 +37,7 @@ public:
 	// IInteractableSortable Interface
 	//
 	
-	int GetPriority() const override { return 0; };
+	int GetPriority() const override;
 
 	//
 };

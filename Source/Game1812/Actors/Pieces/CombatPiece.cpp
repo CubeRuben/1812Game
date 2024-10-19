@@ -48,6 +48,11 @@ void ACombatPiece::AssignOrder(UUnitOrder* UnitOrder)
 		AHeadQuarters::GetInstance()->AddOrderToAssign(combatUnitOrder, Unit.Get());
 }
 
+int ACombatPiece::GetPriority() const
+{
+	return CombatUnitData ? CombatUnitData->GetFormationSortPriority() : 0;
+}
+
 UCombatUnitDataAsset* ACombatPiece::GetCombatUnitData() const
 {
 	return CombatUnitData;

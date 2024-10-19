@@ -33,10 +33,7 @@ public:
 	bool RotateLeft;
 	bool RotateRight;
 
-	bool MakeFormation1;
-	bool MakeFormation2;
-	bool MakeFormation3;
-	bool MakeFormation4;
+	TArray<bool> MakeFormation;
 };
 
 UCLASS()

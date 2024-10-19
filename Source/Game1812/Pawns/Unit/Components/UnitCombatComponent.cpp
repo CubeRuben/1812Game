@@ -41,9 +41,6 @@ void UUnitCombatComponent::BeginPlay()
 
 void UUnitCombatComponent::Init(FCombatUnitStats* UnitCombatStats)
 {
-	if (!UnitCombatStats)
-		return;
-
 	HealthPoints = UnitCombatStats->GetBaseHP();
 }
 

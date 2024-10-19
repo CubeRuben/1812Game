@@ -76,25 +76,5 @@ UCombatUnitDataAsset::UCombatUnitDataAsset()
 	CombatUnitStats = FCombatUnitStats();
 	PieceMesh = nullptr;
 	PieceFoundationMesh = nullptr;
+	FormationSortPriority = 0;
 }
-
-FName UCombatUnitDataAsset::GetName() const
-{
-	return UnitName;
-}
-
-FCombatUnitStats* UCombatUnitDataAsset::GetCombatUnitStats()
-{
-	return &CombatUnitStats;
-}
-
-UStaticMesh* UCombatUnitDataAsset::GetPieceMesh() const
-{
-	return PieceMesh;
-}
-
-UStaticMesh* UCombatUnitDataAsset::GetPieceFoundationMesh() const
-{
-	return PieceFoundationMesh;
-}
-

@@ -27,6 +27,8 @@ FPlayerInput::FPlayerInput()
 	MouseRightHold = false;
 	RotateLeft = false;
 	RotateRight = false;
+
+	MakeFormation = TArray<bool>({false, false, false, false});
 }
 
 APlayerPawn* APlayerPawn::Instance = nullptr;
@@ -62,10 +64,10 @@ void APlayerPawn::LookAtMap(const FInputActionValue& Value) { PlayerInput.LookAt
 void APlayerPawn::LeftShift(const FInputActionValue& Value) { PlayerInput.LeftShift = Value.Get<bool>(); };
 void APlayerPawn::RotateLeft(const FInputActionValue& Value) { PlayerInput.RotateLeft = Value.Get<bool>(); };
 void APlayerPawn::RotateRight(const FInputActionValue& Value) { PlayerInput.RotateRight = Value.Get<bool>(); };
-void APlayerPawn::MakeFormation1(const FInputActionValue& Value) { PlayerInput.MakeFormation1 = Value.Get<bool>(); };
-void APlayerPawn::MakeFormation2(const FInputActionValue& Value) { PlayerInput.MakeFormation2 = Value.Get<bool>(); };
-void APlayerPawn::MakeFormation3(const FInputActionValue& Value) { PlayerInput.MakeFormation3 = Value.Get<bool>(); };
-void APlayerPawn::MakeFormation4(const FInputActionValue& Value) { PlayerInput.MakeFormation4 = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation1(const FInputActionValue& Value) { PlayerInput.MakeFormation[0] = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation2(const FInputActionValue& Value) { PlayerInput.MakeFormation[1] = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation3(const FInputActionValue& Value) { PlayerInput.MakeFormation[2] = Value.Get<bool>(); };
+void APlayerPawn::MakeFormation4(const FInputActionValue& Value) { PlayerInput.MakeFormation[3] = Value.Get<bool>(); };
 
 void APlayerPawn::BeginPlay()
 {

@@ -102,11 +102,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FTransform UnitMeshTransform;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int FormationSortPriority;
+
 public:
 
-	FName GetName() const;
-	FCombatUnitStats* GetCombatUnitStats();
-	UStaticMesh* GetPieceMesh() const;
-	UStaticMesh* GetPieceFoundationMesh() const;
-	
+	const FName& GetName() const { return UnitName; };
+	FCombatUnitStats* GetCombatUnitStats() { return &CombatUnitStats; };
+	UStaticMesh* GetPieceMesh() const { return PieceMesh; };
+	UStaticMesh* GetPieceFoundationMesh() const { return PieceFoundationMesh; };
+	int GetFormationSortPriority() const { return FormationSortPriority; };
 };

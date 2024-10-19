@@ -62,6 +62,9 @@ protected:
 	FHitResult SingleCursorTrace(bool IgnoreGroup = false);
 	void FindInteractableAtCursor(AActor*& Actor, class IInteractable*& Interactable);
 
+	void HandleFormationInput();
+	bool GetFormationOffsetArray(int FormationType, int Amount, TArray<FVector>& OutArray);
+
 	FVector GetSurfaceUnderActor(AActor* Actor);
 
 public:	

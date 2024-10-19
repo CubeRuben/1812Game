@@ -3,6 +3,7 @@
 #include "../PlayerPawn.h"
 #include "PlayerMovementComponent.h"
 #include "Interactable.h"
+#include "InteractableSortable.h"
 
 
 UPlayerInteractionComponent::UPlayerInteractionComponent()
@@ -98,7 +99,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 	{
 		if (playerInput.MouseLeftHold && !PlayerPawn->GetMovementComponent()->IsInGlobalMap()) 
 		{
-			
+			HandleFormationInput();
 
 			FHitResult hit = SingleCursorTrace(true);
 			AActor* draggableActor = Cast<AActor>(CurrentDraggable);
@@ -190,6 +191,148 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 	if (interactable != CurrentHovered)
 		SetCurrentHovered(interactable);
+}
+
+void UPlayerInteractionComponent::HandleFormationInput()
+{
+	FPlayerInput& playerInput = PlayerPawn->GetPlayerInput();
+	
+	if (!playerInput.MakeFormation.Contains(true))
+		return;
+
+	if (InteractableActorsSelectedGroup.Num() == 0) 
+	{
+		for (auto& input : playerInput.MakeFormation)
+		{
+			input = false;
+		}
+		return;
+	}
+
+	TArray<TScriptInterface<IInteractableSortable>> interactables(InteractableActorsSelectedGroup);
+
+	for (auto& interactable : interactables) 
+	{
+		if (!interactable.GetInterface()) 
+		{
+			for (auto& input : playerInput.MakeFormation)
+			{
+				input = false;
+			}
+			return;
+		}
+	}
+
+	interactables.Sort([](const TScriptInterface<IInteractableSortable>& el1, const TScriptInterface<IInteractableSortable>& el2) 
+	{ 
+		return el1.GetInterface()->GetPriority() > el2.GetInterface()->GetPriority(); 
+	});
+
+	for (int i = 0; i < playerInput.MakeFormation.Num(); i++) 
+	{
+		if (!playerInput.MakeFormation[i])
+			continue;
+
+		playerInput.MakeFormation[i] = false;
+
+		TArray<FVector> offsets;
+		if (!GetFormationOffsetArray(i, interactables.Num(), offsets))
+			continue;
+
+		AActor* mainActor = Cast<AActor>(CurrentDraggable);
+		const FVector mainLocation = mainActor->GetActorLocation();
+		const FRotator mainRotation = mainActor->GetActorRotation();
+
+		for (int a = 0; a < interactables.Num(); a++)
+		{
+			AActor* actor = Cast<AActor>(interactables[a].GetObject());
+
+			if (!actor)
+				continue;
+			
+			const FVector newLocation = mainLocation + offsets[a].RotateAngleAxis(mainRotation.Yaw, FVector::UpVector);
+			actor->SetActorLocation(newLocation);
+			actor->SetActorRotation(mainRotation);
+		}
+
+		SetCurrentDraggable(Cast<IInteractable>(interactables[0].GetObject()));
+
+	}
+}
+
+bool UPlayerInteractionComponent::GetFormationOffsetArray(int FormationType, int Amount, TArray<FVector>& OutArray)
+{
+	const float OFFSET = 45.0f;
+
+	OutArray.SetNum(Amount);
+
+	if (Amount <= 0)
+		return false;
+
+	OutArray[0] = FVector::ZeroVector;
+
+	switch (FormationType)
+	{
+	case 0:
+		{
+			for (int i = 0; i < Amount - 1; i++)
+			{
+				const int mult = ((float)i / 2.0f + 1.0f);
+
+				if (i % 2 == 0)
+				{
+					OutArray[i + 1] = FVector(0.0f, OFFSET * mult, 0.0f);
+				}
+				else
+				{
+					OutArray[i + 1] = FVector(0.0f, -OFFSET * mult, 0.0f);
+				}
+			}
+		}
+		return true;
+	case 1:
+		{
+			const int firstRow = FMath::RoundToInt((float)Amount / 2.0f) - (Amount > 4);
+
+			for (int i = 0; i < firstRow; i++) 
+			{
+				const int mult = ((float)i / 2.0f + 1.0f);
+
+				if (i % 2 == 0) 
+				{
+					OutArray[i + 1] = FVector(0.0f, OFFSET * mult, 0.0f);
+				}
+				else 
+				{
+					OutArray[i + 1] = FVector(0.0f, -OFFSET * mult, 0.0f);
+				}
+			}
+
+			const float secondRowOffset = ((Amount == 4) ? 0.0f : ((((2 * (firstRow + 1) - Amount) % 2) == 0) ? 0.0f : (((((Amount - 5) / 2) % 2) ? -1 : 1) * (OFFSET / 2.0f))));
+
+			if (Amount > 3)
+			{
+				OutArray[firstRow + 1] = FVector(-OFFSET, 0.0f - secondRowOffset, 0.0f);
+			}
+
+			for (int i = 0; i < Amount - firstRow - 2; i++)
+			{
+				const int mult = ((float)i / 2.0f + 1.0f);
+
+				if (i % 2 == 0)
+				{
+					OutArray[i + firstRow + 2] = FVector(-OFFSET, OFFSET * mult - secondRowOffset, 0.0f);
+				}
+				else
+				{
+					OutArray[i + firstRow + 2] = FVector(-OFFSET, -OFFSET * mult - secondRowOffset, 0.0f);
+				}
+			}
+		}
+		return true;
+	default:
+		return false;
+	}
 }
 
 void UPlayerInteractionComponent::ClearSelectedGroup()
