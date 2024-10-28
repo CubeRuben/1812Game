@@ -1,6 +1,7 @@
 #include "CombatUnit.h"
 
 #include "../Orders/UnitOrder.h"
+#include "../Orders/FormationMovement.h"
 
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitCombatComponent.h"
@@ -109,8 +110,17 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 	if (!CurrentOrder)
 		return;
 
-	MovementComponent->MoveTo(CurrentOrder->Location, true);
+	MovementComponent->ForceMoveTo(CurrentOrder->Location, EUnitMovementType::Move);
 	MovementComponent->RotateTo(CurrentOrder->YawRotation);
+
+	if (CurrentOrder->bMoveWithSameSpeed) 
+	{
+		MovementComponent->SetFormationMovement(CurrentOrder->FormationMovement.Get());
+	}
+	else 
+	{
+		MovementComponent->SetFormationMovement(nullptr);
+	}
 }
 
 void ACombatUnit::SetCombatUnitData(UCombatUnitDataAsset* NewCombatUnitData)

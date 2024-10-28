@@ -3,6 +3,7 @@
 #include <NavigationPath.h>
 #include <NavigationSystem.h>
 
+#include "../Orders/FormationMovement.h"
 #include "../BaseUnit.h"
 
 UUnitMovementComponent::UUnitMovementComponent()
@@ -85,7 +86,16 @@ void UUnitMovementComponent::MovePawn(float DeltaTime, const FVector& Location)
 {
 	const FVector delta = (Location - UnitPawn->GetActorLocation()) * FVector(1, 1, 0);
 	const FVector direction = delta.GetSafeNormal();
-	const FVector movementDelta = direction * UnitPawn->GetMovementSpeed() * DeltaTime;
+
+	float movementSpeed = UnitPawn->GetMovementSpeed();
+
+	if (!FormationMovement.IsNull()) 
+	{
+		if (movementSpeed > FormationMovement->GetMovementSpeed())
+			movementSpeed = FormationMovement->GetMovementSpeed();
+	}
+
+	const FVector movementDelta = direction * movementSpeed * DeltaTime;
 
 	if (movementDelta.SizeSquared() > delta.SizeSquared())
 	{
@@ -102,16 +112,38 @@ void UUnitMovementComponent::MovePawn(float DeltaTime, const FVector& Location)
 
 void UUnitMovementComponent::RotatePawn(float DeltaTime, float RotationYaw)
 {
-	const float rotationDelta = FMath::Sign(RotationYaw) * DeltaTime * UnitPawn->GetRotationSpeed();
+	float rotationSpeed = UnitPawn->GetRotationSpeed();
+
+	if (!FormationMovement.IsNull())
+	{
+		if (rotationSpeed > FormationMovement->GetRotationSpeed())
+			rotationSpeed = FormationMovement->GetRotationSpeed();
+	}
+
+	const float rotationDelta = FMath::Sign(RotationYaw) * DeltaTime * rotationSpeed;
 	const float limitedRotation = FMath::Clamp(rotationDelta, -FMath::Abs(RotationYaw), FMath::Abs(RotationYaw));
 
 	UnitPawn->AddActorLocalRotation(FRotator(0, limitedRotation, 0));
 }
 
-void UUnitMovementComponent::MoveTo(const FVector& MoveToLocation, bool bForceMove)
+void UUnitMovementComponent::MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType)
 {
-	if (LastTimeOfMoveAssign + 1.f > GetWorld()->GetTimeSeconds() && !bForceMove)
+	if (LastTimeOfMoveAssign + 1.f > GetWorld()->GetTimeSeconds())
 		return;
+
+	ForceMoveTo(MoveToLocation, MovementType);
+}
+
+void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType)
+{
+	if (MovementType == EUnitMovementType::Attack) 
+	{
+		if (!FormationMovement.IsNull())
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "UUnitMovementComponent::ForceMoveTo() - Clear");
+
+		FormationMovement = nullptr;
+	}
+		
 
 	bMustRotateToTargetRotation = false;
 	FVector moveToLocation = ProjectPointToMap(MoveToLocation);
@@ -217,6 +249,11 @@ FVector UUnitMovementComponent::GetLastPathPoint()
 FVector UUnitMovementComponent::GetTargetLocation() const
 {
 	return TargetLocation;
+}
+
+void UUnitMovementComponent::SetFormationMovement(UFormationMovement* NewFormationMovement)
+{
+	FormationMovement = NewFormationMovement;
 }
 
 bool UUnitMovementComponent::IsMoving()

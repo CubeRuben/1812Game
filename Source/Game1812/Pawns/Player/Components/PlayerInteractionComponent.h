@@ -25,22 +25,22 @@ protected:
 
 	class APlayerPawn* PlayerPawn;
 
-	UPROPERTY(EditAnywhere, Category = "Interaction")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
 	float InteractionDistance;
 
-	UPROPERTY(EditAnywhere, Category = "Dragging")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragging")
 	float DraggingHeight;
 
-	UPROPERTY(EditAnywhere, Category = "Dragging")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragging")
 	float AltDraggingHeight;
 
-	UPROPERTY(EditAnywhere, Category = "Dragging")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragging")
 	float RotateSpeed;
 
-	UPROPERTY(EditAnywhere, Category = "Selection")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Selection")
 	bool bIsMultipleSelection;
 
-	UPROPERTY(VisibleAnywhere, Category = "Selection")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Selection")
 	TArray<AActor*> InteractableActorsSelectedGroup;
 
 	class IInteractable* CurrentDraggable;

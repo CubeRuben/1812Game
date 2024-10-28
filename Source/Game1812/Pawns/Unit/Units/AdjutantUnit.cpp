@@ -62,7 +62,7 @@ void AAdjutantUnit::OnMovementComplete()
 			return;
 		}
 
-		MovementComponent->MoveTo(headQuarters->GetActorLocation(), true);
+		MovementComponent->ForceMoveTo(headQuarters->GetActorLocation(), EUnitMovementType::Move);
 		return;
 	}
 
@@ -92,11 +92,11 @@ void AAdjutantUnit::MoveToNextTarget()
 		if (!headQuarters)
 			return;
 
-		MovementComponent->MoveTo(headQuarters->GetActorLocation(), true);
+		MovementComponent->ForceMoveTo(headQuarters->GetActorLocation(), EUnitMovementType::Move);
 		return;
 	}
 
-	MovementComponent->MoveTo(FindClosestTarget().Unit->GetActorLocation(), true);
+	MovementComponent->ForceMoveTo(FindClosestTarget().Unit->GetActorLocation(), EUnitMovementType::Move);
 }
 
 FAssignedCombatUnitOrder AAdjutantUnit::FindClosestTarget()

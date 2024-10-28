@@ -93,7 +93,7 @@ void UUnitCombatComponent::UpdateTempDefeat()
 		return;
 
 	const FVector moveToLocation = CombatUnitPawn->GetActorLocation() + retreatDirection * 200.f + FVector(0, 0, 100.f);
-	movementComponent->MoveTo(moveToLocation);
+	movementComponent->MoveTo(moveToLocation, EUnitMovementType::Move);
 }
 
 void UUnitCombatComponent::UpdateOrderBehaviour()
@@ -112,7 +112,7 @@ void UUnitCombatComponent::UpdateOrderBehaviour()
 
 			if (!enemy)
 			{
-				CombatUnitPawn->GetMovementComponent()->MoveTo(order->Location, true);
+				CombatUnitPawn->GetMovementComponent()->ForceMoveTo(order->Location, EUnitMovementType::Move);
 				CombatUnitPawn->GetMovementComponent()->RotateTo(order->YawRotation);
 				return;
 			}
@@ -138,7 +138,7 @@ void UUnitCombatComponent::UpdateTargetAttack()
 	//Walk to the enemy, if too far
 	if (!IsTargetInAttackRange(TargetedEnemy.Get()))
 	{
-		movementComponent->MoveTo(TargetedEnemy->GetLocation());
+		movementComponent->MoveTo(TargetedEnemy->GetLocation(), EUnitMovementType::Attack);
 		return;
 	}
 

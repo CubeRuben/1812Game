@@ -10,7 +10,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementStartDelegate);
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementEndDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveDelegate, float, Distance);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveDelegate, float, Distance);\
+
+UENUM()
+enum class EUnitMovementType : uint8 
+{
+	Move,
+	Attack
+};
 
 UCLASS(Blueprintable, BlueprintType)
 class GAME1812_API UUnitMovementComponent : public UActorComponent
@@ -36,6 +43,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Movement")
 	bool bIsMoving;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Movement")
+	TObjectPtr<class UFormationMovement> FormationMovement;
 
 	UPROPERTY()
 	class UNavigationPath* Path;
@@ -76,9 +86,12 @@ public:
 
 	FVector GetTargetLocation() const;
 
+	void SetFormationMovement(class UFormationMovement* NewFormationMovement);
+
 	bool IsMoving();
 
-	void MoveTo(const FVector& MoveToLocation, bool bForceMove = false);
+	void MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);
+	void ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);
 	void RotateTo(float FinishRotation);
 	void StopMoving();
 

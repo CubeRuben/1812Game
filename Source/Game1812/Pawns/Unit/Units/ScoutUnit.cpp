@@ -44,7 +44,7 @@ void AScoutUnit::OnMovementComplete()
 
 	FVector location;
 	ExplorationLocations.Dequeue(location);
-	MovementComponent->MoveTo(location, true);
+	MovementComponent->ForceMoveTo(location, EUnitMovementType::Move);
 }
 
 void AScoutUnit::Tick(float DeltaTime)
@@ -115,7 +115,7 @@ void AScoutUnit::AssignOrder(UUnitOrder* NewOrder)
 
 	FVector firstLocation;
 	ExplorationLocations.Dequeue(firstLocation);
-	MovementComponent->MoveTo(firstLocation, true);
+	MovementComponent->ForceMoveTo(firstLocation, EUnitMovementType::Move);
 }
 
 float AScoutUnit::ApplyDamage(IDamageable* Attacker, float Amount)

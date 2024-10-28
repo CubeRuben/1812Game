@@ -40,6 +40,12 @@ public:
 	bool bConcentratedFire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bMoveWithSameSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UFormationMovement> FormationMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
