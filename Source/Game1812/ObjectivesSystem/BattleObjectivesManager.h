@@ -49,15 +49,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float EnemyTakenCasualties;
 
+	UPROPERTY()
+	class ACossacksGameState* GameState;
+
 	virtual void BeginPlay() override;
-
-	void OnActorSpawn(AActor* Actor);
-
-	UFUNCTION()
-	void ScanForData();
-
-	UFUNCTION()
-	void OnUnitDamageTaken(class ACombatUnit* Unit, float TakenDamage);
 
 public:	
 
@@ -70,11 +65,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBattleObjectivesFinishDelegate OnBattleLost;
 
+	void Init(class ACossacksGameState* NewGameState);
+
 	virtual void Tick(float DeltaTime) override;
 
-	float GetStartHP() const;
-	float GetTakenCasualties() const;
-	float GetEnemyStartHP() const;
-	float GetEnemyTakenCasualties() const; 
+	float GetStartHP() const { return StartHP; };
+	float GetTakenCasualties() const { return TakenCasualties; };
+	float GetEnemyStartHP() const { return EnemyStartHP; };
+	float GetEnemyTakenCasualties() const { return EnemyStartHP; };
 
 };

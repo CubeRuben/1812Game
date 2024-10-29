@@ -410,11 +410,6 @@ float UUnitCombatComponent::GetDetectionRange() const
 	return CombatUnitPawn->GetCombatUnitStats()->GetEnemyDetectionRange();
 }
 
-float UUnitCombatComponent::GetMorale() const
-{
-	return Morale;
-}
-
 float UUnitCombatComponent::GetHPRatio() const
 {
 	return HealthPoints / CombatUnitPawn->GetCombatUnitStats()->GetBaseHP();

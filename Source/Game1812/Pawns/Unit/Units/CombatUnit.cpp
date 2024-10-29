@@ -13,8 +13,6 @@
 
 #include "../../../CossacksGameInstance.h"
 
-TMap<ETeam, TArray<ACombatUnit*>> ACombatUnit::CombatUnits = TMap<ETeam, TArray<ACombatUnit*>>();
-
 ACombatUnit::ACombatUnit()
 {
 	CombatComponent = CreateDefaultSubobject<UUnitCombatComponent>(TEXT("Combat Component"));
@@ -30,16 +28,8 @@ void ACombatUnit::BeginPlay()
 		return;
 
 	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
-
-	CombatUnits.FindOrAdd(Team).Add(this);
 }
 
-void ACombatUnit::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	CombatUnits.FindOrAdd(Team).Remove(this);
-}
 
 void ACombatUnit::OnConstruction(const FTransform& Transform)
 {

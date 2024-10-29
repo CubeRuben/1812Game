@@ -95,7 +95,8 @@ public:
 	float GetAttackRange() const;
 	float GetDetectionRange() const;
 
-	float GetMorale() const;
+	float GetHP() const { return HealthPoints; };
+	float GetMorale() const { return Morale; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHPRatio() const;

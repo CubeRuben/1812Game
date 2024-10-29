@@ -16,8 +16,6 @@ public:
 
 protected:
 
-	static TMap<ETeam, TArray<ACombatUnit*>> CombatUnits;
-
 	//Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UUnitCombatComponent* CombatComponent;
@@ -36,13 +34,10 @@ protected:
 	class UCombatUnitDataAsset* CombatUnitData;
 
 	virtual void BeginPlay() override;
-	virtual void BeginDestroy() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 public:
-
-	static const TMap<ETeam, TArray<ACombatUnit*>>& GetCombatUnits() { return CombatUnits; };
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SpawnDefaultController() override;
