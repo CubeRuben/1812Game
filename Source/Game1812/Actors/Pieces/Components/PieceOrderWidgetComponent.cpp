@@ -73,4 +73,6 @@ void UPieceOrderWidgetComponent::AssignOrder(UUnitOrder* UnitOrder)
 		if (piece)
 			piece->AssignOrder(DuplicateObject(UnitOrder, this));
 	}
+
+	playerPawn->GetInteractionComponent()->SetCurrentSelected(nullptr);
 }

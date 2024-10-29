@@ -53,9 +53,7 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FMultipleSelectionDelegate OnMultipleSelectionEnd;
 
-	void SetCurrentDraggable(class IInteractable* NewDraggable);
-	void SetCurrentHovered(class IInteractable* NewHovered);
-	void SetCurrentSelected(class IInteractable* NewSelected);
+	
 
 	virtual void BeginPlay() override;
 
@@ -68,6 +66,10 @@ protected:
 	FVector GetSurfaceUnderActor(AActor* Actor);
 
 public:	
+
+	void SetCurrentDraggable(class IInteractable* NewDraggable);
+	void SetCurrentHovered(class IInteractable* NewHovered);
+	void SetCurrentSelected(class IInteractable* NewSelected);
 
 	void ClearSelectedGroup();
 
