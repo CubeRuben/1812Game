@@ -103,6 +103,9 @@ void UUnitCombatComponent::UpdateOrderBehaviour()
 	if (!order)
 		return;
 
+	if (order->ReorganizationType != EUnitReorganization::None)
+		return;
+
 	if (order->UnitEnemyReaction == EUnitEnemyReaction::Attack)
 	{
 		//Try to find enemy

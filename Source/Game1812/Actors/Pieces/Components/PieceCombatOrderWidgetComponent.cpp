@@ -45,9 +45,11 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 
 	GetSelectedCombatUnits(combatUnits);
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::FromInt(combatUnits.Num()));
+
 	for (int a = 0; a < combatUnits.Num(); a++) 
 	{
-		for (int b = combatUnits.Num(); b > a; b--)
+		for (int b = combatUnits.Num() - 1; b > a; b--)
 		{
 			ACombatUnit* unit1 = combatUnits[a];
 			ACombatUnit* unit2 = combatUnits[b];
@@ -67,8 +69,8 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 
 			unit1->GetOwnerPiece()->AssignOrder(newCombatUnitOrder);
 
-			combatUnits.RemoveAt(a);
 			combatUnits.RemoveAt(b);
+			combatUnits.RemoveAt(a);
 			a--;
 			break;
 		}
@@ -80,7 +82,7 @@ void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* Comba
 
 }
 
-void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit*> OutArray)
+void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit*>& OutArray)
 {
 	APlayerPawn* playerPawn = APlayerPawn::GetInstance();
 
@@ -98,7 +100,7 @@ void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit
 
 		ACombatUnit* combatUnit = Cast<ACombatUnit>(piece->GetUnit());
 
-		if (combatUnit)
+		if (!combatUnit)
 			continue;
 
 		OutArray.AddUnique(combatUnit);
@@ -108,7 +110,7 @@ void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit
 
 	OutArray.AddUnique(ownerCombatUnit);
 
-	OutArray.Sort([](const ACombatUnit& el1, const ACombatUnit& el2) { return el1.GetCombatComponent()->GetHP() > el2.GetCombatComponent()->GetHP(); });
+	OutArray.Sort([](const ACombatUnit& el1, const ACombatUnit& el2) { return el1.GetCombatComponent()->GetHP() < el2.GetCombatComponent()->GetHP(); });
 }
 
 void UPieceCombatOrderWidgetComponent::AssignOrder(UUnitOrder* UnitOrder)

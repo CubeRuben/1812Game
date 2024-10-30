@@ -19,7 +19,7 @@ protected:
 	void CombineOrder(class UCombatUnitOrder* CombatUnitOrder);
 	void RedistributeOrder(class UCombatUnitOrder* CombatUnitOrder);
 
-	void GetSelectedCombatUnits(TArray<class ACombatUnit*> OutArray);
+	void GetSelectedCombatUnits(TArray<class ACombatUnit*>& OutArray);
 
 public:
 
