@@ -28,10 +28,10 @@ protected:
 
 	class ACombatUnit* CombatUnitPawn;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Unit Combat")
 	float HealthPoints;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Unit Combat")
 	float Morale;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Combat")
@@ -97,6 +97,8 @@ public:
 
 	float GetHP() const { return HealthPoints; };
 	float GetMorale() const { return Morale; };
+
+	void Heal(float Amount);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHPRatio() const;

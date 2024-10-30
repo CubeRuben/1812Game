@@ -13,6 +13,8 @@ UCombatUnitOrder::UCombatUnitOrder()
 	bForcedMarch = false;
 	bConcentratedFire = false;
 
+	ReorganizationType = EUnitReorganization::None;
+
 	Location = FVector::ZeroVector;
 	YawRotation = 0.f;
 }

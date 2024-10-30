@@ -23,10 +23,9 @@ protected:
 	void OnEnable();
 	void OnDisable();
 
-	UFUNCTION(BlueprintCallable)
-	void AssignOrder(class UUnitOrder* UnitOrder);
-
 public:
 
+	UFUNCTION(BlueprintCallable)
+	virtual void AssignOrder(class UUnitOrder* UnitOrder);
 	
 };

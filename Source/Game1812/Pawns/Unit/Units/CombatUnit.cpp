@@ -76,21 +76,25 @@ void ACombatUnit::SpawnDefaultController()
 	}
 }
 
-UUnitCombatComponent* ACombatUnit::GetCombatComponent()
-{
-	return CombatComponent;
-}
-
-UUnitReportComponent* ACombatUnit::GetReportComponent()
-{
-	return ReportComponent;
-}
-
 void ACombatUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurrentOrder->ReorganizationType == EUnitReorganization::Combine)
+	{
+		if (CurrentOrder->UnitToCombineWith.IsNull())
+			return;
 
+		if (!IsInReachToReorganize(CurrentOrder->UnitToCombineWith)) 
+		{
+			MovementComponent->MoveTo(CurrentOrder->UnitToCombineWith->GetActorLocation(), EUnitMovementType::Move);
+			return;
+		}
+
+		CurrentOrder->UnitToCombineWith->GetCombatComponent()->Heal(GetCombatComponent()->GetHP());
+		Destroy();
+		return;
+	}
 }
 
 void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
@@ -100,16 +104,31 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 	if (!CurrentOrder)
 		return;
 
-	MovementComponent->ForceMoveTo(CurrentOrder->Location, EUnitMovementType::Move);
-	MovementComponent->RotateTo(CurrentOrder->YawRotation);
+	if (CurrentOrder->ReorganizationType == EUnitReorganization::None) 
+	{
+		MovementComponent->ForceMoveTo(CurrentOrder->Location, EUnitMovementType::Move);
+		MovementComponent->RotateTo(CurrentOrder->YawRotation);
 
-	if (CurrentOrder->bMoveWithSameSpeed) 
-	{
-		MovementComponent->SetFormationMovement(CurrentOrder->FormationMovement.Get());
+		if (CurrentOrder->bMoveWithSameSpeed) 
+		{
+			MovementComponent->SetFormationMovement(CurrentOrder->FormationMovement.Get());
+		}
+		else 
+		{
+			MovementComponent->SetFormationMovement(nullptr);
+		}
+
+		return;
 	}
-	else 
+
+	if (CurrentOrder->ReorganizationType == EUnitReorganization::Combine)
 	{
-		MovementComponent->SetFormationMovement(nullptr);
+		if (CurrentOrder->UnitToCombineWith.IsNull())
+			return;
+
+		MovementComponent->ForceMoveTo(CurrentOrder->UnitToCombineWith->GetActorLocation(), EUnitMovementType::Move);
+
+		return;
 	}
 }
 
@@ -123,6 +142,14 @@ void ACombatUnit::SetCombatUnitData(UCombatUnitDataAsset* NewCombatUnitData)
 	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
 
 	OnCombatUnitDataChange();
+}
+
+bool ACombatUnit::IsInReachToReorganize(ACombatUnit* OtherUnit)
+{
+	if (!OtherUnit)
+		return false;
+
+	return FVector::DistSquared2D(GetActorLocation(), OtherUnit->GetActorLocation()) < FMath::Pow(10.0f, 2);
 }
 
 FCombatUnitStats* ACombatUnit::GetCombatUnitStats() const

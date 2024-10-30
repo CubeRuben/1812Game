@@ -108,6 +108,7 @@ protected:
 public:
 
 	const FName& GetName() const { return UnitName; };
+	const FCombatUnitStats* GetCombatUnitStats() const { return &CombatUnitStats; };
 	FCombatUnitStats* GetCombatUnitStats() { return &CombatUnitStats; };
 	UStaticMesh* GetPieceMesh() const { return PieceMesh; };
 	UStaticMesh* GetPieceFoundationMesh() const { return PieceFoundationMesh; };

@@ -14,6 +14,9 @@ public:
 	AScoutPiece();
 
 protected:
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPieceScoutOrderWidgetComponent* ScoutOrderWidgetComponent;
 
 	FPieceEventDelegate OnOrderPointAdd;
 

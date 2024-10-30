@@ -410,6 +410,11 @@ float UUnitCombatComponent::GetDetectionRange() const
 	return CombatUnitPawn->GetCombatUnitStats()->GetEnemyDetectionRange();
 }
 
+void UUnitCombatComponent::Heal(float Amount)
+{
+	HealthPoints = FMath::Clamp(HealthPoints + Amount, 0.0f, CombatUnitPawn->GetCombatUnitStats()->GetBaseHP());
+}
+
 float UUnitCombatComponent::GetHPRatio() const
 {
 	return HealthPoints / CombatUnitPawn->GetCombatUnitStats()->GetBaseHP();

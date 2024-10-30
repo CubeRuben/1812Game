@@ -11,6 +11,14 @@ enum class EUnitEnemyReaction : uint8 {
 	Defend = 1	UMETA(DisplayName = "Defend"),
 };
 
+UENUM(BlueprintType)
+enum class EUnitReorganization : uint8
+{
+	None = 0,
+	Combine,
+	RedistributeEvenly
+};
+
 UCLASS(BlueprintType, Abstract)
 class GAME1812_API UUnitOrder : public UObject
 {
@@ -30,6 +38,8 @@ public:
 
 	UCombatUnitOrder();
 
+	// Combat
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EUnitEnemyReaction UnitEnemyReaction;
 
@@ -39,11 +49,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bConcentratedFire;
 
+	// Better movement
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bMoveWithSameSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UFormationMovement> FormationMovement;
+
+	// Reorganization
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EUnitReorganization ReorganizationType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class ACombatUnit> UnitToCombineWith;
+
+	// Movement
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;

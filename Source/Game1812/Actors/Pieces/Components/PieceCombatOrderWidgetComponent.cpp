@@ -1,0 +1,141 @@
+#include "PieceCombatOrderWidgetComponent.h"
+
+#include "../Piece.h"
+#include "../../../DataAssets/CombatUnitDataAsset.h"
+#include "../../../Pawns/Unit/Orders/UnitOrder.h"
+#include "../../../Pawns/Unit/Units/CombatUnit.h"
+#include "../../../Pawns/Unit/Components/UnitCombatComponent.h"
+#include "../../../Pawns/Player/PlayerPawn.h"
+#include "../../../Pawns/Player/Components/PlayerInteractionComponent.h"
+
+UPieceCombatOrderWidgetComponent::UPieceCombatOrderWidgetComponent()
+{
+
+}
+
+void UPieceCombatOrderWidgetComponent::DefaultOrder(UCombatUnitOrder* CombatUnitOrder)
+{
+	OwnerPiece->AssignOrder(CombatUnitOrder);
+
+	APlayerPawn* playerPawn = APlayerPawn::GetInstance();
+
+	if (!playerPawn)
+		return;
+
+	const TArray<AActor*> group = playerPawn->GetInteractionComponent()->GetSelectedGroup();
+
+	if (!group.Contains(OwnerPiece))
+		return;
+
+	for (AActor* actor : group)
+	{
+		if (actor == OwnerPiece)
+			continue;
+
+		APiece* piece = Cast<APiece>(actor);
+
+		if (piece)
+			piece->AssignOrder(DuplicateObject(CombatUnitOrder, this));
+	}
+}
+
+void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnitOrder)
+{
+	TArray<ACombatUnit*> combatUnits;
+
+	GetSelectedCombatUnits(combatUnits);
+
+	for (int a = 0; a < combatUnits.Num(); a++) 
+	{
+		for (int b = combatUnits.Num(); b > a; b--)
+		{
+			ACombatUnit* unit1 = combatUnits[a];
+			ACombatUnit* unit2 = combatUnits[b];
+
+			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
+				continue;
+
+			if (unit1->GetCombatComponent()->GetHP() + unit2->GetCombatComponent()->GetHP() > unit2->GetCombatUnitData()->GetCombatUnitStats()->GetBaseHP())
+				continue;
+		
+			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);
+
+			newCombatUnitOrder->UnitToCombineWith = unit2;
+
+			newCombatUnitOrder->bMoveWithSameSpeed = false;
+			newCombatUnitOrder->FormationMovement = nullptr;
+
+			unit1->GetOwnerPiece()->AssignOrder(newCombatUnitOrder);
+
+			combatUnits.RemoveAt(a);
+			combatUnits.RemoveAt(b);
+			a--;
+			break;
+		}
+	}
+}
+
+void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* CombatUnitOrder)
+{
+
+}
+
+void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit*> OutArray)
+{
+	APlayerPawn* playerPawn = APlayerPawn::GetInstance();
+
+	if (!playerPawn)
+		return;
+
+	const TArray<AActor*> group = playerPawn->GetInteractionComponent()->GetSelectedGroup();
+
+	for (auto& actor : group)
+	{
+		APiece* piece = Cast<APiece>(actor);
+
+		if (!piece)
+			continue;
+
+		ACombatUnit* combatUnit = Cast<ACombatUnit>(piece->GetUnit());
+
+		if (combatUnit)
+			continue;
+
+		OutArray.AddUnique(combatUnit);
+	}
+
+	ACombatUnit* ownerCombatUnit = Cast<ACombatUnit>(OwnerPiece->GetUnit());
+
+	OutArray.AddUnique(ownerCombatUnit);
+
+	OutArray.Sort([](const ACombatUnit& el1, const ACombatUnit& el2) { return el1.GetCombatComponent()->GetHP() > el2.GetCombatComponent()->GetHP(); });
+}
+
+void UPieceCombatOrderWidgetComponent::AssignOrder(UUnitOrder* UnitOrder)
+{
+	if (!UnitOrder)
+		return;
+
+	UCombatUnitOrder* combatUnitOrder = Cast<UCombatUnitOrder>(UnitOrder);
+
+	if (!combatUnitOrder)
+		return;
+
+	switch (combatUnitOrder->ReorganizationType)
+	{
+	case EUnitReorganization::None:
+		DefaultOrder(combatUnitOrder);
+		break;
+	case EUnitReorganization::Combine:
+		CombineOrder(combatUnitOrder);
+		break;
+	case EUnitReorganization::RedistributeEvenly:
+		RedistributeOrder(combatUnitOrder);
+		break;
+	}
+
+	APlayerPawn* playerPawn = APlayerPawn::GetInstance();
+
+	if (playerPawn)
+		playerPawn->GetInteractionComponent()->SetCurrentSelected(nullptr);
+}

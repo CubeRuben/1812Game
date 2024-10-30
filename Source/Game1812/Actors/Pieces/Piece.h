@@ -52,9 +52,6 @@ protected:
 	class UPieceMapMarkerComponent* MapMarkerComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UPieceOrderWidgetComponent* OrderWidgetComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPiecePredictedPathComponent* PredictedPathComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

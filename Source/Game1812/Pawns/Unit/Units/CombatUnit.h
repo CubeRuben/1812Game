@@ -42,9 +42,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SpawnDefaultController() override;
 
-	class UUnitCombatComponent* GetCombatComponent();
+	class UUnitCombatComponent* GetCombatComponent() const { return CombatComponent; };
 
-	class UUnitReportComponent* GetReportComponent();
+	class UUnitReportComponent* GetReportComponent() const { return ReportComponent; };
 
 	class UCombatUnitOrder* GetCombatUnitOrder() const { return CurrentOrder; };
 
@@ -56,6 +56,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCombatUnitDataChange();
 
+	bool IsInReachToReorganize(ACombatUnit* OtherUnit);
 
 	//ABaseUnit class override
 	class UUnitMovementComponent* GetMovementComponent() override;

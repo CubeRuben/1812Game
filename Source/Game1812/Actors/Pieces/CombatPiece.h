@@ -19,6 +19,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UPieceCombatStatsComponent* StatsComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UPieceCombatOrderWidgetComponent* CombatOrderWidgetComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCombatUnitDataAsset* CombatUnitData;
 

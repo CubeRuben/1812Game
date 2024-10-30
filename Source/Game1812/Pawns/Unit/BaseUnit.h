@@ -43,6 +43,9 @@ public:
 
 	FOnUnitFogChangeDelegate OnUnitFogChange;
 
+	class APiece* GetOwnerPiece() const { return OwnerPiece.Get(); };
+	void SetOwnerPiece(class APiece* NewOwnerPiece);
+
 	virtual void OnUnitDeath();
 
 	virtual void AssignOrder(class UUnitOrder* NewOrder) {};
@@ -66,6 +69,6 @@ public:
 
 	const struct FUnitTerrainModifiers& GetTerrainModifiers() const;
 
-	void SetOwnerPiece(class APiece* NewOwnerPiece);
+	
 
 };

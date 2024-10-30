@@ -1,9 +1,16 @@
 #include "ScoutPiece.h"
 
 #include "Components/PiecePredictedPathComponent.h"
+#include "Components/PieceScoutOrderWidgetComponent.h"
+
+#include <Components/BoxComponent.h>
 
 AScoutPiece::AScoutPiece()
 {
+	ScoutOrderWidgetComponent = CreateDefaultSubobject<UPieceScoutOrderWidgetComponent>(TEXT("Order Widget"));
+	ScoutOrderWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+	ScoutOrderWidgetComponent->SetupAttachment(BoxCollisionComponent);
+
 	PredictedPathComponent->SetScout(true);
 }
 

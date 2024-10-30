@@ -1,6 +1,7 @@
 #include "CombatPiece.h"
 
 #include "Components/PieceCombatStatsComponent.h"
+#include "Components/PieceCombatOrderWidgetComponent.h"
 #include "../../Pawns/Unit/Units/CombatUnit.h"
 #include "../../DataAssets/CombatUnitDataAsset.h"
 #include "../../CossacksGameInstance.h"
@@ -11,6 +12,10 @@
 ACombatPiece::ACombatPiece()
 {
 	StatsComponent = CreateDefaultSubobject<UPieceCombatStatsComponent>(TEXT("Combat Stats Display"));
+
+	CombatOrderWidgetComponent = CreateDefaultSubobject<UPieceCombatOrderWidgetComponent>(TEXT("Order Widget"));
+	CombatOrderWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+	CombatOrderWidgetComponent->SetupAttachment(BoxCollisionComponent);
 }
 
 void ACombatPiece::SpawnUnit()

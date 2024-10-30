@@ -2,9 +2,6 @@
 
 #include "../Piece.h"
 #include "../../../UI/BaseOrderWidget.h"
-#include "../../../Pawns/Unit/Orders/UnitOrder.h"
-#include "../../../Pawns/Player/PlayerPawn.h"
-#include "../../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 UPieceOrderWidgetComponent::UPieceOrderWidgetComponent()
 {
@@ -48,31 +45,5 @@ void UPieceOrderWidgetComponent::OnDisable()
 
 void UPieceOrderWidgetComponent::AssignOrder(UUnitOrder* UnitOrder)
 {
-	if (!UnitOrder)
-		return;
-
-	OwnerPiece->AssignOrder(UnitOrder);
-
-	APlayerPawn* playerPawn = APlayerPawn::GetInstance();
-
-	if (!playerPawn)
-		return;
-
-	const TArray<AActor*> group = playerPawn->GetInteractionComponent()->GetSelectedGroup();
-
-	if (!group.Contains(OwnerPiece))
-		return;
-
-	for (AActor* actor : group) 
-	{
-		if (actor == OwnerPiece)
-			continue;
-
-		APiece* piece = Cast<APiece>(actor);
-
-		if (piece)
-			piece->AssignOrder(DuplicateObject(UnitOrder, this));
-	}
-
-	playerPawn->GetInteractionComponent()->SetCurrentSelected(nullptr);
+	
 }

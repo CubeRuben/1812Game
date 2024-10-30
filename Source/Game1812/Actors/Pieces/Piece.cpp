@@ -9,7 +9,6 @@
 #include "../UnitPathArrow.h"
 
 #include "Components/PieceMapMarkerComponent.h"
-#include "Components/PieceOrderWidgetComponent.h"
 #include "Components/PiecePredictedPathComponent.h"
 #include "Components/PieceOutlineComponent.h"
 
@@ -34,10 +33,6 @@ APiece::APiece()
 	
 	PieceFigureMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Piece Figure"));
 	PieceFigureMeshComponent->SetupAttachment(BoxCollisionComponent);
-
-	OrderWidgetComponent = CreateDefaultSubobject<UPieceOrderWidgetComponent>(TEXT("Order Widget"));
-	OrderWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
-	OrderWidgetComponent->SetupAttachment(BoxCollisionComponent);
 
 	MapMarkerComponent = CreateDefaultSubobject<UPieceMapMarkerComponent>(TEXT("Map Marker"));
 
