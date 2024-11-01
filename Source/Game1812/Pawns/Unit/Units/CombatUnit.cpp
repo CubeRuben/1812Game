@@ -80,20 +80,59 @@ void ACombatUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentOrder->ReorganizationType == EUnitReorganization::Combine)
+	if (CurrentOrder->ReorganizationType != EUnitReorganization::None)
 	{
-		if (CurrentOrder->UnitToCombineWith.IsNull())
-			return;
-
-		if (!IsInReachToReorganize(CurrentOrder->UnitToCombineWith)) 
+		if (CurrentOrder->UnitToReorganizeWith.IsNull()) 
 		{
-			MovementComponent->MoveTo(CurrentOrder->UnitToCombineWith->GetActorLocation(), EUnitMovementType::Move);
+			CurrentOrder->ReorganizationType = EUnitReorganization::None;
+			return;
+		}	
+
+		if (!IsInReachToReorganize(CurrentOrder->UnitToReorganizeWith))
+		{
+			MovementComponent->MoveTo(CurrentOrder->UnitToReorganizeWith->GetActorLocation(), EUnitMovementType::Move);
 			return;
 		}
 
-		CurrentOrder->UnitToCombineWith->GetCombatComponent()->Heal(GetCombatComponent()->GetHP());
-		Destroy();
-		return;
+		if (CurrentOrder->ReorganizationType == EUnitReorganization::Combine) 
+		{
+			const float morale = CombatComponent->GetMorale();
+			const float hp = CombatComponent->GetHP();
+			const float otherMorale = CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->GetMorale();
+			const float otherHp = CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->GetHP();
+
+			CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->Heal(GetCombatComponent()->GetHP());
+			CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->SetMorale((morale * hp + otherMorale * otherHp) / (hp + otherHp) * 0.8f);
+
+			Destroy();
+			return;
+		}
+
+		if (CurrentOrder->ReorganizationType == EUnitReorganization::RedistributeEvenly)
+		{
+			const float morale = CombatComponent->GetMorale();
+			const float hp = CombatComponent->GetHP();
+			const float otherMorale = CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->GetMorale();
+			const float otherHp = CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->GetHP();
+			const float combinedHp = hp + otherHp;
+			const float averageHp = combinedHp / 2.0f;
+
+			CombatComponent->SetHP(averageHp);
+			CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->SetHP(averageHp);
+
+			if (otherHp - averageHp > 0.0f) 
+			{
+				CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->SetMorale((morale * hp + otherMorale * (averageHp - otherHp)) / averageHp * 0.8f);
+			}
+			else 
+			{
+				CombatComponent->SetMorale((morale * (averageHp - hp) + otherMorale * otherHp) / averageHp * 0.8f);
+			}
+
+			CurrentOrder->ReorganizationType = EUnitReorganization::None;
+			CurrentOrder->UnitToReorganizeWith = nullptr;
+			return;
+		}
 	}
 }
 
@@ -121,13 +160,12 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 		return;
 	}
 
-	if (CurrentOrder->ReorganizationType == EUnitReorganization::Combine)
+	if ((CurrentOrder->ReorganizationType == EUnitReorganization::Combine) || (CurrentOrder->ReorganizationType == EUnitReorganization::RedistributeEvenly))
 	{
-		if (CurrentOrder->UnitToCombineWith.IsNull())
+		if (CurrentOrder->UnitToReorganizeWith.IsNull())
 			return;
 
-		MovementComponent->ForceMoveTo(CurrentOrder->UnitToCombineWith->GetActorLocation(), EUnitMovementType::Move);
-
+		MovementComponent->ForceMoveTo(CurrentOrder->UnitToReorganizeWith->GetActorLocation(), EUnitMovementType::Move);
 		return;
 	}
 }

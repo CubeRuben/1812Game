@@ -63,7 +63,7 @@ public:
 	EUnitReorganization ReorganizationType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class ACombatUnit> UnitToCombineWith;
+	TObjectPtr<class ACombatUnit> UnitToReorganizeWith;
 
 	// Movement
 

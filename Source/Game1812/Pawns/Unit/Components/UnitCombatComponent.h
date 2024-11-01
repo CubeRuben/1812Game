@@ -96,9 +96,11 @@ public:
 	float GetDetectionRange() const;
 
 	float GetHP() const { return HealthPoints; };
-	float GetMorale() const { return Morale; };
-
+	void SetHP(float NewHP) { HealthPoints = NewHP; };
 	void Heal(float Amount);
+
+	float GetMorale() const { return Morale; };
+	void SetMorale(float NewMorale) { Morale = NewMorale; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHPRatio() const;

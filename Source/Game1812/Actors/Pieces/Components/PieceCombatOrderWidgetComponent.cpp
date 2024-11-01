@@ -45,13 +45,12 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 
 	GetSelectedCombatUnits(combatUnits);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::FromInt(combatUnits.Num()));
-
 	for (int a = 0; a < combatUnits.Num(); a++) 
 	{
+		ACombatUnit* unit1 = combatUnits[a];
+
 		for (int b = combatUnits.Num() - 1; b > a; b--)
 		{
-			ACombatUnit* unit1 = combatUnits[a];
 			ACombatUnit* unit2 = combatUnits[b];
 
 			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
@@ -62,7 +61,7 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 		
 			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);
 
-			newCombatUnitOrder->UnitToCombineWith = unit2;
+			newCombatUnitOrder->UnitToReorganizeWith = unit2;
 
 			newCombatUnitOrder->bMoveWithSameSpeed = false;
 			newCombatUnitOrder->FormationMovement = nullptr;
@@ -79,7 +78,63 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 
 void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* CombatUnitOrder)
 {
+	TArray<ACombatUnit*> combatUnits;
 
+	GetSelectedCombatUnits(combatUnits);
+
+	struct FHealthAndCounter 
+	{
+		float Health;
+		int Counter;
+
+		float GetAverageHealth() 
+		{
+			return Health / Counter;
+		}
+	};
+
+	TMap<int, FHealthAndCounter> averageHealths;
+
+	for (auto& unit : combatUnits) 
+	{
+		FHealthAndCounter& value = averageHealths.FindOrAdd(unit->GetCombatUnitData()->GetUniqueID());
+		value.Health += unit->GetCombatComponent()->GetHP();
+		value.Counter++;
+	}
+
+	for (int a = 0; a < combatUnits.Num(); a++)
+	{
+		ACombatUnit* unit1 = combatUnits[a];
+		float averageHealth = averageHealths.FindRef(unit1->GetCombatUnitData()->GetUniqueID()).GetAverageHealth();
+
+		if (unit1->GetCombatComponent()->GetHP() > averageHealth)
+			continue;
+
+		for (int b = combatUnits.Num() - 1; b > a; b--)
+		{	
+			ACombatUnit* unit2 = combatUnits[b];
+
+			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
+				continue;
+
+			if (unit2->GetCombatComponent()->GetHP() < averageHealth)
+				break;
+
+			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);
+
+			newCombatUnitOrder->UnitToReorganizeWith = unit2;
+
+			newCombatUnitOrder->bMoveWithSameSpeed = false;
+			newCombatUnitOrder->FormationMovement = nullptr;
+
+			unit1->GetOwnerPiece()->AssignOrder(newCombatUnitOrder);
+
+			combatUnits.RemoveAt(b);
+			combatUnits.RemoveAt(a);
+			a--;
+			break;
+		}
+	}
 }
 
 void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit*>& OutArray)
