@@ -72,6 +72,6 @@ public:
 	float GetStartHP() const { return StartHP; };
 	float GetTakenCasualties() const { return TakenCasualties; };
 	float GetEnemyStartHP() const { return EnemyStartHP; };
-	float GetEnemyTakenCasualties() const { return EnemyStartHP; };
+	float GetEnemyTakenCasualties() const { return EnemyTakenCasualties; };
 
 };
