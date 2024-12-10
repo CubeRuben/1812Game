@@ -80,6 +80,9 @@ void ACombatUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!CurrentOrder)
+		return;
+
 	if (CurrentOrder->ReorganizationType != EUnitReorganization::None)
 	{
 		if (CurrentOrder->UnitToReorganizeWith.IsNull()) 
