@@ -13,6 +13,8 @@
 
 #include "../../../CossacksGameInstance.h"
 
+#include "../../../Actors/Pieces/Piece.h"
+
 ACombatUnit::ACombatUnit()
 {
 	CombatComponent = CreateDefaultSubobject<UUnitCombatComponent>(TEXT("Combat Component"));
@@ -108,6 +110,10 @@ void ACombatUnit::Tick(float DeltaTime)
 			CurrentOrder->UnitToReorganizeWith->GetCombatComponent()->SetMorale((morale * hp + otherMorale * otherHp) / (hp + otherHp) * 0.8f);
 
 			Destroy();
+			
+			if (OwnerPiece.IsValid())
+				OwnerPiece->OnDeathUnit();
+
 			return;
 		}
 
