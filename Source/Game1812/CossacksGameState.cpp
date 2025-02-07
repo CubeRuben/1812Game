@@ -70,7 +70,7 @@ float ACossacksGameState::GetUnitsHP(ETeam Team)
 			continue;
 
 		if (unit->GetTeam() == Team) 
-			hp += unit->GetCombatComponent()->GetHP();
+			hp += unit->GetCombatComponent()->GetHealthPoints();
 	}
 
 	if (Team == ETeam::France)

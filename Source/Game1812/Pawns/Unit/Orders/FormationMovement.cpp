@@ -13,7 +13,7 @@ float UFormationMovement::FindMinimalMovementSpeed()
 	
 	for (auto& unit : CombatUnits) 
 	{
-		if (unit.IsNull())
+		if (!unit)
 			continue;
 
 		const float speed = unit->GetMovementSpeed();
@@ -33,7 +33,7 @@ float UFormationMovement::FindMinimalRotationSpeed()
 
 	for (auto& unit : CombatUnits)
 	{
-		if (unit.IsNull())
+		if (!unit)
 			continue;
 
 		const float speed = unit->GetRotationSpeed();

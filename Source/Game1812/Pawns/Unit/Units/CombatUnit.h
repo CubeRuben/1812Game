@@ -43,9 +43,7 @@ public:
 	virtual void SpawnDefaultController() override;
 
 	class UUnitCombatComponent* GetCombatComponent() const { return CombatComponent; };
-
 	class UUnitReportComponent* GetReportComponent() const { return ReportComponent; };
-
 	class UCombatUnitOrder* GetCombatUnitOrder() const { return CurrentOrder; };
 
 	struct FCombatUnitStats* GetCombatUnitStats() const;
@@ -53,10 +51,10 @@ public:
 	void SetCombatUnitData(class UCombatUnitDataAsset* NewCombatUnitData);
 	const UCombatUnitDataAsset* GetCombatUnitData() const { return CombatUnitData; };
 
+	void Kill();
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCombatUnitDataChange();
-
-	bool IsInReachToReorganize(ACombatUnit* OtherUnit);
 
 	//ABaseUnit class override
 	class UUnitMovementComponent* GetMovementComponent() override;

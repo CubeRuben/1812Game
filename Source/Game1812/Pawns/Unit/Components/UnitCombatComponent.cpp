@@ -4,7 +4,7 @@
 #include "UnitTerrainModifiersComponent.h"
 #include "Damageable.h"
 
-
+#include "../../../Actors/Pieces/Piece.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
 #include "../Units/CombatUnit.h"
 #include "../Orders/UnitOrder.h"
@@ -104,7 +104,10 @@ void UUnitCombatComponent::UpdateOrderBehaviour()
 		return;
 
 	if (order->ReorganizationType != EUnitReorganization::None)
+	{
+		ReorganizeUpdate();
 		return;
+	}
 
 	if (order->UnitEnemyReaction == EUnitEnemyReaction::Attack)
 	{
@@ -154,6 +157,84 @@ void UUnitCombatComponent::UpdateTargetAttack()
 
 	//TF2 soldier: ATTACK!
 	TryAttack(TargetedEnemy.Get());
+}
+
+void UUnitCombatComponent::ReorganizeUpdate()
+{
+	UCombatUnitOrder* order = GetCombatUnitOrder();
+
+	if (!order->UnitToReorganizeWith)
+	{
+		order->ReorganizationType = EUnitReorganization::None;
+		return;
+	}
+
+	if (!IsInReachToReorganize(order->UnitToReorganizeWith))
+	{
+		const FVector otherUnitLocation = order->UnitToReorganizeWith->GetActorLocation();
+		CombatUnitPawn->GetMovementComponent()->MoveTo(otherUnitLocation, EUnitMovementType::Move);
+		return;
+	}
+
+	switch (order->ReorganizationType)
+	{
+	case EUnitReorganization::Combine:
+		OnCombineReorganization();
+		break;
+	case EUnitReorganization::RedistributeEvenly:
+		OnRedistributeEvenlyReorganization();
+		break;
+	default:
+		break;
+	}
+}
+
+void UUnitCombatComponent::OnCombineReorganization()
+{
+	UCombatUnitOrder* order = GetCombatUnitOrder();
+	UUnitCombatComponent* otherCombatComponent = order->UnitToReorganizeWith->GetCombatComponent();
+
+	//Saving stats before changes
+	const float morale = Morale;
+	const float hp = HealthPoints;
+	const float otherMorale = otherCombatComponent->GetMorale();
+	const float otherHp = otherCombatComponent->GetHealthPoints();
+
+	//Applying stats changes
+	otherCombatComponent->Heal(hp);
+	otherCombatComponent->SetMorale((morale * hp + otherMorale * otherHp) / (hp + otherHp) * 0.8f);
+
+	//Killing unit
+	CombatUnitPawn->Kill();
+}
+
+void UUnitCombatComponent::OnRedistributeEvenlyReorganization()
+{
+	UCombatUnitOrder* order = GetCombatUnitOrder();
+	UUnitCombatComponent* otherCombatComponent = order->UnitToReorganizeWith->GetCombatComponent();
+
+	//Saving stats before changes
+	const float morale = Morale;
+	const float hp = HealthPoints;
+	const float otherMorale = otherCombatComponent->GetMorale();
+	const float otherHp = otherCombatComponent->GetHealthPoints();
+	const float combinedHp = hp + otherHp;
+	const float averageHp = combinedHp / 2.0f;
+
+	//Applying stats changes
+	SetHealthPoints(averageHp);
+	otherCombatComponent->SetHealthPoints(averageHp);
+
+	if (otherHp - averageHp > 0.0f)
+	{
+		otherCombatComponent->SetMorale((morale * hp + otherMorale * (averageHp - otherHp)) / averageHp * 0.8f);
+	}
+	else
+	{
+		SetMorale((morale * (averageHp - hp) + otherMorale * otherHp) / averageHp * 0.8f);
+	}
+
+	order->ClearReorganizationOrder();
 }
 
 void UUnitCombatComponent::OnPawnMove(float Distance)
@@ -217,6 +298,11 @@ bool UUnitCombatComponent::IsTargetInDetectionRange(IDamageable* Target)
 bool UUnitCombatComponent::IsTargetInAttackRange(IDamageable* Target)
 {
 	return FVector::DistSquared2D(Target->GetLocation(), CombatUnitPawn->GetActorLocation()) < FMath::Pow(GetAttackRange(), 2);
+}
+
+bool UUnitCombatComponent::IsInReachToReorganize(ACombatUnit* OtherUnit)
+{
+	return FVector::DistSquared2D(OtherUnit->GetActorLocation(), CombatUnitPawn->GetActorLocation()) < FMath::Pow(10.0f, 2);
 }
 
 float UUnitCombatComponent::ApplyDamage(IDamageable* Attacker, float DamageAmount)
@@ -413,12 +499,17 @@ float UUnitCombatComponent::GetDetectionRange() const
 	return CombatUnitPawn->GetCombatUnitStats()->GetEnemyDetectionRange();
 }
 
-void UUnitCombatComponent::Heal(float Amount)
+void UUnitCombatComponent::SetHealthPoints(float NewHealthPoints)
 {
-	HealthPoints = FMath::Clamp(HealthPoints + Amount, 0.0f, CombatUnitPawn->GetCombatUnitStats()->GetBaseHP());
+	HealthPoints = FMath::Clamp(NewHealthPoints, 0.0f, CombatUnitPawn->GetCombatUnitStats()->GetBaseHP());
 }
 
-float UUnitCombatComponent::GetHPRatio() const
+void UUnitCombatComponent::Heal(float Amount)
+{
+	SetHealthPoints(Amount + HealthPoints);
+}
+
+float UUnitCombatComponent::GetHealthPointsRatio() const
 {
 	return HealthPoints / CombatUnitPawn->GetCombatUnitStats()->GetBaseHP();
 }

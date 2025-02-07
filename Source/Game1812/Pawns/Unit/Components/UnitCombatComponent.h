@@ -64,6 +64,10 @@ protected:
 	void UpdateOrderBehaviour();
 	void UpdateTargetAttack();
 
+	void ReorganizeUpdate();
+	void OnCombineReorganization();
+	void OnRedistributeEvenlyReorganization();
+
 	void FindEnemiesInRange(TArray<class IDamageable*>& OutArray);
 	class IDamageable* FindClosestEnemyInRange();
 
@@ -71,6 +75,7 @@ protected:
 
 	bool IsTargetInDetectionRange(IDamageable* Target);
 	bool IsTargetInAttackRange(IDamageable* Target);
+	bool IsInReachToReorganize(ACombatUnit* OtherUnit);
 	
 public:	
 
@@ -95,15 +100,15 @@ public:
 	float GetAttackRange() const;
 	float GetDetectionRange() const;
 
-	float GetHP() const { return HealthPoints; };
-	void SetHP(float NewHP) { HealthPoints = NewHP; };
+	float GetHealthPoints() const { return HealthPoints; };
+	void SetHealthPoints(float NewHealthPoints);
 	void Heal(float Amount);
 
 	float GetMorale() const { return Morale; };
 	void SetMorale(float NewMorale) { Morale = NewMorale; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetHPRatio() const;
+	float GetHealthPointsRatio() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetMoraleRatio() const;

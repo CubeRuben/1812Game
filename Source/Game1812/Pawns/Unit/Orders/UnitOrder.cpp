@@ -19,6 +19,12 @@ UCombatUnitOrder::UCombatUnitOrder()
 	YawRotation = 0.f;
 }
 
+void UCombatUnitOrder::ClearReorganizationOrder()
+{
+	ReorganizationType = EUnitReorganization::None;
+	UnitToReorganizeWith = nullptr;
+}
+
 UScoutUnitOrder::UScoutUnitOrder()
 {
 	

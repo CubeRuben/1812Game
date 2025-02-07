@@ -56,7 +56,7 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
 				continue;
 
-			if (unit1->GetCombatComponent()->GetHP() + unit2->GetCombatComponent()->GetHP() > unit2->GetCombatUnitData()->GetCombatUnitStats()->GetBaseHP())
+			if (unit1->GetCombatComponent()->GetHealthPoints() + unit2->GetCombatComponent()->GetHealthPoints() > unit2->GetCombatUnitData()->GetCombatUnitStats()->GetBaseHP())
 				continue;
 		
 			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);
@@ -98,7 +98,7 @@ void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* Comba
 	for (auto& unit : combatUnits) 
 	{
 		FHealthAndCounter& value = averageHealths.FindOrAdd(unit->GetCombatUnitData()->GetUniqueID());
-		value.Health += unit->GetCombatComponent()->GetHP();
+		value.Health += unit->GetCombatComponent()->GetHealthPoints();
 		value.Counter++;
 	}
 
@@ -107,7 +107,7 @@ void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* Comba
 		ACombatUnit* unit1 = combatUnits[a];
 		float averageHealth = averageHealths.FindRef(unit1->GetCombatUnitData()->GetUniqueID()).GetAverageHealth();
 
-		if (unit1->GetCombatComponent()->GetHP() > averageHealth)
+		if (unit1->GetCombatComponent()->GetHealthPoints() > averageHealth)
 			continue;
 
 		for (int b = combatUnits.Num() - 1; b > a; b--)
@@ -117,7 +117,7 @@ void UPieceCombatOrderWidgetComponent::RedistributeOrder(UCombatUnitOrder* Comba
 			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
 				continue;
 
-			if (unit2->GetCombatComponent()->GetHP() < averageHealth)
+			if (unit2->GetCombatComponent()->GetHealthPoints() < averageHealth)
 				break;
 
 			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);
@@ -165,7 +165,7 @@ void UPieceCombatOrderWidgetComponent::GetSelectedCombatUnits(TArray<ACombatUnit
 
 	OutArray.AddUnique(ownerCombatUnit);
 
-	OutArray.Sort([](const ACombatUnit& el1, const ACombatUnit& el2) { return el1.GetCombatComponent()->GetHP() < el2.GetCombatComponent()->GetHP(); });
+	OutArray.Sort([](const ACombatUnit& el1, const ACombatUnit& el2) { return el1.GetCombatComponent()->GetHealthPoints() < el2.GetCombatComponent()->GetHealthPoints(); });
 }
 
 void UPieceCombatOrderWidgetComponent::AssignOrder(UUnitOrder* UnitOrder)

@@ -73,6 +73,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float YawRotation;
 
+	void ClearReorganizationOrder();
+
 };
 
 UCLASS(BlueprintType, Blueprintable)
