@@ -57,7 +57,7 @@ void ACossacksGameState::GetCombatUnitsByTeam(TArray<TObjectPtr<class ACombatUni
 {
 	OutArray.Empty();
 
-	OutArray = CombatUnits.FilterByPredicate([Team](const TObjectPtr<class ACombatUnit>& el) { return el.IsNull() ? false : (el.Get()->GetTeam() == Team); });
+	OutArray = CombatUnits.FilterByPredicate([Team](const TObjectPtr<class ACombatUnit>& el) { return !el ? false : (el.Get()->GetTeam() == Team); });
 }
 
 float ACossacksGameState::GetUnitsHP(ETeam Team)
@@ -66,7 +66,7 @@ float ACossacksGameState::GetUnitsHP(ETeam Team)
 
 	for (auto& unit : CombatUnits)
 	{
-		if (unit.IsNull())
+		if (!unit)
 			continue;
 
 		if (unit->GetTeam() == Team) 
@@ -78,7 +78,7 @@ float ACossacksGameState::GetUnitsHP(ETeam Team)
 
 	for (auto& piece : CombatPieces) 
 	{
-		if (piece.IsNull())
+		if (!piece)
 			continue;
 
 		if (piece->GetUnit())

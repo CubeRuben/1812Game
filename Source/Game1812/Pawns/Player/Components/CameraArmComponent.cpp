@@ -44,5 +44,17 @@ void UCameraArmComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	CurrentLength = FMath::FInterpTo(CurrentLength, TargetLength, DeltaTime, Interpolation);
 
 	PlayerPawn->GetCameraArmPoint()->SetRelativeLocation(FVector(-CurrentLength, 0, 0));
+
+	if (OnFullScrollIn.IsBound())
+	{
+		if (CurrentLength <= MinLength * 1.3f)
+			OnFullScrollIn.Execute();
+	}
+
+	if (OnFullScrollOut.IsBound())
+	{
+		if (CurrentLength >= MaxLength * 0.7f)
+			OnFullScrollOut.Execute();
+	}
 }
 

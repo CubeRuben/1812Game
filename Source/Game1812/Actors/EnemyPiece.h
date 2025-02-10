@@ -43,4 +43,5 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	using AActor::GetTargetLocation;
 };

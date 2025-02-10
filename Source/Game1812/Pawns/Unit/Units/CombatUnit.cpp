@@ -106,7 +106,7 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 
 	if ((CurrentOrder->ReorganizationType == EUnitReorganization::Combine) || (CurrentOrder->ReorganizationType == EUnitReorganization::RedistributeEvenly))
 	{
-		if (CurrentOrder->UnitToReorganizeWith.IsNull())
+		if (!CurrentOrder->UnitToReorganizeWith)
 			return;
 
 		MovementComponent->ForceMoveTo(CurrentOrder->UnitToReorganizeWith->GetActorLocation(), EUnitMovementType::Move);

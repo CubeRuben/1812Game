@@ -4,6 +4,8 @@
 #include "Components/SceneComponent.h"
 #include "CameraArmComponent.generated.h"
 
+DECLARE_DELEGATE(FMovemementDelegate)
+
 UCLASS()
 class GAME1812_API UCameraArmComponent : public USceneComponent
 {
@@ -35,6 +37,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
+	FMovemementDelegate OnFullScrollIn;
+	FMovemementDelegate OnFullScrollOut;
 
 	float GetCurrentLength() { return CurrentLength; }
 	float GetHeight() { return FMath::Abs(CurrentLength * FMath::Sin(FMath::DegreesToRadians(GetRelativeRotation().Pitch))); }

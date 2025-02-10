@@ -215,6 +215,7 @@ void UPlayerMovementComponent::MoveCameraToMap(float DeltaTime)
 		(PlayerPawn->GetCameraComponent()->GetComponentRotation() - cameraPoint->GetComponentRotation()).IsNearlyZero(0.05))
 	{
 		MapState = EPlayerCameraState::LookingAtMap;
+		OnLookAtMap.ExecuteIfBound();
 
 		PlayerPawn->GetCameraComponent()->SetWorldLocation(cameraPoint->GetComponentLocation());
 		PlayerPawn->GetCameraComponent()->SetWorldRotation(cameraPoint->GetComponentRotation());
@@ -269,7 +270,9 @@ bool UPlayerMovementComponent::IsInGlobalMapBounds()
 {
 	const FVector2D location(PlayerPawn->GetCameraArmComponent()->GetRelativeLocation());
 
-	return (location > FVector2D(-HalfHeightGlobalMapBorder, -HalfWidthGlobalMapBorder)) && (location < FVector2D(HalfHeightGlobalMapBorder, HalfWidthGlobalMapBorder));
+	const bool inBounds1 = location.ComponentwiseAllGreaterThan(FVector2D(-HalfHeightGlobalMapBorder, -HalfWidthGlobalMapBorder));
+	const bool inBounds2 = location.ComponentwiseAllLessThan(FVector2D(HalfHeightGlobalMapBorder, HalfWidthGlobalMapBorder));
+	return inBounds1 && inBounds2;
 }
 
 bool UPlayerMovementComponent::IsInGlobalMap()
@@ -280,4 +283,10 @@ bool UPlayerMovementComponent::IsInGlobalMap()
 void UPlayerMovementComponent::ChangeCameraSpot(int deltaIndex)
 {
 	CurrentSpot = FMath::Clamp(CurrentSpot + deltaIndex, 0, CameraSpots.Num() - 1);
+
+	if (CurrentSpot == 0)
+		OnLookLeft.ExecuteIfBound();
+
+	if (CurrentSpot == CameraSpots.Num() - 1)
+		OnLookRight.ExecuteIfBound();
 }

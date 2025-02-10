@@ -82,7 +82,7 @@ void UTerrainGeneratorComponent::ClearProps()
 {
 	for (auto& component : PropsMeshComponents) 
 	{
-		if (!component.IsNull())
+		if (component)
 			component->DestroyComponent();
 	}
 

@@ -70,5 +70,5 @@ public:
 	const struct FUnitTerrainModifiers& GetTerrainModifiers() const;
 
 	
-
+	using APawn::GetMovementComponent;
 };

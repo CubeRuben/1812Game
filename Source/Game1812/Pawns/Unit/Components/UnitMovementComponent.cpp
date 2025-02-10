@@ -89,7 +89,7 @@ void UUnitMovementComponent::MovePawn(float DeltaTime, const FVector& Location)
 
 	float movementSpeed = UnitPawn->GetMovementSpeed();
 
-	if (!FormationMovement.IsNull()) 
+	if (FormationMovement) 
 	{
 		if (movementSpeed > FormationMovement->GetMovementSpeed())
 			movementSpeed = FormationMovement->GetMovementSpeed();
@@ -114,7 +114,7 @@ void UUnitMovementComponent::RotatePawn(float DeltaTime, float RotationYaw)
 {
 	float rotationSpeed = UnitPawn->GetRotationSpeed();
 
-	if (!FormationMovement.IsNull())
+	if (FormationMovement)
 	{
 		if (rotationSpeed > FormationMovement->GetRotationSpeed())
 			rotationSpeed = FormationMovement->GetRotationSpeed();
@@ -138,7 +138,7 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 {
 	if (MovementType == EUnitMovementType::Attack) 
 	{
-		if (!FormationMovement.IsNull())
+		if (FormationMovement)
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "UUnitMovementComponent::ForceMoveTo() - Clear");
 
 		FormationMovement = nullptr;

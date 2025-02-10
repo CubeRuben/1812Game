@@ -7,6 +7,7 @@
 
 #include "PlayerMovementComponent.generated.h"
 
+DECLARE_DELEGATE(FMovemementDelegate)
 
 UCLASS()
 class GAME1812_API UPlayerMovementComponent : public UActorComponent
@@ -77,6 +78,10 @@ protected:
 	FVector2D GetInputDirection();
 
 public:
+
+	FMovemementDelegate OnLookLeft;
+	FMovemementDelegate OnLookRight;
+	FMovemementDelegate OnLookAtMap;
 
 	EPlayerCameraState GetMapState();
 

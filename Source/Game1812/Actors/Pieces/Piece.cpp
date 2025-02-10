@@ -17,6 +17,9 @@
 #include <Components/StaticMeshComponent.h>
 #include <Components/WidgetComponent.h>
 
+FPieceGlobalEventDelegate APiece::OnMapHitWasDraggedGlobalEvent = FPieceGlobalEventDelegate();
+FPieceGlobalEventDelegate APiece::OnOrderAssignGlobalEvent = FPieceGlobalEventDelegate();
+
 APiece::APiece()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -82,6 +85,7 @@ void APiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	{
 		bWasDragged = false;
 		OnMapHitWasDraggedEvent.Broadcast();
+		OnMapHitWasDraggedGlobalEvent.ExecuteIfBound(this);
 	}
 	
 	if (!bCanSpawnUnit)
@@ -113,6 +117,7 @@ void APiece::SpawnUnit()
 void APiece::AssignOrder(UUnitOrder* UnitOrder)
 {
 	OnOrderAssignEvent.Broadcast();
+	OnOrderAssignGlobalEvent.ExecuteIfBound(this);
 }
 
 FRotator APiece::GetResetRotation()

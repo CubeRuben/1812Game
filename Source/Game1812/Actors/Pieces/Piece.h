@@ -9,6 +9,7 @@
 #include "Piece.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FPieceEventDelegate);
+DECLARE_DELEGATE_OneParam(FPieceGlobalEventDelegate, class APiece*);
 
 #define ADD_PIECE_EVENT_DELEGATE(name) TEMPLATE_EVENT_DELEGATE(FPieceEventDelegate, name)
 
@@ -114,6 +115,9 @@ protected:
 	void PlaySound(EPieceSoundType SoundType);
 
 public:
+
+	static FPieceGlobalEventDelegate OnMapHitWasDraggedGlobalEvent;
+	static FPieceGlobalEventDelegate OnOrderAssignGlobalEvent;
 
 	virtual void Tick(float DeltaTime) override;
 
