@@ -56,7 +56,7 @@ void UPieceCombatOrderWidgetComponent::CombineOrder(UCombatUnitOrder* CombatUnit
 			if (unit1->GetCombatUnitData() != unit2->GetCombatUnitData())
 				continue;
 
-			if (unit1->GetCombatComponent()->GetHealthPoints() + unit2->GetCombatComponent()->GetHealthPoints() > unit2->GetCombatUnitData()->GetCombatUnitStats()->GetBaseHP())
+			if (unit1->GetCombatComponent()->GetHealthPoints() + unit2->GetCombatComponent()->GetHealthPoints() > unit2->GetCombatUnitData()->GetCombatUnitStats().GetBaseHP())
 				continue;
 		
 			UCombatUnitOrder* newCombatUnitOrder = DuplicateObject(CombatUnitOrder, this);

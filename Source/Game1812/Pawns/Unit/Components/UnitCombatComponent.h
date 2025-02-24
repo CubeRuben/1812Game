@@ -88,7 +88,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTemporarilyDefeatDelegate OnTemporarilyDefeat;
 
-	void Init(struct FCombatUnitStats* UnitCombatStats);
+	void Init(const struct FCombatUnitStats& UnitCombatStats);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

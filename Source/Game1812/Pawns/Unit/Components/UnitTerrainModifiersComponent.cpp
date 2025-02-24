@@ -42,6 +42,9 @@ void UUnitTerrainModifiersComponent::UpdateModifiers()
 
 	const ECombatUnitType unitType = OwnerUnit->GetUnitType();
 
+	if (unitType == ECombatUnitType::None)
+		return;
+
 	for (ATerrainPropertyVolume* terrain : OverlappedTerrainVolumes) 
 	{
 		const UTerrainPropertyDataAsset* data = terrain->GetTerrainPropertyDataAsset();

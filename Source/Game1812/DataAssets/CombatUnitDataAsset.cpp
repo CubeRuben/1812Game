@@ -70,11 +70,12 @@ float FCombatUnitStats::GetEnemyDetectionRange() const
 	return EnemyDetectionRange;
 }
 
-UCombatUnitDataAsset::UCombatUnitDataAsset()
+UCombatUnitDataAsset::UCombatUnitDataAsset() :
+	UnitName("Unnamed Unit"), CombatUnitStats(FCombatUnitStats()), PieceMesh(nullptr), PieceFoundationMesh(nullptr), FormationSortPriority(0)
 {
-	UnitName = "Unnamed Unit";
-	CombatUnitStats = FCombatUnitStats();
-	PieceMesh = nullptr;
-	PieceFoundationMesh = nullptr;
-	FormationSortPriority = 0;
+}
+
+FCombatUnitVisual::FCombatUnitVisual() :
+	UnitMesh(nullptr), HealthPointPerMesh(100.0f), MovementSpeed(0.0f), RotationSpeed(0.0f), ForceTeleportDistanceSquared(10000.0f)
+{
 }

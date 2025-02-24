@@ -39,9 +39,9 @@ void UUnitCombatComponent::BeginPlay()
 	CombatUnitPawn->GetMovementComponent()->OnMove.AddDynamic(this, &UUnitCombatComponent::OnPawnMove);
 }
 
-void UUnitCombatComponent::Init(FCombatUnitStats* UnitCombatStats)
+void UUnitCombatComponent::Init(const struct FCombatUnitStats& UnitCombatStats)
 {
-	HealthPoints = UnitCombatStats->GetBaseHP();
+	HealthPoints = UnitCombatStats.GetBaseHP();
 }
 
 void UUnitCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -65,7 +65,7 @@ void UUnitCombatComponent::UpdateMoraleRestoration(float DeltaTime)
 	if (CombatUnitPawn->GetMovementComponent()->IsMoving() || (TimeOfLastTakenDamage + 5.f > GetWorld()->GetTimeSeconds()))
 		return;
 
-	const float moraleRestorationSpeed = CombatUnitPawn->GetCombatUnitStats()->GetMoraleRestorationSpeed();
+	const float moraleRestorationSpeed = CombatUnitPawn->GetCombatUnitStats().GetMoraleRestorationSpeed();
 	const float moraleRestoreDelta = moraleRestorationSpeed * DeltaTime;
 
 	AddMorale(moraleRestoreDelta);
@@ -239,7 +239,7 @@ void UUnitCombatComponent::OnRedistributeEvenlyReorganization()
 
 void UUnitCombatComponent::OnPawnMove(float Distance)
 {
-	float moraleLoss = CombatUnitPawn->GetCombatUnitStats()->GetDistanceForFullMoraleLoss();
+	float moraleLoss = CombatUnitPawn->GetCombatUnitStats().GetDistanceForFullMoraleLoss();
 
 	if (GetCombatUnitOrder()->bForcedMarch)
 		moraleLoss *= 1.5f;
@@ -327,7 +327,7 @@ float UUnitCombatComponent::ApplyDamage(IDamageable* Attacker, float DamageAmoun
 	}
 
 	//Reduce morale
-	const float moraleLoss = CombatUnitPawn->GetCombatUnitStats()->GetMoraleLossDueToLosses();
+	const float moraleLoss = CombatUnitPawn->GetCombatUnitStats().GetMoraleLossDueToLosses();
 	AddMorale(-(totalDamage * moraleLoss));
 
 	//Make defeated if low morale
@@ -360,7 +360,7 @@ float UUnitCombatComponent::CalculateDefense() const
 
 float UUnitCombatComponent::GetDamageMultiplier(ECombatUnitType AttackedUnitType) const
 {
-	const float* customMultiplier = CombatUnitPawn->GetCombatUnitStats()->GetDamageMultipliers().Find(AttackedUnitType);
+	const float* customMultiplier = CombatUnitPawn->GetCombatUnitStats().GetDamageMultipliers().Find(AttackedUnitType);
 
 	if (customMultiplier)
 		return *customMultiplier;
@@ -370,12 +370,12 @@ float UUnitCombatComponent::GetDamageMultiplier(ECombatUnitType AttackedUnitType
 
 float UUnitCombatComponent::CalculateMovementSpeed()
 {
-	const float maxSpeed = CombatUnitPawn->GetCombatUnitStats()->GetMaxMovementSpeed();
+	const float maxSpeed = CombatUnitPawn->GetCombatUnitStats().GetMaxMovementSpeed();
 
 	if (bIsTemporarilyDefeated)
 		return maxSpeed * 1.25f;
 	
-	const float minSpeed = CombatUnitPawn->GetCombatUnitStats()->GetMinMovementSpeed();
+	const float minSpeed = CombatUnitPawn->GetCombatUnitStats().GetMinMovementSpeed();
 	const float speed = Morale * (maxSpeed - minSpeed) + minSpeed;
 	const float clampedSpeed = FMath::Clamp(speed, minSpeed, maxSpeed);
 
@@ -387,7 +387,7 @@ float UUnitCombatComponent::CalculateMovementSpeed()
 
 float UUnitCombatComponent::CalculateRotationSpeed()
 {
-	const float baseRotationSpeed = CombatUnitPawn->GetCombatUnitStats()->GetRotationSpeed();
+	const float baseRotationSpeed = CombatUnitPawn->GetCombatUnitStats().GetRotationSpeed();
 
 	if (bIsTemporarilyDefeated)
 		return baseRotationSpeed * 3.5f;
@@ -476,32 +476,32 @@ UCombatUnitOrder* UUnitCombatComponent::GetCombatUnitOrder()
 
 float UUnitCombatComponent::GetAttackCooldown() const
 {
-	return CombatUnitPawn->GetCombatUnitStats()->GetAttackCooldown();
+	return CombatUnitPawn->GetCombatUnitStats().GetAttackCooldown();
 }
 
 float UUnitCombatComponent::GetBaseDamage() const
 {
-	return CombatUnitPawn->GetCombatUnitStats()->GetBaseDamage();
+	return CombatUnitPawn->GetCombatUnitStats().GetBaseDamage();
 }
 
 float UUnitCombatComponent::GetBaseDefense() const
 {
-	return CombatUnitPawn->GetCombatUnitStats()->GetBaseDefense();
+	return CombatUnitPawn->GetCombatUnitStats().GetBaseDefense();
 }
 
 float UUnitCombatComponent::GetAttackRange() const
 {
-	return CombatUnitPawn->GetCombatUnitStats()->GetAttackDistance();
+	return CombatUnitPawn->GetCombatUnitStats().GetAttackDistance();
 }
 
 float UUnitCombatComponent::GetDetectionRange() const
 {
-	return CombatUnitPawn->GetCombatUnitStats()->GetEnemyDetectionRange();
+	return CombatUnitPawn->GetCombatUnitStats().GetEnemyDetectionRange();
 }
 
 void UUnitCombatComponent::SetHealthPoints(float NewHealthPoints)
 {
-	HealthPoints = FMath::Clamp(NewHealthPoints, 0.0f, CombatUnitPawn->GetCombatUnitStats()->GetBaseHP());
+	HealthPoints = FMath::Clamp(NewHealthPoints, 0.0f, CombatUnitPawn->GetCombatUnitStats().GetBaseHP());
 }
 
 void UUnitCombatComponent::Heal(float Amount)
@@ -511,7 +511,7 @@ void UUnitCombatComponent::Heal(float Amount)
 
 float UUnitCombatComponent::GetHealthPointsRatio() const
 {
-	return HealthPoints / CombatUnitPawn->GetCombatUnitStats()->GetBaseHP();
+	return HealthPoints / CombatUnitPawn->GetCombatUnitStats().GetBaseHP();
 }
 
 float UUnitCombatComponent::GetMoraleRatio() const

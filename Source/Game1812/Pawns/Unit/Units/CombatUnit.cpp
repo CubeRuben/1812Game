@@ -5,6 +5,7 @@
 
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitCombatComponent.h"
+#include "../Components/UnitCombatVisualComponent.h"
 #include "../Components/UnitReportComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
 #include "../Components/UnitPieceProjectionComponent.h"
@@ -18,6 +19,7 @@
 ACombatUnit::ACombatUnit()
 {
 	CombatComponent = CreateDefaultSubobject<UUnitCombatComponent>(TEXT("Combat Component"));
+	VisualComponent = CreateDefaultSubobject<UUnitCombatVisualComponent>(TEXT("Visual Component"));
 
 	CombatUnitData = nullptr;
 }
@@ -30,6 +32,7 @@ void ACombatUnit::BeginPlay()
 		return;
 
 	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
+	VisualComponent->Init(CombatUnitData);
 }
 
 void ACombatUnit::OnConstruction(const FTransform& Transform)
@@ -122,6 +125,7 @@ void ACombatUnit::SetCombatUnitData(UCombatUnitDataAsset* NewCombatUnitData)
 		return;
 
 	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
+	VisualComponent->Init(CombatUnitData);
 
 	OnCombatUnitDataChange();
 }
@@ -134,9 +138,9 @@ void ACombatUnit::Kill()
 		OwnerPiece->OnDeathUnit();
 }
 
-FCombatUnitStats* ACombatUnit::GetCombatUnitStats() const
+const FCombatUnitStats& ACombatUnit::GetCombatUnitStats() const
 {
-	return CombatUnitData ? CombatUnitData->GetCombatUnitStats() : nullptr;
+	return CombatUnitData->GetCombatUnitStats();
 }
 
 UUnitOrder* ACombatUnit::GetCurrentOrder()
@@ -166,7 +170,7 @@ float ACombatUnit::ApplyDamage(IDamageable* Attacker, float Amount)
 
 ECombatUnitType ACombatUnit::GetUnitType() const
 {
-	return GetCombatUnitStats() ? GetCombatUnitStats()->GetUnitType() : ECombatUnitType::None;
+	return CombatUnitData ? CombatUnitData->GetCombatUnitStats().GetUnitType() : ECombatUnitType::None;
 }
 
 FVector ACombatUnit::GetLocation()

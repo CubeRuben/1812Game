@@ -21,6 +21,9 @@ protected:
 	class UUnitCombatComponent* CombatComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UUnitCombatVisualComponent* VisualComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UUnitReportComponent* ReportComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -46,7 +49,7 @@ public:
 	class UUnitReportComponent* GetReportComponent() const { return ReportComponent; };
 	class UCombatUnitOrder* GetCombatUnitOrder() const { return CurrentOrder; };
 
-	struct FCombatUnitStats* GetCombatUnitStats() const;
+	const struct FCombatUnitStats& GetCombatUnitStats() const;
 
 	void SetCombatUnitData(class UCombatUnitDataAsset* NewCombatUnitData);
 	const UCombatUnitDataAsset* GetCombatUnitData() const { return CombatUnitData; };

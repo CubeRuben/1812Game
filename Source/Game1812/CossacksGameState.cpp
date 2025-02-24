@@ -84,7 +84,7 @@ float ACossacksGameState::GetUnitsHP(ETeam Team)
 		if (piece->GetUnit())
 			continue;
 
-		hp += piece->GetCombatUnitData()->GetCombatUnitStats()->GetBaseHP();
+		hp += piece->GetCombatUnitData()->GetCombatUnitStats().GetBaseHP();
 	}
 
 	return hp;

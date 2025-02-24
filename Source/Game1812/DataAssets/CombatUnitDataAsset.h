@@ -73,6 +73,41 @@ public:
 
 };
 
+USTRUCT(BlueprintType)
+struct GAME1812_API FCombatUnitVisual
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	FCombatUnitVisual();
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMesh* UnitMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float HealthPointPerMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MovementSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RotationSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ForceTeleportDistanceSquared;
+
+public:
+
+	UStaticMesh* GetUnitMesh() const { return UnitMesh; }
+	float GetHealthPointsPerMesh() const { return HealthPointPerMesh; }
+	float GetMovementSpeed() const { return MovementSpeed; }
+	float GetRotationSpeed() const { return RotationSpeed; }
+	float GetForceTeleportDistanceSquared() const { return ForceTeleportDistanceSquared; }
+};
+
 UCLASS(BlueprintType)
 class GAME1812_API UCombatUnitDataAsset : public UDataAsset
 {
@@ -97,10 +132,7 @@ protected:
 	UStaticMesh* PieceFoundationMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UStaticMesh* UnitMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FTransform UnitMeshTransform;
+	FCombatUnitVisual CombatUnitVisual;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int FormationSortPriority;
@@ -108,9 +140,9 @@ protected:
 public:
 
 	const FName& GetName() const { return UnitName; };
-	const FCombatUnitStats* GetCombatUnitStats() const { return &CombatUnitStats; };
-	FCombatUnitStats* GetCombatUnitStats() { return &CombatUnitStats; };
+	const FCombatUnitStats& GetCombatUnitStats() const { return CombatUnitStats; };
 	UStaticMesh* GetPieceMesh() const { return PieceMesh; };
 	UStaticMesh* GetPieceFoundationMesh() const { return PieceFoundationMesh; };
+	const FCombatUnitVisual& GetCombatUnitVisual() const { return CombatUnitVisual; }
 	int GetFormationSortPriority() const { return FormationSortPriority; };
 };
