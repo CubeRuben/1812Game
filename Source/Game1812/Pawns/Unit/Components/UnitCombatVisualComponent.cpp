@@ -31,15 +31,54 @@ void UUnitCombatVisualComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	for (int i = 0; i < UnitMeshComponents.Num(); i++)
 	{
+		UStaticMeshComponent* const component = UnitMeshComponents[i];
+
 		const FVector rotatedOffset = MeshesOffsets[i].RotateAngleAxis(rootRotation, FVector::UpVector);
 		const FVector targetLocation = rotatedOffset + rootLocation;
 
-		const FVector componentLocation = UnitMeshComponents[i]->GetComponentLocation();
+		const FVector componentLocation = component->GetComponentLocation();
 
-		const FVector movementDirection = (targetLocation - componentLocation).GetSafeNormal2D();
-		const FVector movementDelta = movementDirection * unitVisual.GetMovementSpeed() * DeltaTime;
+		const FVector targetMovement = targetLocation - componentLocation;
+		const float deltaMove = unitVisual.GetMovementSpeed() * DeltaTime;
 
-		UnitMeshComponents[i]->AddWorldOffset(movementDelta);
+		const bool atTarget = deltaMove * deltaMove >= targetMovement.SizeSquared2D();
+
+		FVector newComponentLocation;
+		float targetDeltaRotation = 0.0f;
+
+		if (atTarget)
+		{
+			newComponentLocation = targetLocation;
+
+			targetDeltaRotation = FQuat::FindBetween(component->GetForwardVector(), GetOwner()->GetActorForwardVector()).Rotator().Yaw;
+		}
+		else 
+		{
+			const FVector movementDirection = targetMovement.GetSafeNormal2D();
+			const FVector movementDelta = movementDirection * deltaMove;
+
+			newComponentLocation = componentLocation + movementDelta;
+
+			targetDeltaRotation = FQuat::FindBetween(component->GetForwardVector(), movementDirection).Rotator().Yaw;
+		}
+
+		FHitResult hit;
+
+		GetWorld()->LineTraceSingleByChannel(hit, newComponentLocation + FVector(0.0f, 0.0f, 250.f), newComponentLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
+
+		if (hit.bBlockingHit) 
+		{
+			newComponentLocation = hit.Location;
+		}
+
+		component->SetWorldLocation(newComponentLocation);
+
+		if (FMath::Abs(targetDeltaRotation) >= 0.1f) 
+		{
+			const float deltaRotation = unitVisual.GetRotationSpeed() * DeltaTime;
+
+			component->AddWorldRotation(FRotator(0.0f, deltaRotation * FMath::Sign(targetDeltaRotation), 0.0f));
+		}
 	}
 }
 

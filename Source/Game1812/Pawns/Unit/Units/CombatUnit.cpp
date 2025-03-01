@@ -81,6 +81,8 @@ void ACombatUnit::SpawnDefaultController()
 void ACombatUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	DrawDebugPoint(GetWorld(), GetActorLocation(), 5.0f, FColor::Red, false, 0.1f);
 }
 
 void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
