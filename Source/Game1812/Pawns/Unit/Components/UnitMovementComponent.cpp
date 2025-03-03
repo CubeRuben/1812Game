@@ -84,30 +84,41 @@ void UUnitMovementComponent::UpdateMovement(float DeltaTime)
 
 void UUnitMovementComponent::MovePawn(float DeltaTime, const FVector& Location)
 {
-	const FVector delta = (Location - UnitPawn->GetActorLocation()) * FVector(1, 1, 0);
+	const FVector actorLocation = UnitPawn->GetActorLocation();
+
+	const FVector delta = (Location - actorLocation) * FVector(1, 1, 0);
 	const FVector direction = delta.GetSafeNormal();
 
 	float movementSpeed = UnitPawn->GetMovementSpeed();
 
 	if (FormationMovement) 
 	{
-		if (movementSpeed > FormationMovement->GetMovementSpeed())
-			movementSpeed = FormationMovement->GetMovementSpeed();
+		movementSpeed = FMath::Min(movementSpeed, FormationMovement->GetMovementSpeed());
 	}
 
 	const FVector movementDelta = direction * movementSpeed * DeltaTime;
 
-	if (movementDelta.SizeSquared() > delta.SizeSquared())
+	FVector newActorLocation;
+
+	if (movementDelta.SizeSquared2D() > delta.SizeSquared2D())
 	{
-		UnitPawn->SetActorLocation(Location);
+		newActorLocation = Location;
 	}
 	else
 	{
-		UnitPawn->AddActorWorldOffset(movementDelta);
+		newActorLocation = actorLocation + movementDelta;
 	}
 
-	UnitPawn->AddActorWorldOffset(FVector(0, 0, 50));
-	UnitPawn->AddActorWorldOffset(FVector(0, 0, -100), true);
+	FHitResult hit;
+
+	GetWorld()->LineTraceSingleByChannel(hit, newActorLocation + FVector(0.0f, 0.0f, 250.f), newActorLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
+
+	if (hit.bBlockingHit)
+	{
+		newActorLocation = hit.Location;
+	}
+
+	UnitPawn->SetActorLocation(newActorLocation);
 }
 
 void UUnitMovementComponent::RotatePawn(float DeltaTime, float RotationYaw)

@@ -38,7 +38,7 @@ void UUnitTerrainModifiersComponent::UpdateModifiers()
 	if (OverlappedTerrainVolumes.IsEmpty())
 		return Modifiers.Reset();
 	
-	Modifiers.Reset(50.f);
+	Modifiers.Reset();
 
 	const ECombatUnitType unitType = OwnerUnit->GetUnitType();
 
