@@ -2,12 +2,13 @@
 
 #include "../Units/CombatUnit.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
+#include "../../../Actors/GlobalUnitCombatVisual.h"
 
 #include <Components/StaticMeshComponent.h>
 
 UUnitCombatVisualComponent::UUnitCombatVisualComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UUnitCombatVisualComponent::BeginPlay()
@@ -16,14 +17,18 @@ void UUnitCombatVisualComponent::BeginPlay()
 
 	CombatUnitPawn = Cast<ACombatUnit>(GetOwner());
 
-	if (!CombatUnitPawn)
+	if (!CombatUnitPawn) 
+	{
 		DestroyComponent();
+		return;
+	}
+
+	if (!AGlobalUnitCombatVisual::GetInstance()) 
+		AGlobalUnitCombatVisual::CreateInstance(GetWorld());
 }
 
-void UUnitCombatVisualComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UUnitCombatVisualComponent::UpdateVisual(float DeltaTime)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	const FVector rootLocation = GetOwner()->GetRootComponent()->GetComponentLocation();
 	const float rootRotation = GetOwner()->GetRootComponent()->GetComponentRotation().Yaw;
 
@@ -37,18 +42,16 @@ void UUnitCombatVisualComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		const FVector targetLocation = rotatedOffset + rootLocation;
 
 		const FVector componentLocation = component->GetComponentLocation();
-
 		const FVector targetMovement = targetLocation - componentLocation;
 		const float deltaMove = unitVisual.GetMovementSpeed() * DeltaTime;
 
 		const bool atTarget = deltaMove * deltaMove >= targetMovement.SizeSquared2D();
 
-		FVector newComponentLocation;
 		float targetDeltaRotation = 0.0f;
 
 		if (atTarget)
 		{
-			newComponentLocation = targetLocation;
+			component->SetWorldLocation(targetLocation);
 
 			targetDeltaRotation = FQuat::FindBetween(component->GetForwardVector(), GetOwner()->GetActorForwardVector()).Rotator().Yaw;
 		}
@@ -57,21 +60,10 @@ void UUnitCombatVisualComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			const FVector movementDirection = targetMovement.GetSafeNormal2D();
 			const FVector movementDelta = movementDirection * deltaMove;
 
-			newComponentLocation = componentLocation + movementDelta;
+			component->AddWorldOffset(movementDelta);
 
 			targetDeltaRotation = FQuat::FindBetween(component->GetForwardVector(), movementDirection).Rotator().Yaw;
 		}
-
-		FHitResult hit;
-
-		GetWorld()->LineTraceSingleByChannel(hit, newComponentLocation + FVector(0.0f, 0.0f, 250.f), newComponentLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
-
-		if (hit.bBlockingHit) 
-		{
-			newComponentLocation = hit.Location;
-		}
-
-		component->SetWorldLocation(newComponentLocation);
 
 		if (FMath::Abs(targetDeltaRotation) >= 0.1f) 
 		{
@@ -85,6 +77,9 @@ void UUnitCombatVisualComponent::TickComponent(float DeltaTime, ELevelTick TickT
 void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 {
 	if (!UnitCombatStats)
+		return;
+
+	if (!AGlobalUnitCombatVisual::GetInstance())
 		return;
 
 	const FCombatUnitVisual& combatUnitVisual = UnitCombatStats->GetCombatUnitVisual();
@@ -124,6 +119,8 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 		UnitMeshComponents[i]->SetWorldLocation(location);
 		UnitMeshComponents[i]->SetWorldRotation(FRotator(0.0f, rootRotation, 0.0f));
 	}
+
+	AGlobalUnitCombatVisual::GetInstance()->AddVisualComponents(this, UnitMeshComponents);
 }
 
 void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number)

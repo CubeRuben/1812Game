@@ -23,14 +23,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FVector> MeshesOffsets;
 
-
 	virtual void BeginPlay() override;
 
 	void UpdateFormationOffsets(int Number);
 
 public:	
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void UpdateVisual(float DeltaTime);
 
 	void Init(class UCombatUnitDataAsset* UnitCombatStats);
 		

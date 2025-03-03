@@ -13,7 +13,6 @@ void FUnitTerrainModifiers::Reset(float Value)
 	DamageModifier = Value;
 }
 
-
 UUnitTerrainModifiersComponent::UUnitTerrainModifiersComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
