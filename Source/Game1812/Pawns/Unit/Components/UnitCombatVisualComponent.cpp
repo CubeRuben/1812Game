@@ -45,11 +45,14 @@ void UUnitCombatVisualComponent::UpdateVisual(float DeltaTime)
 		const FVector targetMovement = targetLocation - componentLocation;
 		const float deltaMove = unitVisual.GetMovementSpeed() * DeltaTime;
 
-		const bool atTarget = deltaMove * deltaMove >= targetMovement.SizeSquared2D();
+		const float targetMovementSizeSquared = targetMovement.SizeSquared2D();
+
+		const bool atTarget = deltaMove * deltaMove >= targetMovementSizeSquared;
+		const bool isFurtherForceTeleportDistance = unitVisual.GetForceTeleportDistanceSquared() <= targetMovementSizeSquared;
 
 		float targetDeltaRotation = 0.0f;
 
-		if (atTarget)
+		if (atTarget || isFurtherForceTeleportDistance)
 		{
 			component->SetWorldLocation(targetLocation);
 
@@ -127,6 +130,14 @@ void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number, float Offset
 {
 	MeshesOffsets.Empty();
 	MeshesOffsets.SetNum(Number);
+
+	if (Number <= 0)
+		return;
+
+	MeshesOffsets[0] = FVector::ZeroVector;
+
+	if (Number <= 1)
+		return;
 
 	const int firstRow = FMath::RoundToInt((float)Number / 2.0f) - (Number > 3);
 
