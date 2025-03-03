@@ -76,6 +76,6 @@ UCombatUnitDataAsset::UCombatUnitDataAsset() :
 }
 
 FCombatUnitVisual::FCombatUnitVisual() :
-	UnitMesh(nullptr), HealthPointPerMesh(100.0f), MovementSpeed(0.0f), RotationSpeed(0.0f), ForceTeleportDistanceSquared(10000.0f)
+	UnitMesh(nullptr), HealthPointPerMesh(100.0f), MovementSpeed(0.0f), RotationSpeed(0.0f), ForceTeleportDistanceSquared(10000.0f), MeshOffset(10.0f)
 {
 }

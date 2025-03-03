@@ -99,6 +99,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ForceTeleportDistanceSquared;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MeshOffset;
+
 public:
 
 	UStaticMesh* GetUnitMesh() const { return UnitMesh; }
@@ -106,6 +109,7 @@ public:
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetRotationSpeed() const { return RotationSpeed; }
 	float GetForceTeleportDistanceSquared() const { return ForceTeleportDistanceSquared; }
+	float GetMeshOffset() const { return MeshOffset; }
 };
 
 UCLASS(BlueprintType)

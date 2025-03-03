@@ -106,7 +106,7 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 		UnitMeshComponents[i] = component;
 	}
 
-	UpdateFormationOffsets(meshesNumber);
+	UpdateFormationOffsets(meshesNumber, combatUnitVisual.GetMeshOffset());
 
 	const FVector rootLocation = GetOwner()->GetRootComponent()->GetComponentLocation();
 	const float rootRotation = GetOwner()->GetRootComponent()->GetComponentRotation().Yaw;
@@ -123,14 +123,12 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 	AGlobalUnitCombatVisual::GetInstance()->AddVisualComponents(this, UnitMeshComponents);
 }
 
-void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number)
+void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number, float Offset)
 {
-	const float Offset = 10.0f;
-
 	MeshesOffsets.Empty();
 	MeshesOffsets.SetNum(Number);
 
-	const int firstRow = FMath::RoundToInt((float)Number / 2.0f) - (Number > 4);
+	const int firstRow = FMath::RoundToInt((float)Number / 2.0f) - (Number > 3);
 
 	for (int i = 0; i < firstRow; i++)
 	{

@@ -25,7 +25,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void UpdateFormationOffsets(int Number);
+	void UpdateFormationOffsets(int Number, float Offset);
 
 public:	
 
