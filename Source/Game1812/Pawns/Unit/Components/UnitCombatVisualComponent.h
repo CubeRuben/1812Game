@@ -21,11 +21,19 @@ protected:
 	TArray<class UStaticMeshComponent*> UnitMeshComponents;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<class UStaticMeshComponent*> DeadUnitMeshComponents;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FVector> MeshesOffsets;
 
 	virtual void BeginPlay() override;
 
 	void UpdateFormationOffsets(int Number, float Offset);
+
+	void OnHealthPointsChange(float HealthPoints);
+
+	void ReviveMeshes(int NumberToRevive);
+	void KillMeshes(int NumberToKill);
 
 public:	
 

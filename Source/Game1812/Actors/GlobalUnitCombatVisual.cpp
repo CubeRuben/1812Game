@@ -48,10 +48,17 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 
 	for (int a = 0; a < MeshComponents.Num(); a++) 
 	{
+		UStaticMeshComponent* const component1 = MeshComponents[a];
+
+		if (!component1->IsVisible())
+			continue;
+
 		for (int b = a + 1; b < MeshComponents.Num(); b++)
 		{
-			UStaticMeshComponent* const component1 = MeshComponents[a];
 			UStaticMeshComponent* const component2 = MeshComponents[b];
+
+			if (!component2->IsVisible())
+				continue;
 
 			FVector delta = component1->GetComponentLocation() - component2->GetComponentLocation();
 			delta.Z = 0;
@@ -75,10 +82,13 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 
 	for (UStaticMeshComponent* const component : MeshComponents)
 	{
+		if (!component->IsVisible())
+			continue;
+
 		FHitResult hit;
 
 		const FVector componentLocation = component->GetComponentLocation();
-
+		
 		GetWorld()->LineTraceSingleByChannel(hit, componentLocation + FVector(0.0f, 0.0f, 250.f), componentLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
 
 		if (hit.bBlockingHit)

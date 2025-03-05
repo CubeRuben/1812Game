@@ -1,5 +1,6 @@
 #include "UnitCombatVisualComponent.h"
 
+#include "UnitCombatComponent.h"
 #include "../Units/CombatUnit.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
 #include "../../../Actors/GlobalUnitCombatVisual.h"
@@ -22,6 +23,8 @@ void UUnitCombatVisualComponent::BeginPlay()
 		DestroyComponent();
 		return;
 	}
+
+	CombatUnitPawn->GetCombatComponent()->OnHealthPointsChange.AddUObject(this, &UUnitCombatVisualComponent::OnHealthPointsChange);
 
 	if (!AGlobalUnitCombatVisual::GetInstance()) 
 		AGlobalUnitCombatVisual::CreateInstance(GetWorld());
@@ -175,4 +178,78 @@ void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number, float Offset
 			MeshesOffsets[i + firstRow + 2] = FVector(-Offset, -Offset * mult - secondRowOffset, 0.0f);
 		}
 	}
+}
+
+void UUnitCombatVisualComponent::OnHealthPointsChange(float HealthPoints)
+{
+	const FCombatUnitVisual& unitVisual = CombatUnitPawn->GetCombatUnitData()->GetCombatUnitVisual();
+
+	const int newMeshesNumber = FMath::CeilToInt(HealthPoints / unitVisual.GetHealthPointsPerMesh());
+	const int newMeshesNumberClamped = FMath::Clamp(newMeshesNumber, 0, UnitMeshComponents.Num() + DeadUnitMeshComponents.Num());
+
+	const int currentMeshesNumber = UnitMeshComponents.Num();
+	const int deltaMeshesNumber = newMeshesNumberClamped - currentMeshesNumber;
+
+	if (deltaMeshesNumber > 0)
+	{
+		ReviveMeshes(deltaMeshesNumber);
+	}
+	else if (deltaMeshesNumber < 0)
+	{
+		KillMeshes(-deltaMeshesNumber);
+	}
+}
+
+void UUnitCombatVisualComponent::ReviveMeshes(int NumberToRevive)
+{
+	const int aliveMeshesNum = UnitMeshComponents.Num();
+	const int deadMeshesLastIndex = DeadUnitMeshComponents.Num() - 1;
+
+	const FVector rootLocation = GetOwner()->GetRootComponent()->GetComponentLocation();
+	const float rootRotation = GetOwner()->GetRootComponent()->GetComponentRotation().Yaw;
+
+	UnitMeshComponents.SetNum(aliveMeshesNum + NumberToRevive);
+
+	for (int i = 0; i < NumberToRevive; i++)
+	{
+		const int deadMeshesIndex = deadMeshesLastIndex - i;
+		const int aliveMeshesIndex = aliveMeshesNum + i;
+
+		UStaticMeshComponent* const component = DeadUnitMeshComponents[deadMeshesIndex];
+
+		component->SetVisibility(true);
+
+		const FVector rotatedOffset = MeshesOffsets[aliveMeshesIndex].RotateAngleAxis(rootRotation, FVector::UpVector);
+		const FVector targetLocation = rotatedOffset + rootLocation;
+
+		component->SetWorldLocation(targetLocation);
+		component->SetWorldRotation(FRotator(0.0f, rootRotation, 0.0f));
+
+		DeadUnitMeshComponents.RemoveAt(deadMeshesIndex, 1, false);
+		UnitMeshComponents[aliveMeshesIndex] = component;
+	}
+
+	DeadUnitMeshComponents.Shrink();
+}
+
+void UUnitCombatVisualComponent::KillMeshes(int NumberToKill)
+{
+	const int meshesLastIndex = UnitMeshComponents.Num() - 1;
+	const int deadMeshesNum = DeadUnitMeshComponents.Num();
+
+	DeadUnitMeshComponents.SetNum(deadMeshesNum + NumberToKill);
+
+	for (int i = 0; i < NumberToKill; i++) 
+	{
+		const int aliveMeshesIndex = meshesLastIndex - i;
+
+		UStaticMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
+
+		component->SetVisibility(false);
+
+		UnitMeshComponents.RemoveAt(aliveMeshesIndex, 1, false);
+		DeadUnitMeshComponents[deadMeshesNum + i] = component;
+	}
+
+	UnitMeshComponents.Shrink();
 }

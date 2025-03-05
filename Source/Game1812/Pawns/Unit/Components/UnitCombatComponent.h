@@ -15,6 +15,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageTakenDelegate, class AComb
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTemporarilyDefeatDelegate);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPropertyChangeDelegate, float);
+
 UCLASS(Blueprintable, BlueprintType)
 class GAME1812_API UUnitCombatComponent : public UActorComponent
 {
@@ -79,6 +81,8 @@ protected:
 	
 public:	
 
+	FOnPropertyChangeDelegate OnHealthPointsChange;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnDamageDealtDelegate OnDamageDealt;
 
@@ -121,4 +125,7 @@ public:
 	float CalculateMovementSpeed();
 	float CalculateRotationSpeed();
 	
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent);
+#endif
 };

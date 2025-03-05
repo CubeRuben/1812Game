@@ -312,10 +312,10 @@ float UUnitCombatComponent::ApplyDamage(IDamageable* Attacker, float DamageAmoun
 
 	//Calculate total damage with defense
 	const float totalDamage = FMath::Max(1, DamageAmount);
-	HealthPoints -= totalDamage;
+	SetHealthPoints(HealthPoints - totalDamage);
 
 	//Destroy if no HP
-	if (HealthPoints <= 0.f)
+	if (HealthPoints <= 0.0f)
 	{
 		CombatUnitPawn->OnUnitDeath();
 		CombatUnitPawn->Destroy();
@@ -502,6 +502,7 @@ float UUnitCombatComponent::GetDetectionRange() const
 void UUnitCombatComponent::SetHealthPoints(float NewHealthPoints)
 {
 	HealthPoints = FMath::Clamp(NewHealthPoints, 0.0f, CombatUnitPawn->GetCombatUnitStats().GetBaseHP());
+	OnHealthPointsChange.Broadcast(HealthPoints);
 }
 
 void UUnitCombatComponent::Heal(float Amount)
@@ -528,3 +529,17 @@ void UUnitCombatComponent::SetTargetedEnemy(IDamageable* NewTarget)
 {
 	TargetedEnemy = NewTarget;
 }
+
+#if WITH_EDITOR
+void UUnitCombatComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName propertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	if (propertyName == GET_MEMBER_NAME_CHECKED(UUnitCombatComponent, HealthPoints))
+	{
+		OnHealthPointsChange.Broadcast(HealthPoints);
+	}
+}
+#endif

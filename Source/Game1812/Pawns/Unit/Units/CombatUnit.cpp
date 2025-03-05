@@ -22,49 +22,38 @@ ACombatUnit::ACombatUnit()
 	VisualComponent = CreateDefaultSubobject<UUnitCombatVisualComponent>(TEXT("Visual Component"));
 
 	CombatUnitData = nullptr;
+	ReportComponent = nullptr;
+	PieceProjectionComponent = nullptr;
+	CurrentOrder = nullptr;
 }
 
 void ACombatUnit::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!CombatUnitData)
-		return;
-
-	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
-	VisualComponent->Init(CombatUnitData);
-}
-
-void ACombatUnit::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-
-	if (PieceProjectionComponent)
-		PieceProjectionComponent->DestroyComponent();
-
-	if (ReportComponent)
-		ReportComponent->DestroyComponent();
-
-	PieceProjectionComponent = nullptr;
-	ReportComponent = nullptr;
-
 	if (Team == ETeam::Russia)
 	{
 		ReportComponent = NewObject<UUnitReportComponent>(this, TEXT("Report Component"));
 		ReportComponent->RegisterComponent();
 	}
-	else 
+	else
 	{
 		PieceProjectionComponent = NewObject<UUnitPieceProjectionComponent>(this, TEXT("Piece Projection Component"));
 		PieceProjectionComponent->RegisterComponent();
 	}
 
-	if (!CurrentOrder) 
+	if (!CurrentOrder)
 	{
 		CurrentOrder = NewObject<UCombatUnitOrder>();
 	}
 
 	CurrentOrder->Location = GetActorLocation();
+
+	if (!CombatUnitData)
+		return;
+
+	CombatComponent->Init(CombatUnitData->GetCombatUnitStats());
+	VisualComponent->Init(CombatUnitData);
 }
 
 void ACombatUnit::SpawnDefaultController()
