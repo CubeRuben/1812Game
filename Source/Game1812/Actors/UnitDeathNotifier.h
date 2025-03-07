@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../FogSystem/FogAffected.h"
+#include "../FogSystem/FogAffectedActor.h"
 #include "UnitDeathNotifier.generated.h"
 
 UCLASS()
-class GAME1812_API AUnitDeathNotifier : public AActor, public IFogAffected
+class GAME1812_API AUnitDeathNotifier : public AActor, public IFogAffectedActor
 {
 	GENERATED_BODY()
 	

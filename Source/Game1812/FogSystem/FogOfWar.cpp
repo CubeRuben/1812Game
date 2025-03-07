@@ -1,6 +1,6 @@
-	#include "FogOfWar.h"
+#include "FogOfWar.h"
 
-#include "FogAffected.h"
+#include "FogAffectedActor.h"
 #include "../Actors/HeadQuarters.h"
 
 #include <Components/BoxComponent.h>
@@ -117,14 +117,14 @@ void AFogOfWar::Tick(float DeltaTime)
 void AFogOfWar::CheckActorsInFog()
 {
 	TArray<AActor*> affectedActors;
-	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UFogAffected::StaticClass(), affectedActors);
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UFogAffectedActor::StaticClass(), affectedActors);
 
 	for (AActor* actor : affectedActors)
 	{
 		if (!actor)
 			continue;
 
-		IFogAffected* fogAffected = Cast<IFogAffected>(actor);
+		IFogAffectedActor* fogAffected = Cast<IFogAffectedActor>(actor);
 
 		if (!fogAffected)
 			continue;

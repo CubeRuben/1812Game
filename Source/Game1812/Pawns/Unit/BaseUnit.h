@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "../../FogSystem/FogAffected.h"
+#include "../../FogSystem/FogAffectedActor.h"
 #include "TeamEnum.h"
 #include "UnitTypeEnum.h"
 #include "BaseUnit.generated.h"
@@ -10,7 +10,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUnitFogChangeDelegate, bool);
 
 UCLASS(Abstract, Blueprintable)
-class GAME1812_API ABaseUnit : public APawn, public IFogAffected
+class GAME1812_API ABaseUnit : public APawn, public IFogAffectedActor
 {
 	GENERATED_BODY()
 

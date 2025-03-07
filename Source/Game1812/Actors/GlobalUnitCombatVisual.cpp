@@ -92,13 +92,7 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 		GetWorld()->LineTraceSingleByChannel(hit, componentLocation + FVector(0.0f, 0.0f, 250.f), componentLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
 
 		if (hit.bBlockingHit)
-		{
 			component->SetWorldLocation(hit.Location);
-		}
-		else 
-		{
-			GEngine->AddOnScreenDebugMessage(100, 5.0f, FColor::Yellow, "AGlobalUnitCombatVisual::Tick - Unit Visual out of map");
-		}
 	}
 }
 

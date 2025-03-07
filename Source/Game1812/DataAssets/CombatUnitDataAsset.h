@@ -102,6 +102,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MeshOffset;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMesh* DeadUnitMeshOverride;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector DeadMeshOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FRotator DeadMeshRotation;
+
 public:
 
 	UStaticMesh* GetUnitMesh() const { return UnitMesh; }
@@ -110,6 +119,9 @@ public:
 	float GetRotationSpeed() const { return RotationSpeed; }
 	float GetForceTeleportDistanceSquared() const { return ForceTeleportDistanceSquared; }
 	float GetMeshOffset() const { return MeshOffset; }
+	UStaticMesh* GetDeadUnitMeshOverride() const { return DeadUnitMeshOverride; }
+	FVector GetDeadMeshOffset() const { return DeadMeshOffset; }
+	FRotator GetDeadMeshRotation() const { return DeadMeshRotation; }
 };
 
 UCLASS(BlueprintType)
