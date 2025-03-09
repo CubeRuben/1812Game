@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "../../FogSystem/FogAffectedActor.h"
+#include "../../FogSystem/FogAffected.h"
 #include "TeamEnum.h"
 #include "UnitTypeEnum.h"
 #include "BaseUnit.generated.h"
@@ -10,7 +10,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUnitFogChangeDelegate, bool);
 
 UCLASS(Abstract, Blueprintable)
-class GAME1812_API ABaseUnit : public APawn, public IFogAffectedActor
+class GAME1812_API ABaseUnit : public APawn, public IFogAffected
 {
 	GENERATED_BODY()
 
@@ -51,9 +51,10 @@ public:
 	virtual void AssignOrder(class UUnitOrder* NewOrder) {};
 
 	//IFogAffected Interface
-	void OnBeingCoveredInFog() override;
-	void OnBeingRevealedFromFog() override;
-	bool IsCoveredInFog() override;
+	virtual void OnBeingCoveredInFog() override;
+	virtual void OnBeingRevealedFromFog() override;
+	virtual bool IsCoveredInFog() override;
+	inline FVector GetWorldLocation() const override { return GetActorLocation(); }
 	//
 
 	virtual class UBoxComponent* GetColliderComponent() { return BoxComponent; };

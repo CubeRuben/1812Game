@@ -2,17 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
-#include "../../../FogSystem/FogAffected.h"
-#include "UnitCombatMeshComponent.generated.h"
+#include "../../FogSystem/FogAffected.h"
+#include "DeadUnitMeshComponent.generated.h"
 
 UCLASS()
-class GAME1812_API UUnitCombatMeshComponent : public UStaticMeshComponent, public IFogAffected
+class GAME1812_API UDeadUnitMeshComponent : public UStaticMeshComponent, public IFogAffected
 {
 	GENERATED_BODY()
-
+	
 public:
 
-	UUnitCombatMeshComponent();
+	UDeadUnitMeshComponent();
 
 	//IFogAffected Interface
 	void OnBeingCoveredInFog() override { SetVisibility(false); }
@@ -20,5 +20,5 @@ public:
 	bool IsCoveredInFog() override { return !IsVisible(); }
 	inline FVector GetWorldLocation() const override { return GetComponentLocation(); }
 	//
-	
+
 };

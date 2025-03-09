@@ -67,6 +67,12 @@ public:
 	void AssignOrder(class UUnitOrder* NewOrder);
 	//
 	
+	//IFogAffected Interface override
+	void OnBeingCoveredInFog() override;
+	void OnBeingRevealedFromFog() override;
+	TArray<IFogAffected*>* GetFogAffectedComponents() override;
+	//
+
 	//IDamageable Interface
 	float ApplyDamage(IDamageable* Attacker, float Amount) override;
 	ETeam GetTeam() const override { return Team; };

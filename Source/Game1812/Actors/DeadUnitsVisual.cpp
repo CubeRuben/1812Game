@@ -13,20 +13,7 @@ ADeadUnitsVisual::ADeadUnitsVisual()
 
 }
 
-void ADeadUnitsVisual::BeginPlay()
+void ADeadUnitsVisual::AddDeadMesh(const FVector& Location, const FCombatUnitVisual& CombatUnitVisual)
 {
-	Super::BeginPlay();
-	
+	DrawDebugPoint(GetWorld(), Location, 5.0f, FColor::Red, true, 30.0f);
 }
-
-void ADeadUnitsVisual::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-TArray<class IFogAffectedComponent*>* ADeadUnitsVisual::GetFogAffectedComponents()
-{
-	return nullptr;
-}
-

@@ -108,6 +108,24 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 	}
 }
 
+void ACombatUnit::OnBeingCoveredInFog()
+{
+	OnUnitFogChange.Broadcast(true);
+}
+
+void ACombatUnit::OnBeingRevealedFromFog()
+{
+	OnUnitFogChange.Broadcast(false);
+}
+
+TArray<IFogAffected*>* ACombatUnit::GetFogAffectedComponents()
+{
+	if (VisualComponent)
+		return VisualComponent->GetFogAffectedComponents();
+	
+	return nullptr;
+}
+
 void ACombatUnit::SetCombatUnitData(UCombatUnitDataAsset* NewCombatUnitData)
 {
 	CombatUnitData = NewCombatUnitData;

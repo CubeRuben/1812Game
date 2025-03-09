@@ -1,6 +1,6 @@
 #include "FogOfWar.h"
 
-#include "FogAffectedActor.h"
+#include "FogAffected.h"
 #include "../Actors/HeadQuarters.h"
 
 #include <Components/BoxComponent.h>
@@ -117,31 +117,52 @@ void AFogOfWar::Tick(float DeltaTime)
 void AFogOfWar::CheckActorsInFog()
 {
 	TArray<AActor*> affectedActors;
-	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UFogAffectedActor::StaticClass(), affectedActors);
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UFogAffected::StaticClass(), affectedActors);
 
 	for (AActor* actor : affectedActors)
 	{
 		if (!actor)
 			continue;
 
-		IFogAffectedActor* fogAffected = Cast<IFogAffectedActor>(actor);
+		IFogAffected* fogAffected = Cast<IFogAffected>(actor);
 
 		if (!fogAffected)
 			continue;
 
-		FIntPoint index = LocationToIndex(actor->GetActorLocation());
+		UpdateFogAffected(fogAffected);
 
-		const bool isFogDisabled = FogAlphaImageBuilder.GetPixel(FVector2i(index.X, index.Y)).W > 0.75f;
-		const bool isActorInFog = fogAffected->IsCoveredInFog();
+		TArray<IFogAffected*>* const fogAffectedComponents = fogAffected->GetFogAffectedComponents();
 
-		if (isFogDisabled && isActorInFog || !AffectActors)
+		if (!fogAffectedComponents)
+			continue;
+
+		for (IFogAffected* fogAffectedComponent : *fogAffectedComponents) 
 		{
-			fogAffected->OnBeingRevealedFromFog();
+			if (!fogAffectedComponent)
+				continue;
+
+			UpdateFogAffected(fogAffectedComponent);
 		}
-		else if (!isFogDisabled && !isActorInFog)
-		{
-			fogAffected->OnBeingCoveredInFog();
-		}
+	}
+}
+
+void AFogOfWar::UpdateFogAffected(IFogAffected* FogAffected)
+{
+	if (!FogAffected->IsAffectedByFog())
+		return;
+
+	FIntPoint index = LocationToIndex(FogAffected->GetWorldLocation());
+
+	const bool isOutOfFog = FogAlphaImageBuilder.GetPixel(FVector2i(index.X, index.Y)).W > 0.5f;
+	const bool fogStateOfAffected = FogAffected->IsCoveredInFog();
+
+	if (isOutOfFog && fogStateOfAffected || !AffectActors)
+	{
+		FogAffected->OnBeingRevealedFromFog();
+	}
+	else if (!isOutOfFog && !fogStateOfAffected)
+	{
+		FogAffected->OnBeingCoveredInFog();
 	}
 }
 

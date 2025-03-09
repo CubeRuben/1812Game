@@ -1,11 +1,12 @@
 #include "UnitCombatVisualComponent.h"
 
 #include "UnitCombatComponent.h"
+#include "UnitCombatMeshComponent.h"
 #include "../Units/CombatUnit.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
 #include "../../../Actors/GlobalUnitCombatVisual.h"
-
-#include <Components/StaticMeshComponent.h>
+#include "../../../Actors/DeadUnitsVisual.h"
+#include "../../../FogSystem/FogAffected.h"
 
 UUnitCombatVisualComponent::UUnitCombatVisualComponent()
 {
@@ -28,6 +29,11 @@ void UUnitCombatVisualComponent::BeginPlay()
 
 	if (!AGlobalUnitCombatVisual::GetInstance()) 
 		AGlobalUnitCombatVisual::CreateInstance(GetWorld());
+}
+
+TArray<IFogAffected*>* UUnitCombatVisualComponent::GetFogAffectedComponents()
+{
+	return &FogAffectedComponents;
 }
 
 void UUnitCombatVisualComponent::UpdateVisual(float DeltaTime)
@@ -94,13 +100,14 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 	const int meshesNumber = FMath::RoundToInt(combatUnitStats.GetBaseHP() / combatUnitVisual.GetHealthPointsPerMesh());
 
 	UnitMeshComponents.SetNum(meshesNumber);
+	FogAffectedComponents.SetNum(meshesNumber);
 
 	const FString componentBaseName("Combat Unit Mesh ");
 
 	for (int i = 0; i < meshesNumber; i++) 
 	{
 		const FName componentName(componentBaseName + FString::FromInt(i));
-		UStaticMeshComponent* component = NewObject<UStaticMeshComponent>(GetOwner(), UStaticMeshComponent::StaticClass(), componentName);
+		UUnitCombatMeshComponent* component = NewObject<UUnitCombatMeshComponent>(GetOwner(), UUnitCombatMeshComponent::StaticClass(), componentName);
 		
 		if (!component)
 			return;
@@ -110,6 +117,7 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 		component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
 		UnitMeshComponents[i] = component;
+		FogAffectedComponents[i] = component;
 	}
 
 	UpdateFormationOffsets(meshesNumber, combatUnitVisual.GetMeshOffset());
@@ -209,13 +217,14 @@ void UUnitCombatVisualComponent::ReviveMeshes(int NumberToRevive)
 	const float rootRotation = GetOwner()->GetRootComponent()->GetComponentRotation().Yaw;
 
 	UnitMeshComponents.SetNum(aliveMeshesNum + NumberToRevive);
+	FogAffectedComponents.SetNum(aliveMeshesNum + NumberToRevive);
 
 	for (int i = 0; i < NumberToRevive; i++)
 	{
 		const int deadMeshesIndex = deadMeshesLastIndex - i;
 		const int aliveMeshesIndex = aliveMeshesNum + i;
 
-		UStaticMeshComponent* const component = DeadUnitMeshComponents[deadMeshesIndex];
+		UUnitCombatMeshComponent* const component = DeadUnitMeshComponents[deadMeshesIndex];
 
 		component->SetVisibility(true);
 
@@ -226,7 +235,9 @@ void UUnitCombatVisualComponent::ReviveMeshes(int NumberToRevive)
 		component->SetWorldRotation(FRotator(0.0f, rootRotation, 0.0f));
 
 		DeadUnitMeshComponents.RemoveAt(deadMeshesIndex, 1, false);
+
 		UnitMeshComponents[aliveMeshesIndex] = component;
+		FogAffectedComponents[aliveMeshesIndex] = component;
 	}
 
 	DeadUnitMeshComponents.Shrink();
@@ -243,13 +254,43 @@ void UUnitCombatVisualComponent::KillMeshes(int NumberToKill)
 	{
 		const int aliveMeshesIndex = meshesLastIndex - i;
 
-		UStaticMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
+		UUnitCombatMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
 
 		component->SetVisibility(false);
 
 		UnitMeshComponents.RemoveAt(aliveMeshesIndex, 1, false);
+		FogAffectedComponents.RemoveAt(aliveMeshesIndex, 1, false);
+
 		DeadUnitMeshComponents[deadMeshesNum + i] = component;
 	}
 
 	UnitMeshComponents.Shrink();
+	FogAffectedComponents.Shrink();
+}
+
+void UUnitCombatVisualComponent::SpawnDeadMeshes(int Number)
+{
+	ADeadUnitsVisual* deadUnitsVisual = ADeadUnitsVisual::GetInstance();
+
+	if (!deadUnitsVisual)
+	{
+		ADeadUnitsVisual::CreateInstance(GetWorld());
+
+		deadUnitsVisual = ADeadUnitsVisual::GetInstance();
+
+		if (!deadUnitsVisual)
+			return;
+	}
+
+	const int meshesLastIndex = UnitMeshComponents.Num() - 1;
+
+	const FCombatUnitVisual& combatUnitVisual = CombatUnitPawn->GetCombatUnitData()->GetCombatUnitVisual();
+
+	for (int i = 0; i < Number; i++)
+	{
+		const int aliveMeshesIndex = meshesLastIndex - i;
+		UUnitCombatMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
+
+		deadUnitsVisual->AddDeadMesh(component->GetComponentLocation(), combatUnitVisual);
+	}
 }

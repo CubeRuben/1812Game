@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../FogSystem/FogAffectedActor.h"
+#include "../FogSystem/FogAffected.h"
 #include "DeadUnitsVisual.generated.h"
 
 UCLASS()
-class GAME1812_API ADeadUnitsVisual : public AActor, public IFogAffectedActor
+class GAME1812_API ADeadUnitsVisual : public AActor, public IFogAffected
 {
 	GENERATED_BODY()
 	
@@ -19,23 +19,26 @@ protected:
 	static ADeadUnitsVisual* Instance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class IFogAffectedComponent*> FogAffected;
+	TArray<class UDeadUnitMeshComponent*> DeadUnitMeshComponents;
 
-	virtual void BeginPlay() override;
+	TArray<IFogAffected*> FogAffectedComponents;
 
 public:	
 
 	static ADeadUnitsVisual* GetInstance() { return Instance; }
 	static void CreateInstance(UWorld* World);
 
-	virtual void Tick(float DeltaTime) override;
+	void AddDeadMesh(const FVector& Location, const struct FCombatUnitVisual& CombatUnitVisual);
 
-	// IFogAffectedActor
-	virtual void OnBeingCoveredInFog() { }
-	virtual void OnBeingRevealedFromFog() { }
-	virtual bool IsCoveredInFog() { return false; };
+	//IFogAffected Interface
+	void OnBeingCoveredInFog() override { }
+	void OnBeingRevealedFromFog() override { }
+	bool IsCoveredInFog() override { return false; }
+	inline FVector GetWorldLocation() const override { return GetActorLocation(); }
 
-	virtual TArray<class IFogAffectedComponent*>* GetFogAffectedComponents();
+	bool IsAffectedByFog() override { return false; }
+
+	virtual TArray<IFogAffected*>* GetFogAffectedComponents() { return &FogAffectedComponents; }
 	//
 
 };

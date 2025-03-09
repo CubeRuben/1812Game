@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../FogSystem/FogAffectedActor.h"
+#include "../FogSystem/FogAffected.h"
 #include "UnitDeathNotifier.generated.h"
 
 UCLASS()
-class GAME1812_API AUnitDeathNotifier : public AActor, public IFogAffectedActor
+class GAME1812_API AUnitDeathNotifier : public AActor, public IFogAffected
 {
 	GENERATED_BODY()
 	
@@ -27,6 +27,7 @@ public:
 	void OnBeingCoveredInFog() override;
 	void OnBeingRevealedFromFog() override;
 	bool IsCoveredInFog() override;
+	inline FVector GetWorldLocation() const override { return GetActorLocation(); }
 	//
 
 };

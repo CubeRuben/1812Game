@@ -18,10 +18,12 @@ protected:
 	class ACombatUnit* CombatUnitPawn;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UStaticMeshComponent*> UnitMeshComponents;
+	TArray<class UUnitCombatMeshComponent*> UnitMeshComponents;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UStaticMeshComponent*> DeadUnitMeshComponents;
+	TArray<class UUnitCombatMeshComponent*> DeadUnitMeshComponents;
+
+	TArray<class IFogAffected*> FogAffectedComponents;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<FVector> MeshesOffsets;
@@ -34,8 +36,11 @@ protected:
 
 	void ReviveMeshes(int NumberToRevive);
 	void KillMeshes(int NumberToKill);
+	void SpawnDeadMeshes(int Number);
 
 public:	
+
+	TArray<class IFogAffected*>* GetFogAffectedComponents();
 
 	void UpdateVisual(float DeltaTime);
 

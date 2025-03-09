@@ -1,6 +1,7 @@
 #include "GlobalUnitCombatVisual.h"
 
 #include "../Pawns/Unit/Components/UnitCombatVisualComponent.h"
+#include "../Pawns/Unit/Components/UnitCombatMeshComponent.h"
 
 AGlobalUnitCombatVisual* AGlobalUnitCombatVisual::Instance = nullptr;
 
@@ -9,7 +10,7 @@ void AGlobalUnitCombatVisual::CreateInstance(UWorld* World)
 	Instance = World->SpawnActor<AGlobalUnitCombatVisual>(AGlobalUnitCombatVisual::StaticClass());
 }
 
-void AGlobalUnitCombatVisual::AddVisualComponents(UUnitCombatVisualComponent* NewVisualComponent, const TArray<class UStaticMeshComponent*>& NewMeshComponents)
+void AGlobalUnitCombatVisual::AddVisualComponents(UUnitCombatVisualComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
 {
 	VisualComponents.Add(NewVisualComponent);
 	MeshComponents.Append(NewMeshComponents);

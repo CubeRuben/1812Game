@@ -85,10 +85,11 @@ protected:
 	void AddConstantDiscoveredArea();
 
 	void UpdateFogTexture();
-
 	void UpdateDiscoveredAreas();
 
 	void CheckActorsInFog();
+	
+	void UpdateFogAffected(class IFogAffected* FogAffected);
 
 	static void AddTextureToTexture(TImageBuilder<FVector4f>& MainImage, const TImageBuilder<FVector4f>& Image);
 
