@@ -201,7 +201,7 @@ void UUnitCombatComponent::OnCombineReorganization()
 	const float otherHp = otherCombatComponent->GetHealthPoints();
 
 	//Applying stats changes
-	otherCombatComponent->Heal(hp);
+	otherCombatComponent->ApplyHeal(hp);
 	otherCombatComponent->SetMorale((morale * hp + otherMorale * otherHp) / (hp + otherHp) * 0.8f);
 
 	//Killing unit
@@ -312,7 +312,7 @@ float UUnitCombatComponent::ApplyDamage(IDamageable* Attacker, float DamageAmoun
 
 	//Calculate total damage with defense
 	const float totalDamage = FMath::Max(1, DamageAmount);
-	SetHealthPoints(HealthPoints - totalDamage);
+	ApplyDamage(totalDamage);
 
 	//Destroy if no HP
 	if (HealthPoints <= 0.0f)
@@ -499,15 +499,27 @@ float UUnitCombatComponent::GetDetectionRange() const
 	return CombatUnitPawn->GetCombatUnitStats().GetEnemyDetectionRange();
 }
 
-void UUnitCombatComponent::SetHealthPoints(float NewHealthPoints)
+void UUnitCombatComponent::SetHealthPointsClamped(float NewHealthPoints)
 {
 	HealthPoints = FMath::Clamp(NewHealthPoints, 0.0f, CombatUnitPawn->GetCombatUnitStats().GetBaseHP());
-	OnHealthPointsChange.Broadcast(HealthPoints);
 }
 
-void UUnitCombatComponent::Heal(float Amount)
+void UUnitCombatComponent::SetHealthPoints(float NewHealthPoints)
 {
-	SetHealthPoints(Amount + HealthPoints);
+	SetHealthPointsClamped(NewHealthPoints);
+	OnHealthPointsChange.Broadcast(HealthPoints, false);
+}
+
+void UUnitCombatComponent::ApplyHeal(float Amount)
+{
+	SetHealthPointsClamped(HealthPoints + Amount);
+	OnHealthPointsChange.Broadcast(HealthPoints, false);
+}
+
+void UUnitCombatComponent::ApplyDamage(float Amount)
+{
+	SetHealthPointsClamped(HealthPoints - Amount);
+	OnHealthPointsChange.Broadcast(HealthPoints, true);
 }
 
 float UUnitCombatComponent::GetHealthPointsRatio() const
@@ -539,7 +551,8 @@ void UUnitCombatComponent::PostEditChangeProperty(FPropertyChangedEvent& Propert
 
 	if (propertyName == GET_MEMBER_NAME_CHECKED(UUnitCombatComponent, HealthPoints))
 	{
-		OnHealthPointsChange.Broadcast(HealthPoints);
+		SetHealthPointsClamped(HealthPoints);
+		OnHealthPointsChange.Broadcast(HealthPoints, true);
 	}
 }
 #endif

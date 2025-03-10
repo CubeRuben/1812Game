@@ -23,10 +23,13 @@ protected:
 
 	TArray<IFogAffected*> FogAffectedComponents;
 
+	void BeginPlay() override;
+	void BeginDestroy() override;
+
 public:	
 
 	static ADeadUnitsVisual* GetInstance() { return Instance; }
-	static void CreateInstance(UWorld* World);
+	static ADeadUnitsVisual* GetInstance(UWorld* World);
 
 	void AddDeadMesh(const FVector& Location, const struct FCombatUnitVisual& CombatUnitVisual);
 

@@ -32,7 +32,7 @@ protected:
 
 	void UpdateFormationOffsets(int Number, float Offset);
 
-	void OnHealthPointsChange(float HealthPoints);
+	void OnHealthPointsChange(float HealthPoints, bool WasDamaged);
 
 	void ReviveMeshes(int NumberToRevive);
 	void KillMeshes(int NumberToKill);

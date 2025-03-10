@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageTakenDelegate, class AComb
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTemporarilyDefeatDelegate);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnPropertyChangeDelegate, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthPointsChangeDelegate, float, bool);
 
 UCLASS(Blueprintable, BlueprintType)
 class GAME1812_API UUnitCombatComponent : public UActorComponent
@@ -81,7 +81,7 @@ protected:
 	
 public:	
 
-	FOnPropertyChangeDelegate OnHealthPointsChange;
+	FOnHealthPointsChangeDelegate OnHealthPointsChange;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDamageDealtDelegate OnDamageDealt;
@@ -105,8 +105,10 @@ public:
 	float GetDetectionRange() const;
 
 	float GetHealthPoints() const { return HealthPoints; };
+	void SetHealthPointsClamped(float NewHealthPoints);
 	void SetHealthPoints(float NewHealthPoints);
-	void Heal(float Amount);
+	void ApplyHeal(float Amount);
+	void ApplyDamage(float Amount);
 
 	float GetMorale() const { return Morale; };
 	void SetMorale(float NewMorale) { Morale = NewMorale; };

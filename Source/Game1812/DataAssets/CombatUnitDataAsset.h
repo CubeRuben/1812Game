@@ -111,6 +111,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FRotator DeadMeshRotation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FRotator DeadMeshRandomRotation;
+
 public:
 
 	UStaticMesh* GetUnitMesh() const { return UnitMesh; }
@@ -122,6 +125,7 @@ public:
 	UStaticMesh* GetDeadUnitMeshOverride() const { return DeadUnitMeshOverride; }
 	FVector GetDeadMeshOffset() const { return DeadMeshOffset; }
 	FRotator GetDeadMeshRotation() const { return DeadMeshRotation; }
+	FRotator GetDeadMeshRandomRotation() const { return DeadMeshRandomRotation; }
 };
 
 UCLASS(BlueprintType)

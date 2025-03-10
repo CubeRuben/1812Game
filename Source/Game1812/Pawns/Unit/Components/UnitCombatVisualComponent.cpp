@@ -188,7 +188,7 @@ void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number, float Offset
 	}
 }
 
-void UUnitCombatVisualComponent::OnHealthPointsChange(float HealthPoints)
+void UUnitCombatVisualComponent::OnHealthPointsChange(float HealthPoints, bool WasDamaged)
 {
 	const FCombatUnitVisual& unitVisual = CombatUnitPawn->GetCombatUnitData()->GetCombatUnitVisual();
 
@@ -204,6 +204,11 @@ void UUnitCombatVisualComponent::OnHealthPointsChange(float HealthPoints)
 	}
 	else if (deltaMeshesNumber < 0)
 	{
+		if (WasDamaged)
+		{
+			SpawnDeadMeshes(-deltaMeshesNumber);
+		}
+
 		KillMeshes(-deltaMeshesNumber);
 	}
 }
@@ -270,16 +275,11 @@ void UUnitCombatVisualComponent::KillMeshes(int NumberToKill)
 
 void UUnitCombatVisualComponent::SpawnDeadMeshes(int Number)
 {
-	ADeadUnitsVisual* deadUnitsVisual = ADeadUnitsVisual::GetInstance();
+	ADeadUnitsVisual* const deadUnitsVisual = ADeadUnitsVisual::GetInstance(GetWorld());
 
 	if (!deadUnitsVisual)
 	{
-		ADeadUnitsVisual::CreateInstance(GetWorld());
-
-		deadUnitsVisual = ADeadUnitsVisual::GetInstance();
-
-		if (!deadUnitsVisual)
-			return;
+		return;
 	}
 
 	const int meshesLastIndex = UnitMeshComponents.Num() - 1;
