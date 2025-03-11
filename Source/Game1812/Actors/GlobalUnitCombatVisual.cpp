@@ -5,15 +5,14 @@
 
 AGlobalUnitCombatVisual* AGlobalUnitCombatVisual::Instance = nullptr;
 
-void AGlobalUnitCombatVisual::CreateInstance(UWorld* World)
+AGlobalUnitCombatVisual* AGlobalUnitCombatVisual::GetInstance(UWorld* World)
 {
-	Instance = World->SpawnActor<AGlobalUnitCombatVisual>(AGlobalUnitCombatVisual::StaticClass());
-}
+	if (Instance)
+		return Instance;
 
-void AGlobalUnitCombatVisual::AddVisualComponents(UUnitCombatVisualComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
-{
-	VisualComponents.Add(NewVisualComponent);
-	MeshComponents.Append(NewMeshComponents);
+	Instance = World->SpawnActor<AGlobalUnitCombatVisual>(AGlobalUnitCombatVisual::StaticClass());
+
+	return Instance;
 }
 
 AGlobalUnitCombatVisual::AGlobalUnitCombatVisual()
@@ -42,23 +41,34 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	for (UUnitCombatVisualComponent* const component : VisualComponents) 
+	for (TWeakObjectPtr<UUnitCombatVisualComponent>& component : VisualComponents)
 	{
+		if (!component.IsValid())
+			continue;
+
 		component->UpdateVisual(DeltaTime);
 	}
 
 	for (int a = 0; a < MeshComponents.Num(); a++) 
 	{
-		UStaticMeshComponent* const component1 = MeshComponents[a];
+		UUnitCombatMeshComponent* const component1 = MeshComponents[a].Get();
+
+		//Remove all nullptr to unit's meshes, cleanup here, because it's faster to find nullptr, that ptr in given array
+		if (!component1)
+		{
+			MeshComponents.RemoveAll([](TWeakObjectPtr<UUnitCombatMeshComponent>& el) { return el == nullptr; });
+			a--;
+			continue;
+		}
 
 		if (!component1->IsVisible())
 			continue;
 
 		for (int b = a + 1; b < MeshComponents.Num(); b++)
 		{
-			UStaticMeshComponent* const component2 = MeshComponents[b];
+			UUnitCombatMeshComponent* const component2 = MeshComponents[b].Get();
 
-			if (!component2->IsVisible())
+			if (!component2 || !component2->IsVisible())
 				continue;
 
 			FVector delta = component1->GetComponentLocation() - component2->GetComponentLocation();
@@ -81,9 +91,9 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 		}
 	}
 
-	for (UStaticMeshComponent* const component : MeshComponents)
+	for (TWeakObjectPtr<UUnitCombatMeshComponent>& component : MeshComponents)
 	{
-		if (!component->IsVisible())
+		if (!component.IsValid() || !component->IsVisible())
 			continue;
 
 		FHitResult hit;
@@ -97,3 +107,13 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 	}
 }
 
+void AGlobalUnitCombatVisual::AddVisualComponent(UUnitCombatVisualComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
+{
+	VisualComponents.Add(NewVisualComponent);
+	MeshComponents.Append(NewMeshComponents);
+}
+
+void AGlobalUnitCombatVisual::RemoveVisualComponent(UUnitCombatVisualComponent* VisualComponentToRemove)
+{
+	VisualComponents.Remove(VisualComponentToRemove);
+}

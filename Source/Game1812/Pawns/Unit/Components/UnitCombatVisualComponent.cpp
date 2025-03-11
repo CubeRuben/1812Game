@@ -26,9 +26,16 @@ void UUnitCombatVisualComponent::BeginPlay()
 	}
 
 	CombatUnitPawn->GetCombatComponent()->OnHealthPointsChange.AddUObject(this, &UUnitCombatVisualComponent::OnHealthPointsChange);
+}
 
-	if (!AGlobalUnitCombatVisual::GetInstance()) 
-		AGlobalUnitCombatVisual::CreateInstance(GetWorld());
+void UUnitCombatVisualComponent::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	AGlobalUnitCombatVisual* const instance = AGlobalUnitCombatVisual::GetInstance();
+
+	if (instance)
+		instance->RemoveVisualComponent(this);
 }
 
 TArray<IFogAffected*>* UUnitCombatVisualComponent::GetFogAffectedComponents()
@@ -91,7 +98,7 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 	if (!UnitCombatStats)
 		return;
 
-	if (!AGlobalUnitCombatVisual::GetInstance())
+	if (!AGlobalUnitCombatVisual::GetInstance(GetWorld()))
 		return;
 
 	const FCombatUnitVisual& combatUnitVisual = UnitCombatStats->GetCombatUnitVisual();
@@ -134,7 +141,7 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 		UnitMeshComponents[i]->SetWorldRotation(FRotator(0.0f, rootRotation, 0.0f));
 	}
 
-	AGlobalUnitCombatVisual::GetInstance()->AddVisualComponents(this, UnitMeshComponents);
+	AGlobalUnitCombatVisual::GetInstance()->AddVisualComponent(this, UnitMeshComponents);
 }
 
 void UUnitCombatVisualComponent::UpdateFormationOffsets(int Number, float Offset)

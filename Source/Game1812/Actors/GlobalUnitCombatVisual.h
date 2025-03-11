@@ -17,11 +17,9 @@ protected:
 
 	static AGlobalUnitCombatVisual* Instance;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UUnitCombatVisualComponent*> VisualComponents;
+	TArray<TWeakObjectPtr<class UUnitCombatVisualComponent>> VisualComponents;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UUnitCombatMeshComponent*> MeshComponents;
+	TArray<TWeakObjectPtr<class UUnitCombatMeshComponent>> MeshComponents;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CrammingDistance;
@@ -35,9 +33,10 @@ protected:
 public:	
 
 	static AGlobalUnitCombatVisual* GetInstance() { return Instance; }
-	static void CreateInstance(UWorld* World);
+	static AGlobalUnitCombatVisual* GetInstance(UWorld* World);
 
-	void AddVisualComponents(class UUnitCombatVisualComponent* NewVisualComponent, const TArray<class UUnitCombatMeshComponent*>& NewMeshComponents);
+	void AddVisualComponent(class UUnitCombatVisualComponent* NewVisualComponent, const TArray<class UUnitCombatMeshComponent*>& NewMeshComponents);
+	void RemoveVisualComponent(class UUnitCombatVisualComponent* VisualComponentToRemove);
 
 	virtual void Tick(float DeltaTime) override;
 

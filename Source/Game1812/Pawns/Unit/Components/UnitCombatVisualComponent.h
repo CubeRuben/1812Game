@@ -29,6 +29,7 @@ protected:
 	TArray<FVector> MeshesOffsets;
 
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 	void UpdateFormationOffsets(int Number, float Offset);
 
