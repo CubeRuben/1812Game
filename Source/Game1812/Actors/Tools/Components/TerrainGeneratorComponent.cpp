@@ -39,19 +39,33 @@ void UTerrainGeneratorComponent::GenerateProps()
 		return;
 
 	const bool bRandomRotation = GeneratorDataAsset->GetRandomRotation();
+	const float falloffPower = GeneratorDataAsset->GetFalloffPower();
+	const FVector& scale = GeneratorDataAsset->GetScale();
 
 	const FVector actorLocation = OwnerVolume->GetActorLocation();
 	const FRotator actorRotation = OwnerVolume->GetActorRotation();
 	const FVector extent = OwnerVolume->GetBoxComponent()->GetScaledBoxExtent();
+	const FVector traceExtentZ(0.0f, 0.0f, extent.Z * 2.0f);
 
 	FRandomStream randomStream(Seed);
 
 	FPoissonPoints poissonPoints(randomStream, GeneratorDataAsset->GetMinDistance(), extent.X * 2.0f, extent.Y * 2.0f);
 	poissonPoints.GeneratePoissonPoints();
 
+	const FString componentBaseName("Prop Mesh Component ");
+
 	for (FVector2D& point : poissonPoints.GetPoints()) 
 	{
-		const FName propComponentName(FString("Prop Mesh Component ").Append(FString::FromInt(PropsMeshComponents.Num())));
+		const float unitX = point.X / extent.X - 1.0f;
+		const float unitY = point.Y / extent.Y - 1.0f;
+		const float distanceSquared = unitX * unitX + unitY * unitY;
+		const float distanceSquaredPowered = FMath::Pow(distanceSquared, falloffPower);
+		const float falloffRandom = randomStream.FRand();
+
+		if (distanceSquaredPowered > falloffRandom)
+			continue;
+
+		const FName propComponentName(componentBaseName + FString::FromInt(PropsMeshComponents.Num()));
 		UStaticMeshComponent* propComponent = NewObject<UStaticMeshComponent>(OwnerVolume, UStaticMeshComponent::StaticClass(), propComponentName);
 
 		const int randomMeshVariantIndex = randomStream.RandRange(0, meshVariants.Num() - 1);
@@ -62,10 +76,11 @@ void UTerrainGeneratorComponent::GenerateProps()
 		FHitResult hit;
 		const FVector relativeSpawnLocation(point.X - extent.X, point.Y - extent.Y, 0.0f);
 		const FVector spawnLocation = relativeSpawnLocation.RotateAngleAxis(actorRotation.Yaw, FVector::UpVector) + actorLocation;
-		const FVector extentZ(0.0f, 0.0f, extent.Z);
-		GetWorld()->LineTraceSingleByChannel(hit, spawnLocation + extentZ, spawnLocation - extentZ, ECollisionChannel::ECC_GameTraceChannel1);
+		
+		GetWorld()->LineTraceSingleByChannel(hit, spawnLocation + traceExtentZ, spawnLocation - traceExtentZ, ECollisionChannel::ECC_GameTraceChannel1);
 
 		propComponent->SetWorldLocation(hit.Location);
+		propComponent->SetWorldScale3D(scale);
 		
 		if (bRandomRotation) 
 		{

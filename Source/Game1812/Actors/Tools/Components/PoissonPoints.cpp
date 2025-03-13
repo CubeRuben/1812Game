@@ -37,7 +37,7 @@ void FPoissonPoints::GeneratePoissonPoints(int32 MaxAttempts)
 
     while (activePoints.Num() > 0)
     {
-        const int32 index = FMath::RandRange(0, activePoints.Num() - 1);
+        const int32 index = RandomStream->RandRange(0, activePoints.Num() - 1);
         FVector2D point = activePoints[index];
         bool bFound = false;
 

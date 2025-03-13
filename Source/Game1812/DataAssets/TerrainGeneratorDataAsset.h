@@ -19,7 +19,13 @@ protected:
 	float MinDistance;
 
 	UPROPERTY(EditAnywhere)
+	float FalloffPower;
+
+	UPROPERTY(EditAnywhere)
 	bool RandomRotation;
+
+	UPROPERTY(EditAnywhere)
+	FVector Scale;
 
 	UPROPERTY(EditAnywhere)
 	TArray<UStaticMesh*> MeshVariants;
@@ -27,7 +33,9 @@ protected:
 public:
 
 	float GetMinDistance() const { return MinDistance; };
+	float GetFalloffPower() const { return FalloffPower; };
 	bool GetRandomRotation() const { return RandomRotation; };
+	const FVector& GetScale() const { return Scale; };
 	const TArray<UStaticMesh*>& GetMeshVariants() const { return MeshVariants;};
 	
 };
