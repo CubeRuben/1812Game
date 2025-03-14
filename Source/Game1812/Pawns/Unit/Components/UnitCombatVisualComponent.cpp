@@ -122,6 +122,8 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 		component->RegisterComponent();
 		component->SetStaticMesh(combatUnitVisual.GetUnitMesh());
 		component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		GetOwner()->AddInstanceComponent(component);
 		
 		UnitMeshComponents[i] = component;
 		FogAffectedComponents[i] = component;

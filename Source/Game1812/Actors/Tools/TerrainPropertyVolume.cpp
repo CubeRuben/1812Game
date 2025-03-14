@@ -18,19 +18,12 @@ ATerrainPropertyVolume::ATerrainPropertyVolume()
 	NavModifierComponent->AreaClass = UNavArea_CustomTerrain::StaticClass();
 }
 
-#if WITH_EDITOR
-void ATerrainPropertyVolume::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void ATerrainPropertyVolume::OnConstruction(const FTransform& Transform)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	Super::OnConstruction(Transform);
 
-	FName propertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if (!TerrainPropertyDataAsset)
+		return;
 
-	if (propertyName == GET_MEMBER_NAME_CHECKED(ATerrainPropertyVolume, TerrainPropertyDataAsset))
-	{
-		if (!TerrainPropertyDataAsset)
-			return;
-
-		NavModifierComponent->AreaClass = TerrainPropertyDataAsset->GetTerrainNavAreaClass();
-	}
+	NavModifierComponent->AreaClass = TerrainPropertyDataAsset->GetTerrainNavAreaClass();
 }
-#endif

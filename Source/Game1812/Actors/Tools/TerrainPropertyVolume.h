@@ -24,12 +24,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UTerrainPropertyDataAsset* TerrainPropertyDataAsset;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 public:
 
 	const class UTerrainPropertyDataAsset* GetTerrainPropertyDataAsset() const { return TerrainPropertyDataAsset; };
 	class UBoxComponent* GetBoxComponent() const { return BoxComponent; };
 
-#if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 };

@@ -124,7 +124,7 @@ FVector AUnitPathArrow::ProjectPointToMap(const FVector& Point)
 {
 	FHitResult hit;
 
-	GetWorld()->LineTraceSingleByChannel(hit, Point, Point - FVector(0, 0, 4000.f), ECollisionChannel::ECC_GameTraceChannel1);
+	GetWorld()->LineTraceSingleByChannel(hit, Point, Point - FVector(0.0f, 0.0f, 4000.f), ECollisionChannel::ECC_GameTraceChannel1);
 
 	if (!hit.bBlockingHit)
 		return Point;

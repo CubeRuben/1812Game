@@ -39,6 +39,7 @@ void UTerrainGeneratorComponent::GenerateProps()
 		return;
 
 	const bool bRandomRotation = GeneratorDataAsset->GetRandomRotation();
+	const bool bEnableCollision = GeneratorDataAsset->GetEnableCollision();
 	const float falloffPower = GeneratorDataAsset->GetFalloffPower();
 	const FVector& scale = GeneratorDataAsset->GetScale();
 
@@ -72,6 +73,9 @@ void UTerrainGeneratorComponent::GenerateProps()
 		propComponent->SetStaticMesh(meshVariants[randomMeshVariantIndex]);
 		propComponent->RegisterComponent();
 		propComponent->AttachToComponent(OwnerVolume->GetBoxComponent(), FAttachmentTransformRules::KeepWorldTransform);
+
+		if (!bEnableCollision)
+			propComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
 		FHitResult hit;
 		const FVector relativeSpawnLocation(point.X - extent.X, point.Y - extent.Y, 0.0f);

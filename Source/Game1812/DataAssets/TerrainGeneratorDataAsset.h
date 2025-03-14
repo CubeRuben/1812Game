@@ -25,6 +25,9 @@ protected:
 	bool RandomRotation;
 
 	UPROPERTY(EditAnywhere)
+	bool EnableCollision;
+
+	UPROPERTY(EditAnywhere)
 	FVector Scale;
 
 	UPROPERTY(EditAnywhere)
@@ -35,6 +38,7 @@ public:
 	float GetMinDistance() const { return MinDistance; };
 	float GetFalloffPower() const { return FalloffPower; };
 	bool GetRandomRotation() const { return RandomRotation; };
+	bool GetEnableCollision() const { return EnableCollision; };
 	const FVector& GetScale() const { return Scale; };
 	const TArray<UStaticMesh*>& GetMeshVariants() const { return MeshVariants;};
 	
