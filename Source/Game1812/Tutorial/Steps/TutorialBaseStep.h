@@ -28,6 +28,7 @@ public:
 	const TArray<FText>& GetDialogs() const { return Dialogs; }
 	const TArray<FText>& GetTips() const { return Tips; }
 
-	virtual void StepStart(class ATutorialManager* TutorialManager);
+	void StepStart(class ATutorialManager* TutorialManager);
+	virtual void StepStart();
 	virtual void StepEnd();
 };

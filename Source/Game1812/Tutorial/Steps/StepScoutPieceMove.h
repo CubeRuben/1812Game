@@ -17,8 +17,10 @@ protected:
 
 	void PieceMapHit(class APiece* Piece);
 
+	void SetPiecesOutlineEnabled(bool OutlineEnabled);
+
 public:
 
-	void StepStart(class ATutorialManager* TutorialManager) override;
+	void StepStart() override;
 	void StepEnd() override;
 };

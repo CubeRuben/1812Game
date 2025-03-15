@@ -39,7 +39,13 @@ protected:
 
 public:
 
-	void GetCombatUnitsByTeam(TArray<TObjectPtr<class ACombatUnit>> OutArray, ETeam Team);
+	void GetCombatUnitsByTeam(TArray<TObjectPtr<class ACombatUnit>>& OutArray, ETeam Team);
+
+	const TArray<TObjectPtr<class ACombatUnit>>& GetCombatUnits() const { return CombatUnits; }
+	const TArray<TObjectPtr<class AAdjutantUnit>>& GetAdjutantUnits() const { return AdjutantUnits; }
+	const TArray<TObjectPtr<class AScoutUnit>>& GetScoutUnits() const { return ScoutUnits; }
+	const TArray<TObjectPtr<class ACombatPiece>>& GetCombatPieces() const { return CombatPieces; }
+	const TArray<TObjectPtr<class AScoutPiece>>& GetScoutPieces() const { return ScoutPieces; }
 
 	float GetUnitsHP(ETeam Team);
 };

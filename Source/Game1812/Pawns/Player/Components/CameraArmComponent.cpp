@@ -29,9 +29,8 @@ void UCameraArmComponent::BeginPlay()
 
 float UCameraArmComponent::AddTargetLength(float deltaLength)
 {
-	float savedLength = TargetLength;
-
-	float minLength = PlayerPawn->GetMovementComponent()->IsInGlobalMapBounds() ? MinLength : PlayerPawn->GetMovementComponent()->GetGlobalMapArmLength();
+	const float savedLength = TargetLength;
+	const float minLength = PlayerPawn->GetMovementComponent()->IsInGlobalMapBounds() ? MinLength : PlayerPawn->GetMovementComponent()->GetGlobalMapArmLength();
 
 	TargetLength = FMath::Clamp(TargetLength + deltaLength, minLength, MaxLength);
 	return savedLength - TargetLength;
@@ -45,16 +44,16 @@ void UCameraArmComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	PlayerPawn->GetCameraArmPoint()->SetRelativeLocation(FVector(-CurrentLength, 0, 0));
 
-	if (OnFullScrollIn.IsBound())
+	if (OnTutorialScrollIn.IsBound())
 	{
 		if (CurrentLength <= MinLength * 1.3f)
-			OnFullScrollIn.Execute();
+			OnTutorialScrollIn.Execute();
 	}
 
-	if (OnFullScrollOut.IsBound())
+	if (OnTutorialScrollOut.IsBound())
 	{
-		if (CurrentLength >= MaxLength * 0.7f)
-			OnFullScrollOut.Execute();
+		if (CurrentLength >= (MaxLength + MinLength) * 0.4f)
+			OnTutorialScrollOut.Execute();
 	}
 }
 

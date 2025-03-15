@@ -14,10 +14,8 @@ void UStepLookAtMap::LookedAtMap()
 	Manager->NextStep();
 }
 
-void UStepLookAtMap::StepStart(ATutorialManager* TutorialManager)
+void UStepLookAtMap::StepStart()
 {
-	Super::StepStart(TutorialManager);
-
 	Manager->GetPlayerPawn()->GetMovementComponent()->OnLookAtMap.BindUObject(this, &UStepLookAtMap::LookedAtMap);
 }
 

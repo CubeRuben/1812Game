@@ -6,10 +6,10 @@ UPieceOutlineComponent::UPieceOutlineComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	bIsCursorHovered = false;
-	bIsGroupSelectionHovered = false;
-	bIsBeingDragged = false;
-	bIsSelected = false;
+	bCursorHovered = false;
+	bGroupSelectionHovered = false;
+	bBeingDragged = false;
+	bSelected = false;
 }
 
 void UPieceOutlineComponent::BeginPlay()
@@ -34,63 +34,63 @@ void UPieceOutlineComponent::BeginPlay()
 
 void UPieceOutlineComponent::OnCursorHoverStart()
 {
-	bIsCursorHovered = true;
+	bCursorHovered = true;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnCursorHoverStop()
 {
-	bIsCursorHovered = false;
+	bCursorHovered = false;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnGroupSelectionHoverStart()
 {
-	bIsGroupSelectionHovered = true;
+	bGroupSelectionHovered = true;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnGroupSelectionHoverStop()
 {
-	bIsGroupSelectionHovered = false;
+	bGroupSelectionHovered = false;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnDragStart()
 {
-	bIsBeingDragged = true;
+	bBeingDragged = true;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnDragStop()
 {
-	bIsBeingDragged = false;
+	bBeingDragged = false;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnSelected()
 {
-	bIsSelected = true;
+	bSelected = true;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::OnSelectionRemoved()
 {
-	bIsSelected = false;
+	bSelected = false;
 
 	UpdateOutlineState();
 }
 
 void UPieceOutlineComponent::UpdateOutlineState()
 {
-	SetOutlineEnabled(bIsCursorHovered || bIsGroupSelectionHovered || bIsBeingDragged || bIsSelected);
+	SetOutlineEnabled(bCursorHovered || bGroupSelectionHovered || bBeingDragged || bSelected || bAttentionEnabled);
 }
 
 void UPieceOutlineComponent::SetOutlineEnabled(bool bIsEnabled)
@@ -119,8 +119,21 @@ void UPieceOutlineComponent::SetOutlineEnabled(bool bIsEnabled)
 
 int UPieceOutlineComponent::GetDepthStencilValue()
 {
-	if (bIsGroupSelectionHovered)
+	if (bGroupSelectionHovered)
 		return 11;
 
-	return 10;
+	if (!bAttentionEnabled)
+		return 10;
+
+	if (bAttentionEnabled)
+		return 12;
+
+	return 0;
+}
+
+void UPieceOutlineComponent::SetAttentionEnabled(bool NewAttentionEnabled)
+{
+	bAttentionEnabled = NewAttentionEnabled;
+
+	UpdateOutlineState();
 }

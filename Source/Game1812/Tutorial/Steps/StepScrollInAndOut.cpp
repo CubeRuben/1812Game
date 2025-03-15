@@ -2,6 +2,7 @@
 
 #include "../TutorialManager.h"
 #include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 #include "../../Pawns/Player/Components/PlayerMovementComponent.h"
 #include "../../Pawns/Player/Components/CameraArmComponent.h"
 
@@ -23,16 +24,18 @@ void UStepScrollInAndOut::ScrolledOut()
 	Manager->NextStep();
 }
 
-void UStepScrollInAndOut::StepStart(ATutorialManager* TutorialManager)
+void UStepScrollInAndOut::StepStart()
 {
-	Super::StepStart(TutorialManager);
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(false);
 
-	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnFullScrollIn.BindUObject(this, &UStepScrollInAndOut::ScrolledIn);
-	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnFullScrollOut.BindUObject(this, &UStepScrollInAndOut::ScrolledOut);
+	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnTutorialScrollIn.BindUObject(this, &UStepScrollInAndOut::ScrolledIn);
+	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnTutorialScrollOut.BindUObject(this, &UStepScrollInAndOut::ScrolledOut);
 }
 
 void UStepScrollInAndOut::StepEnd()
 {
-	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnFullScrollIn.Unbind();
-	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnFullScrollOut.Unbind();
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(true);
+
+	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnTutorialScrollIn.Unbind();
+	Manager->GetPlayerPawn()->GetCameraArmComponent()->OnTutorialScrollOut.Unbind();
 }

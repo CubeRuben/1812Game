@@ -14,10 +14,8 @@ void UStepCombatPieceMove::PieceMapHit(APiece* Piece)
 		Manager->NextStep();
 }
 
-void UStepCombatPieceMove::StepStart(ATutorialManager* TutorialManager)
+void UStepCombatPieceMove::StepStart()
 {
-	Super::StepStart(TutorialManager);
-
 	APiece::OnMapHitWasDraggedGlobalEvent.BindUObject(this, &UStepCombatPieceMove::PieceMapHit);
 }
 

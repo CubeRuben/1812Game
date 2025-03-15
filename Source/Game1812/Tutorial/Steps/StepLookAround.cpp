@@ -30,9 +30,9 @@ void UStepLookAround::CheckComplete()
 		Manager->NextStep();
 }
 
-void UStepLookAround::StepStart(ATutorialManager* TutorialManager)
+void UStepLookAround::StepStart()
 {
-	Super::StepStart(TutorialManager);
+	Manager->GetPlayerPawn()->GetMovementComponent()->SetAllowedToMapTransition(false);
 
 	Manager->GetPlayerPawn()->GetMovementComponent()->OnLookLeft.BindUObject(this, &UStepLookAround::LookedLeft);
 	Manager->GetPlayerPawn()->GetMovementComponent()->OnLookRight.BindUObject(this, &UStepLookAround::LookedRight);
@@ -40,6 +40,8 @@ void UStepLookAround::StepStart(ATutorialManager* TutorialManager)
 
 void UStepLookAround::StepEnd()
 {
+	Manager->GetPlayerPawn()->GetMovementComponent()->SetAllowedToMapTransition(true);
+
 	Manager->GetPlayerPawn()->GetMovementComponent()->OnLookLeft.Unbind();
 	Manager->GetPlayerPawn()->GetMovementComponent()->OnLookRight.Unbind();
 }

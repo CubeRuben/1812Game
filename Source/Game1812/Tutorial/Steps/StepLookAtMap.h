@@ -19,7 +19,7 @@ protected:
 
 public:
 
-	void StepStart(class ATutorialManager* TutorialManager) override;
+	void StepStart() override;
 	void StepEnd() override;
 	
 };

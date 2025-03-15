@@ -17,6 +17,8 @@ UPlayerInteractionComponent::UPlayerInteractionComponent()
 	DraggingHeight = 150.f;
 	AltDraggingHeight = 50.f;
 	RotateSpeed = 100.f;
+
+	AllowedToInteract = true;
 }
 
 void UPlayerInteractionComponent::BeginPlay()
@@ -36,9 +38,12 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-#define MOVEMENT_INTERPOLATION_SPEED 20.0f
+	const float MovementInterpolationSpeed = 20.0f;
 
-	if (PlayerPawn->GetMovementComponent()->GetMapState() != EPlayerCameraState::LookingAtMap) 
+	const bool isNotLookingAtMap = PlayerPawn->GetMovementComponent()->GetMapState() != EPlayerCameraState::LookingAtMap;
+	const bool isNotAllowedToInteract = !AllowedToInteract;
+
+	if (isNotLookingAtMap || isNotAllowedToInteract)
 	{
 		SetCurrentDraggable(nullptr);
 		SetCurrentSelected(nullptr);
@@ -109,7 +114,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 			FVector horizontalTargetLocation = hit.Location;
 			horizontalTargetLocation.Z = draggableActor->GetActorLocation().Z;
-			const FVector newHorizontalLocation = FMath::VInterpTo(draggableActor->GetActorLocation(), horizontalTargetLocation, DeltaTime, MOVEMENT_INTERPOLATION_SPEED);
+			const FVector newHorizontalLocation = FMath::VInterpTo(draggableActor->GetActorLocation(), horizontalTargetLocation, DeltaTime, MovementInterpolationSpeed);
 			const FVector deltaLocation = newHorizontalLocation - draggableActor->GetActorLocation();
 			
 			draggableActor->SetActorLocation(newHorizontalLocation);
@@ -127,7 +132,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 			{
 				const FVector hoverLocation = GetSurfaceUnderActor(draggableActor) + FVector(0.0f, 0.0f, draggingHeight);
-				const FVector newVerticalLocation = FMath::VInterpTo(draggableActor->GetActorLocation(), hoverLocation, DeltaTime, MOVEMENT_INTERPOLATION_SPEED);
+				const FVector newVerticalLocation = FMath::VInterpTo(draggableActor->GetActorLocation(), hoverLocation, DeltaTime, MovementInterpolationSpeed);
 
 				draggableActor->SetActorLocation(newVerticalLocation);
 			}
@@ -138,7 +143,7 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 					continue;
 
 				const FVector hoverLocation = GetSurfaceUnderActor(el) + FVector(0.0f, 0.0f, draggingHeight);
-				const FVector newVerticalLocation = FMath::VInterpTo(el->GetActorLocation(), hoverLocation, DeltaTime, MOVEMENT_INTERPOLATION_SPEED);
+				const FVector newVerticalLocation = FMath::VInterpTo(el->GetActorLocation(), hoverLocation, DeltaTime, MovementInterpolationSpeed);
 
 				el->SetActorLocation(newVerticalLocation);
 			}

@@ -38,8 +38,8 @@ protected:
 
 public:
 
-	FMovemementDelegate OnFullScrollIn;
-	FMovemementDelegate OnFullScrollOut;
+	FMovemementDelegate OnTutorialScrollIn;
+	FMovemementDelegate OnTutorialScrollOut;
 
 	float GetCurrentLength() { return CurrentLength; }
 	float GetHeight() { return FMath::Abs(CurrentLength * FMath::Sin(FMath::DegreesToRadians(GetRelativeRotation().Pitch))); }

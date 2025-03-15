@@ -119,6 +119,10 @@ public:
 	static FPieceGlobalEventDelegate OnMapHitWasDraggedGlobalEvent;
 	static FPieceGlobalEventDelegate OnOrderAssignGlobalEvent;
 
+	class UPieceMapMarkerComponent* GetMapMarkerComponent() const { return MapMarkerComponent; }
+	class UPiecePredictedPathComponent* GetPredictedPathComponent() const { return PredictedPathComponent; }
+	class UPieceOutlineComponent* GetOutlineComponent() const { return OutlineComponent; }
+
 	virtual void Tick(float DeltaTime) override;
 
 	bool IsDead() const { return bIsDead; }

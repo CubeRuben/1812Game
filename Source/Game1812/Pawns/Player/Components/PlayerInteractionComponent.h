@@ -43,9 +43,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Selection")
 	TArray<AActor*> InteractableActorsSelectedGroup;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction Limits")
+	bool AllowedToInteract;
+
 	class IInteractable* CurrentDraggable;
 	class IInteractable* CurrentHovered;
 	class IInteractable* CurrentSelected;
+
 
 	UPROPERTY(BlueprintAssignable)
 	FMultipleSelectionDelegate OnMultipleSelectionStart;
@@ -70,6 +74,9 @@ public:
 	void SetCurrentDraggable(class IInteractable* NewDraggable);
 	void SetCurrentHovered(class IInteractable* NewHovered);
 	void SetCurrentSelected(class IInteractable* NewSelected);
+
+	bool IsAllowedToInteract() const { return AllowedToInteract; }
+	void SetAllowedToInteract(bool NewAllowedToInteract) { AllowedToInteract = NewAllowedToInteract; }
 
 	void ClearSelectedGroup();
 

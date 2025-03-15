@@ -25,6 +25,8 @@ UPlayerMovementComponent::UPlayerMovementComponent()
 	RotationInterpSpeed = 20.0f;
 
 	MovementInterpSpeed = 5.0f;
+
+	AllowedToMapTransition = true;
 }
 
 void UPlayerMovementComponent::BeginPlay()
@@ -92,11 +94,12 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	{
 		if (PlayerPawn->GetPlayerInput().LookAtMap)
 		{
-			MapState = EPlayerCameraState::OutOfMap;
 			PlayerPawn->GetPlayerInput().LookAtMap = false;
 
 			PlayerPawn->GetPlayerInput().MoveLeft = false;
 			PlayerPawn->GetPlayerInput().MoveRight = false;
+			
+			MapState = EPlayerCameraState::OutOfMap;
 		}
 		else 
 		{
@@ -114,9 +117,11 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	{
 		if (PlayerPawn->GetPlayerInput().LookAtMap || PlayerPawn->GetPlayerInput().MoveForward)
 		{
-			MapState = EPlayerCameraState::MovingToMap;
 			PlayerPawn->GetPlayerInput().LookAtMap = false;
 			PlayerPawn->GetPlayerInput().MoveForward = false;
+			
+			if (AllowedToMapTransition)
+				MapState = EPlayerCameraState::MovingToMap;
 		}
 		else
 		{

@@ -55,4 +55,7 @@ public:
 	void BeginStep(int StepIndex);
 	void NextStep();
 
+	UFUNCTION(BlueprintCallable)
+	void ForceFinish();
+
 };

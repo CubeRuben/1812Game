@@ -45,15 +45,15 @@ void ATutorialManager::BeginStep(int StepIndex)
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 
+	if (StepIndex != CurrentStepIndex)
+		TutorialSteps[CurrentStepIndex]->StepEnd();
+
 	if (!TutorialSteps.IsValidIndex(StepIndex)) 
 	{
-		TutorialWidget->RemoveFromViewport();
+		TutorialWidget->RemoveFromParent();
 		Destroy();
 		return;
 	}
-
-	if (StepIndex != CurrentStepIndex)
-		TutorialSteps[CurrentStepIndex]->StepEnd();
 
 	CurrentStepIndex = StepIndex;
 	DialogsIndex = 0;
@@ -67,6 +67,17 @@ void ATutorialManager::BeginStep(int StepIndex)
 void ATutorialManager::NextStep()
 {
 	BeginStep(CurrentStepIndex + 1);
+}
+
+void ATutorialManager::ForceFinish()
+{
+	if (TutorialSteps.IsValidIndex(CurrentStepIndex))
+		TutorialSteps[CurrentStepIndex]->StepEnd();
+
+	if (TutorialWidget)
+		TutorialWidget->RemoveFromParent();
+
+	Destroy();
 }
 
 void ATutorialManager::NextDialog()

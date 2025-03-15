@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Map Movement")
 	float HalfHeightGlobalMapBorder;
 
+	UPROPERTY(EditAnywhere, Category = "Movement Limits")
+	bool AllowedToMapTransition;
+
 	virtual void BeginPlay() override;
 
 	void FindCameraSpots(TArray<class APlayerCameraSpot*>& Spots);
@@ -88,6 +91,9 @@ public:
 	float GetGlobalMapArmLength();
 	bool IsInGlobalMapBounds();
 	bool IsInGlobalMap();
+
+	void SetAllowedToMapTransition(bool NewAllowedToMapTransition) { AllowedToMapTransition = NewAllowedToMapTransition; } 
+	bool IsAllowedToMapTransition() const { return AllowedToMapTransition; } 
 
 	void ChangeCameraSpot(int deltaIndex);
 

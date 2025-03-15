@@ -17,10 +17,12 @@ protected:
 
 	class APiece* OwnerPiece;
 
-	bool bIsCursorHovered;
-	bool bIsGroupSelectionHovered;
-	bool bIsBeingDragged;
-	bool bIsSelected;
+	bool bCursorHovered;
+	bool bGroupSelectionHovered;
+	bool bBeingDragged;
+	bool bSelected;
+
+	bool bAttentionEnabled;
 
 	virtual void BeginPlay() override;
 
@@ -44,4 +46,7 @@ protected:
 
 public:	
 		
+	bool IsAttentionEnabled() const { return bAttentionEnabled; }
+	void SetAttentionEnabled(bool NewAttentionEnabled);
+
 };

@@ -13,10 +13,8 @@ void UStepGiveOrder::OrderAssigned(APiece* Piece)
 	Manager->NextStep();
 }
 
-void UStepGiveOrder::StepStart(ATutorialManager* TutorialManager)
+void UStepGiveOrder::StepStart()
 {
-	Super::StepStart(TutorialManager);
-
 	APiece::OnOrderAssignGlobalEvent.BindUObject(this, &UStepGiveOrder::OrderAssigned);
 }
 
