@@ -17,8 +17,8 @@
 #include <Components/StaticMeshComponent.h>
 #include <Components/WidgetComponent.h>
 
-FPieceGlobalEventDelegate APiece::OnMapHitWasDraggedGlobalEvent = FPieceGlobalEventDelegate();
 FPieceGlobalEventDelegate APiece::OnOrderAssignGlobalEvent = FPieceGlobalEventDelegate();
+FPieceGlobalEventDelegate APiece::OnAddedToMapGlobalEvent = FPieceGlobalEventDelegate();
 
 APiece::APiece()
 {
@@ -53,6 +53,7 @@ void APiece::BeginPlay()
 	Super::BeginPlay();
 
 	BoxCollisionComponent->OnComponentHit.AddDynamic(this, &APiece::OnHit);
+	BoxCollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &APiece::OnBeginOverlap);
 	BoxCollisionComponent->OnComponentEndOverlap.AddDynamic(this, &APiece::OnEndOverlap);
 
 }
@@ -85,7 +86,6 @@ void APiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	{
 		bWasDragged = false;
 		OnMapHitWasDraggedEvent.Broadcast();
-		OnMapHitWasDraggedGlobalEvent.ExecuteIfBound(this);
 	}
 	
 	if (!bCanSpawnUnit)
@@ -93,6 +93,15 @@ void APiece::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimi
 	
 	SpawnUnit();
 	bCanSpawnUnit = false;
+}
+
+void APiece::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherComp->ComponentTags.Contains("MapBorder"))
+		return;
+
+	OnAddedToMapEvent.Broadcast();
+	OnAddedToMapGlobalEvent.Broadcast(this);
 }
 
 void APiece::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -117,7 +126,7 @@ void APiece::SpawnUnit()
 void APiece::AssignOrder(UUnitOrder* UnitOrder)
 {
 	OnOrderAssignEvent.Broadcast();
-	OnOrderAssignGlobalEvent.ExecuteIfBound(this);
+	OnOrderAssignGlobalEvent.Broadcast(this);
 }
 
 FRotator APiece::GetResetRotation()

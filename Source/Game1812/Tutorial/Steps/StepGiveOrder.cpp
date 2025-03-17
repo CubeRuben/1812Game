@@ -15,10 +15,10 @@ void UStepGiveOrder::OrderAssigned(APiece* Piece)
 
 void UStepGiveOrder::StepStart()
 {
-	APiece::OnOrderAssignGlobalEvent.BindUObject(this, &UStepGiveOrder::OrderAssigned);
+	DelegateHandle = APiece::AddOnOrderAssignGlobalHandler(FPieceGlobalEventDelegate::FDelegate::CreateUObject(this, &UStepGiveOrder::OrderAssigned));
 }
 
 void UStepGiveOrder::StepEnd()
 {
-	APiece::OnOrderAssignGlobalEvent.Unbind();
+	APiece::RemoveOnOrderAssignGlobalHandler(DelegateHandle);
 }

@@ -10,7 +10,7 @@ UStepScoutPieceMove::UStepScoutPieceMove()
 
 }
 
-void UStepScoutPieceMove::PieceMapHit(APiece* Piece)
+void UStepScoutPieceMove::PieceAddedToMap(APiece* Piece)
 {
 	if (Cast<AScoutPiece>(Piece))
 		Manager->NextStep();
@@ -38,12 +38,12 @@ void UStepScoutPieceMove::StepStart()
 {
 	SetPiecesOutlineEnabled(true); 
 
-	APiece::OnMapHitWasDraggedGlobalEvent.BindUObject(this, &UStepScoutPieceMove::PieceMapHit);
+	DelegateHandle = APiece::AddOnAddedToMapGlobalHandler(FPieceGlobalEventDelegate::FDelegate::CreateUObject(this, &UStepScoutPieceMove::PieceAddedToMap));
 }
 
 void UStepScoutPieceMove::StepEnd()
 {
 	SetPiecesOutlineEnabled(false);
 
-	APiece::OnMapHitWasDraggedGlobalEvent.Unbind();
+	APiece::RemoveOnAddedToMapGlobalHandler(DelegateHandle);
 }

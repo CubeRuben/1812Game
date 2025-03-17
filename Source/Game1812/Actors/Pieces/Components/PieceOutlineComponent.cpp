@@ -122,7 +122,7 @@ int UPieceOutlineComponent::GetDepthStencilValue()
 	if (bGroupSelectionHovered)
 		return 11;
 
-	if (!bAttentionEnabled)
+	if (bCursorHovered || bBeingDragged || bSelected)
 		return 10;
 
 	if (bAttentionEnabled)

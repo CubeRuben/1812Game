@@ -15,6 +15,8 @@ public:
 
 protected:
 
+	FDelegateHandle DelegateHandle;
+
 	void OrderAssigned(class APiece* Piece);
 
 public:

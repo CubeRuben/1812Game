@@ -9,9 +9,10 @@
 #include "Piece.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FPieceEventDelegate);
-DECLARE_DELEGATE_OneParam(FPieceGlobalEventDelegate, class APiece*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FPieceGlobalEventDelegate, class APiece*);
 
 #define ADD_PIECE_EVENT_DELEGATE(name) TEMPLATE_EVENT_DELEGATE(FPieceEventDelegate, name)
+#define ADD_PIECE_GLOBAL_EVENT_DELEGATE(name) TEMPLATE_GLOBAL_EVENT_DELEGATE(FPieceGlobalEventDelegate, name)
 
 UENUM(BlueprintType)
 enum class EPieceSoundType : uint8 
@@ -86,8 +87,11 @@ protected:
 
 	ADD_PIECE_EVENT_DELEGATE(MapHit);
 	ADD_PIECE_EVENT_DELEGATE(MapHitWasDragged);
+	ADD_PIECE_EVENT_DELEGATE(AddedToMap);
 	ADD_PIECE_EVENT_DELEGATE(RemovedFromMap);
 
+	ADD_PIECE_GLOBAL_EVENT_DELEGATE(OrderAssign);
+	ADD_PIECE_GLOBAL_EVENT_DELEGATE(AddedToMap);
 	// Delegates - Interaction
 
 	ADD_PIECE_EVENT_DELEGATE(StartDragging);
@@ -107,6 +111,9 @@ protected:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
 	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	virtual void SpawnUnit();
@@ -115,9 +122,6 @@ protected:
 	void PlaySound(EPieceSoundType SoundType);
 
 public:
-
-	static FPieceGlobalEventDelegate OnMapHitWasDraggedGlobalEvent;
-	static FPieceGlobalEventDelegate OnOrderAssignGlobalEvent;
 
 	class UPieceMapMarkerComponent* GetMapMarkerComponent() const { return MapMarkerComponent; }
 	class UPiecePredictedPathComponent* GetPredictedPathComponent() const { return PredictedPathComponent; }

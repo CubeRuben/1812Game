@@ -15,7 +15,11 @@ public:
 
 protected:
 
-	void PieceMapHit(class APiece* Piece);
+	FDelegateHandle DelegateHandle;
+
+	void SetPiecesOutlineEnabled(bool OutlineEnabled);
+
+	void PieceAddedToMap(class APiece* Piece);
 
 public:
 

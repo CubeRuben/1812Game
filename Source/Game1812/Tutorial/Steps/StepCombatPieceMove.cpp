@@ -2,24 +2,50 @@
 
 #include "../TutorialManager.h"
 #include "../../Actors/Pieces/CombatPiece.h"
+#include "../../Actors/Pieces/Components/PieceOutlineComponent.h"
+#include "../../CossacksGameState.h"
 
 UStepCombatPieceMove::UStepCombatPieceMove()
 {
 
 }
 
-void UStepCombatPieceMove::PieceMapHit(APiece* Piece)
+void UStepCombatPieceMove::PieceAddedToMap(APiece* Piece)
 {
 	if (Cast<ACombatPiece>(Piece))
 		Manager->NextStep();
 }
 
+
+void UStepCombatPieceMove::SetPiecesOutlineEnabled(bool OutlineEnabled)
+{
+	ACossacksGameState* const gameState = GetWorld()->GetGameState<ACossacksGameState>();
+
+	if (!gameState)
+		return;
+
+	const TArray<TObjectPtr<ACombatPiece>>& combatPieces = gameState->GetCombatPieces();
+
+	for (const TObjectPtr<ACombatPiece>& combatPiece : combatPieces)
+	{
+		if (combatPiece.IsNull())
+			continue;
+
+		combatPiece->GetOutlineComponent()->SetAttentionEnabled(OutlineEnabled);
+	}
+}
+
+
 void UStepCombatPieceMove::StepStart()
 {
-	APiece::OnMapHitWasDraggedGlobalEvent.BindUObject(this, &UStepCombatPieceMove::PieceMapHit);
+	SetPiecesOutlineEnabled(true);
+
+	DelegateHandle = APiece::AddOnAddedToMapGlobalHandler(FPieceGlobalEventDelegate::FDelegate::CreateUObject(this, &UStepCombatPieceMove::PieceAddedToMap));
 }
 
 void UStepCombatPieceMove::StepEnd()
 {
-	APiece::OnMapHitWasDraggedGlobalEvent.Unbind();
+	SetPiecesOutlineEnabled(false);
+
+	APiece::RemoveOnAddedToMapGlobalHandler(DelegateHandle);
 }
