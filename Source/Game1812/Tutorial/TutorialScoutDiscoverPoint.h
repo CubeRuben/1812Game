@@ -20,9 +20,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* StaticMeshComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	bool PointActive;
 
 	virtual void BeginPlay() override;
 
@@ -30,7 +27,7 @@ protected:
 
 public:	
 
-	bool GetPointActive() const { return PointActive; }
+	bool GetPointActive() const;
 	void SetPointActive(bool NewActive);
 
 	FDelegateHandle BindOnPointDiscover(const FOnPointDiscoverDelegate::FDelegate& Delegate) { return OnPointDiscover.Add(Delegate); }
@@ -41,6 +38,6 @@ public:
 	void OnBeingRevealedFromFog() override;
 	bool IsCoveredInFog() override { return true; }
 	inline FVector GetWorldLocation() const override { return GetActorLocation(); };
-	bool IsAffectedByFog() override { return PointActive; }
+	bool IsAffectedByFog() override { return GetPointActive(); }
 	//
 };

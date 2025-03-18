@@ -1,7 +1,6 @@
 #include "TutorialScoutDiscoverPoint.h"
 
-ATutorialScoutDiscoverPoint::ATutorialScoutDiscoverPoint() :
-	PointActive(false)
+ATutorialScoutDiscoverPoint::ATutorialScoutDiscoverPoint()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 
@@ -16,13 +15,17 @@ void ATutorialScoutDiscoverPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	StaticMeshComponent->SetVisibility(PointActive);
+	StaticMeshComponent->SetVisibility(false);
+}
+
+bool ATutorialScoutDiscoverPoint::GetPointActive() const
+{
+	return StaticMeshComponent->IsVisible();
 }
 
 void ATutorialScoutDiscoverPoint::SetPointActive(bool NewActive)
 {
-	PointActive = NewActive;
-	StaticMeshComponent->SetVisibility(PointActive);
+	StaticMeshComponent->SetVisibility(NewActive);
 }
 
 void ATutorialScoutDiscoverPoint::OnBeingRevealedFromFog()

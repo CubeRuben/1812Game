@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../../../Macros/EventDelegate.h"
 #include "UnitMovementComponent.generated.h"
 
 UDELEGATE(BlueprintAuthorityOnly)
@@ -11,6 +12,8 @@ UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementEndDelegate);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveDelegate, float, Distance);\
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMovementEndStaticDelegate, class ABaseUnit*);
 
 UENUM()
 enum class EUnitMovementType : uint8 
@@ -54,6 +57,8 @@ protected:
 	int CurrentFollowingSegmentIndex;
 
 	float LastTimeOfMoveAssign;
+
+	TEMPLATE_GLOBAL_EVENT_DELEGATE(FOnMovementEndStaticDelegate, MovementEnd);
 
 	FVector GetNextPathPoint();
 	FVector GetLastPathPoint();

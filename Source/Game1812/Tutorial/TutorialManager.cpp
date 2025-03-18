@@ -115,7 +115,6 @@ void ATutorialManager::NextTip()
 
 	if (!currentStep->GetTips().IsValidIndex(TipsIndex))
 	{
-		NextTip();
 		return;
 	}
 

@@ -39,7 +39,7 @@ protected:
 
 public:
 
-	void GetCombatUnitsByTeam(TArray<TObjectPtr<class ACombatUnit>>& OutArray, ETeam Team);
+	void GetCombatUnitsByTeam(TArray<TWeakObjectPtr<class ACombatUnit>>& OutArray, ETeam Team);
 
 	const TArray<TObjectPtr<class ACombatUnit>>& GetCombatUnits() const { return CombatUnits; }
 	const TArray<TObjectPtr<class AAdjutantUnit>>& GetAdjutantUnits() const { return AdjutantUnits; }

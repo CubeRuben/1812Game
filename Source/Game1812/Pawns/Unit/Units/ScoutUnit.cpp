@@ -6,7 +6,6 @@
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
 
-
 AScoutUnit::AScoutUnit() 
 {
 	PrimaryActorTick.bCanEverTick = true;

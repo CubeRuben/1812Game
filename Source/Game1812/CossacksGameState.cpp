@@ -53,7 +53,7 @@ void ACossacksGameState::IterateActors()
 	}
 }
 
-void ACossacksGameState::GetCombatUnitsByTeam(TArray<TObjectPtr<class ACombatUnit>>& OutArray, ETeam Team)
+void ACossacksGameState::GetCombatUnitsByTeam(TArray<TWeakObjectPtr<class ACombatUnit>>& OutArray, ETeam Team)
 {
 	OutArray.Empty();
 

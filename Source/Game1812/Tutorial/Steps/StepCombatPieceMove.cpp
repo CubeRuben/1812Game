@@ -16,7 +16,6 @@ void UStepCombatPieceMove::PieceAddedToMap(APiece* Piece)
 		Manager->NextStep();
 }
 
-
 void UStepCombatPieceMove::SetPiecesOutlineEnabled(bool OutlineEnabled)
 {
 	ACossacksGameState* const gameState = GetWorld()->GetGameState<ACossacksGameState>();
@@ -34,7 +33,6 @@ void UStepCombatPieceMove::SetPiecesOutlineEnabled(bool OutlineEnabled)
 		combatPiece->GetOutlineComponent()->SetAttentionEnabled(OutlineEnabled);
 	}
 }
-
 
 void UStepCombatPieceMove::StepStart()
 {

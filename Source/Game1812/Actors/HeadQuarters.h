@@ -4,7 +4,10 @@
 #include "GameFramework/Actor.h"
 #include "../Pawns/Unit/Orders/UnitOrder.h"
 #include "../Pawns/Unit/Orders/AssignedUnitOrder.h"
+#include "../Macros/EventDelegate.h"
 #include "HeadQuarters.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOrdersSendDelegate)
 
 UCLASS()
 class GAME1812_API AHeadQuarters : public AActor
@@ -30,7 +33,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float RangeForCloseOrders;
-	
+
+	TEMPLATE_EVENT_DELEGATE(FOrdersSendDelegate, OrdersSend);
 
 	virtual void BeginPlay() override;
 

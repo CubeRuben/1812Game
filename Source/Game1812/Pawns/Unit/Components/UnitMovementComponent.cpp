@@ -159,8 +159,12 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 	bMustRotateToTargetRotation = false;
 	FVector moveToLocation = ProjectPointToMap(MoveToLocation);
 
-	if (TargetLocation == moveToLocation)
-		return OnMovementEnd.Broadcast();
+	if (TargetLocation == moveToLocation) 
+	{
+		OnMovementEnd.Broadcast();
+		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
+		return;
+	}
 
 	TargetLocation = moveToLocation;
 
@@ -174,6 +178,7 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 	else
 	{
 		OnMovementEnd.Broadcast();
+		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 	}
 }
 
@@ -187,8 +192,11 @@ void UUnitMovementComponent::StopMoving()
 {
 	TargetLocation = ProjectPointToMap(UnitPawn->GetActorLocation());
 
-	if (bIsMoving)
+	if (bIsMoving) 
+	{
 		OnMovementEnd.Broadcast();
+		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
+	}
 
 	bIsMoving = false;
 }
@@ -227,6 +235,7 @@ void UUnitMovementComponent::CheckMovementEnd()
 
 	bIsMoving = false;
 	OnMovementEnd.Broadcast();
+	OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 }
 
 FVector UUnitMovementComponent::GetNextPathPoint()

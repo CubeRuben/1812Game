@@ -57,6 +57,8 @@ void AHeadQuarters::RemoveAdjutantUnit(AAdjutantUnit* AdjutantUnit)
 
 void AHeadQuarters::SendOrders()
 {
+	OnOrdersSendEvent.Broadcast();
+
 	for (int i = 0; i < UnitOrders.Num();) 
 	{
 		//Remove order, if unit is dead
