@@ -21,7 +21,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* FigureMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Height;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

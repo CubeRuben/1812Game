@@ -25,6 +25,8 @@ ACombatUnit::ACombatUnit()
 	ReportComponent = nullptr;
 	PieceProjectionComponent = nullptr;
 	CurrentOrder = nullptr;
+
+	CoveredInFog = true;
 }
 
 void ACombatUnit::BeginPlay()
@@ -110,12 +112,19 @@ void ACombatUnit::AssignOrder(UUnitOrder* NewOrder)
 
 void ACombatUnit::OnBeingCoveredInFog()
 {
+	CoveredInFog = true;
 	OnUnitFogChange.Broadcast(true);
 }
 
 void ACombatUnit::OnBeingRevealedFromFog()
 {
+	CoveredInFog = false;
 	OnUnitFogChange.Broadcast(false);
+}
+
+bool ACombatUnit::IsCoveredInFog()
+{
+	return CoveredInFog;
 }
 
 TArray<IFogAffected*>* ACombatUnit::GetFogAffectedComponents()

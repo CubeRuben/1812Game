@@ -14,6 +14,12 @@ public:
 
 	UDeadUnitMeshComponent();
 
+protected:
+
+	void BeginPlay() override;
+	
+public:
+
 	//IFogAffected Interface
 	void OnBeingCoveredInFog() override { SetVisibility(false); }
 	void OnBeingRevealedFromFog() override { SetVisibility(true); }

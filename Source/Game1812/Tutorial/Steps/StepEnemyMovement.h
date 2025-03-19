@@ -21,8 +21,18 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TArray<FVector> RevealPoints;
 
+	UPROPERTY(EditAnywhere)
+	float RevealRadius;
+
+	UPROPERTY(EditAnywhere)
+	float TimerTimeout;
+
+	FTimerHandle TimerHandle;
+
 	void MoveEnemyUnits();
 	void RevealArea();
+
+	void TimerEnd();
 
 public:
 

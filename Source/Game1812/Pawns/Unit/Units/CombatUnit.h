@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCombatUnitDataAsset* CombatUnitData;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool CoveredInFog;
+
 	virtual void BeginPlay() override;
 
 public:
@@ -70,6 +73,7 @@ public:
 	//IFogAffected Interface override
 	void OnBeingCoveredInFog() override;
 	void OnBeingRevealedFromFog() override;
+	bool IsCoveredInFog() override;
 	TArray<IFogAffected*>* GetFogAffectedComponents() override;
 	//
 

@@ -358,7 +358,7 @@ void UPlayerInteractionComponent::ClearSelectedGroup()
 void UPlayerInteractionComponent::SetSelectedGroup(const TArray<TScriptInterface<class IInteractable>>& NewGroup)
 {
 	if (CurrentSelected)
-		return;
+		SetCurrentSelected(nullptr);
 
 	if (!PlayerPawn->GetPlayerInput().LeftShift)
 		ClearSelectedGroup();

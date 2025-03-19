@@ -17,7 +17,7 @@ AEnemyPiece::AEnemyPiece()
 	FigureMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FigureMeshComponent->SetupAttachment(RootComponent);
 
-	Height = 1226.0f;
+	Height = 1231.0f;
 
 	bIsCoveredInFog = true;
 }

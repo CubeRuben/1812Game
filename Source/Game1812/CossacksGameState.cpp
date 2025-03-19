@@ -53,11 +53,18 @@ void ACossacksGameState::IterateActors()
 	}
 }
 
-void ACossacksGameState::GetCombatUnitsByTeam(TArray<TWeakObjectPtr<class ACombatUnit>>& OutArray, ETeam Team)
+void ACossacksGameState::GetCombatUnitsByTeam(TArray<TWeakObjectPtr<ACombatUnit>>& OutArray, ETeam Team)
 {
 	OutArray.Empty();
 
-	OutArray = CombatUnits.FilterByPredicate([Team](const TObjectPtr<class ACombatUnit>& el) { return !el ? false : (el.Get()->GetTeam() == Team); });
+	for (TObjectPtr<ACombatUnit>& unit : CombatUnits) 
+	{
+		if (!unit)
+			continue;
+
+		if (unit->GetTeam() == Team)
+			OutArray.Add(unit);
+	}
 }
 
 float ACossacksGameState::GetUnitsHP(ETeam Team)

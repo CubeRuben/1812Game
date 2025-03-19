@@ -1,6 +1,7 @@
 #include "HeadQuarters.h"
 
 #include "../Pawns/Unit/BaseUnit.h"
+#include "../Pawns/Unit/Units/CombatUnit.h"
 #include "../Pawns/Unit/Units/AdjutantUnit.h"
 #include "../CossacksGameInstance.h"
 
@@ -100,14 +101,36 @@ void AHeadQuarters::AddOrderToAssign(class UCombatUnitOrder* UnitOrder, ABaseUni
 	UnitOrders.Add(FAssignedCombatUnitOrder(UnitOrder, Unit));
 }
 
-ABaseUnit* AHeadQuarters::SpawnUnit(TSubclassOf<class ABaseUnit> UnitClass)
+ABaseUnit* AHeadQuarters::SpawnUnit(TSubclassOf<ABaseUnit> UnitClass)
 {
 	FVector point = GetActorLocation();
 
 	FActorSpawnParameters spawnParams;
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	return GetWorld()->SpawnActor<ABaseUnit>(UnitClass.Get(), point, FRotator(0, GetActorRotation().Yaw, 0), spawnParams);
+	ABaseUnit* unit = GetWorld()->SpawnActor<ABaseUnit>(UnitClass.Get(), point, FRotator(0, GetActorRotation().Yaw, 0), spawnParams);
+
+	if (unit->IsA(ACombatUnit::StaticClass()))
+	{
+		const float offset = 75.0f;
+
+		point.X += FMath::FRandRange(-offset, offset);
+		point.Y += FMath::FRandRange(-offset, offset);
+
+		point.Z += 25.0f;
+
+		unit->SetActorLocation(point);
+
+		UCombatUnitOrder* const order = Cast<UCombatUnitOrder>(unit->GetCurrentOrder());
+
+		if (order) 
+		{
+			order->Location = point;
+			unit->AssignOrder(order);
+		}
+	}
+
+	return unit;
 }
 
 bool AHeadQuarters::HaveAnyOrders()

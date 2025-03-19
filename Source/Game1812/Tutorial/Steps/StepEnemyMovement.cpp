@@ -9,7 +9,8 @@
 
 #include "Kismet/KismetArrayLibrary.h"
 
-UStepEnemyMovement::UStepEnemyMovement()
+UStepEnemyMovement::UStepEnemyMovement() :
+	RevealRadius(5.0f), TimerTimeout(10.f)
 {
 	
 }
@@ -54,16 +55,29 @@ void UStepEnemyMovement::RevealArea()
 	TImageBuilder<FVector4f> revealArea;
 	revealArea.SetDimensions(fogOfWar->GetDimensions());
 	revealArea.Clear(FVector4f::Zero());
+
+	for (FVector point : RevealPoints) 
+	{
+		ApplyCircularBrushToImage(revealArea, fogOfWar->LocationToIndex(point), RevealRadius, FVector4f::One());
+	}
+
+	fogOfWar->AddDiscoveredArea(revealArea);
+}
+
+void UStepEnemyMovement::TimerEnd()
+{
+	Manager->NextStep();
 }
 
 void UStepEnemyMovement::StepStart()
 {
 	MoveEnemyUnits();
-
 	RevealArea();
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateUObject(this, &UStepEnemyMovement::TimerEnd), TimerTimeout, false);
 }
 
 void UStepEnemyMovement::StepEnd()
 {
-	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }

@@ -6,6 +6,8 @@
 #include "../Orders/FormationMovement.h"
 #include "../BaseUnit.h"
 
+FOnMovementEndStaticDelegate UUnitMovementComponent::OnMovementEndGlobalEvent = FOnMovementEndStaticDelegate();
+
 UUnitMovementComponent::UUnitMovementComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -149,9 +151,6 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 {
 	if (MovementType == EUnitMovementType::Attack) 
 	{
-		if (FormationMovement)
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "UUnitMovementComponent::ForceMoveTo() - Clear");
-
 		FormationMovement = nullptr;
 	}
 		
@@ -162,7 +161,6 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 	if (TargetLocation == moveToLocation) 
 	{
 		OnMovementEnd.Broadcast();
-		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 		return;
 	}
 
@@ -178,7 +176,6 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 	else
 	{
 		OnMovementEnd.Broadcast();
-		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 	}
 }
 
@@ -195,7 +192,6 @@ void UUnitMovementComponent::StopMoving()
 	if (bIsMoving) 
 	{
 		OnMovementEnd.Broadcast();
-		OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 	}
 
 	bIsMoving = false;
