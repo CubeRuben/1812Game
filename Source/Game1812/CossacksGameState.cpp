@@ -11,7 +11,7 @@
 
 #include <Kismet/GameplayStatics.h>
 
-#define ADD_CAST_ACTOR(Type, Array) if (Type* actor = Cast<Type>(Actor)) Array.Add(actor);
+#define ADD_CAST_ACTOR(Type, Array) if (Type* actor = Cast<Type>(Actor)) Array.AddUnique(actor);
 
 ACossacksGameState::ACossacksGameState()
 {
@@ -25,9 +25,6 @@ void ACossacksGameState::BeginPlay()
 	GetWorld()->AddOnActorSpawnedHandler(FOnActorSpawned::FDelegate::CreateUObject(this, &ACossacksGameState::OnActorSpawn));
 
 	IterateActors();
-
-	if (ABattleObjectivesManager::GetInstance())
-		ABattleObjectivesManager::GetInstance()->Init(this);
 }
 
 void ACossacksGameState::OnActorSpawn(AActor* Actor)

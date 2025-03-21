@@ -49,10 +49,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float EnemyTakenCasualties;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class ACossacksGameState* GameState;
 
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 public:	
 
@@ -65,6 +66,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBattleObjectivesFinishDelegate OnBattleLost;
 
+	void PreInit();
 	void Init(class ACossacksGameState* NewGameState);
 
 	virtual void Tick(float DeltaTime) override;

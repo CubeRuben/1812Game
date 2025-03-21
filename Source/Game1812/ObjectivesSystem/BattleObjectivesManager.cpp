@@ -16,7 +16,6 @@ ABattleObjectivesManager* ABattleObjectivesManager::GetInstance()
 	return Instance;
 }
 
-
 ABattleObjectivesManager::ABattleObjectivesManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -35,6 +34,20 @@ void ABattleObjectivesManager::BeginPlay()
 	Super::BeginPlay();
 
 	Instance = this;
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ABattleObjectivesManager::PreInit);
+}
+
+void ABattleObjectivesManager::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	Instance = nullptr;
+}
+
+void ABattleObjectivesManager::PreInit()
+{
+	Init(GetWorld()->GetGameState<ACossacksGameState>());
 }
 
 void ABattleObjectivesManager::Init(ACossacksGameState* NewGameState)
@@ -51,6 +64,9 @@ void ABattleObjectivesManager::Init(ACossacksGameState* NewGameState)
 void ABattleObjectivesManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!GameState)
+		return;
 
 	TakenCasualties = StartHP - GameState->GetUnitsHP(ETeam::Russia);
 	EnemyTakenCasualties = EnemyStartHP - GameState->GetUnitsHP(ETeam::France);
