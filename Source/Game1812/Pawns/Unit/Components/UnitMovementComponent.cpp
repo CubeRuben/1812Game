@@ -160,7 +160,6 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 
 	if (TargetLocation == moveToLocation) 
 	{
-		OnMovementEnd.Broadcast();
 		return;
 	}
 
