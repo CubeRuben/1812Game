@@ -99,6 +99,9 @@ void AScoutUnit::AssignOrder(UUnitOrder* NewOrder)
 {
 	CurrentOrder = Cast<UScoutUnitOrder>(NewOrder);
 
+	if (!CurrentOrder)
+		return;
+
 	if (MovementComponent->IsMoving())
 		return;
 

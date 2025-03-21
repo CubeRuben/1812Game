@@ -1,6 +1,6 @@
 #include "PieceCombatOrderWidgetComponent.h"
 
-#include "../Piece.h"
+#include "../CombatPiece.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
 #include "../../../Pawns/Unit/Orders/UnitOrder.h"
 #include "../../../Pawns/Unit/Units/CombatUnit.h"
@@ -32,7 +32,7 @@ void UPieceCombatOrderWidgetComponent::DefaultOrder(UCombatUnitOrder* CombatUnit
 		if (actor == OwnerPiece)
 			continue;
 
-		APiece* piece = Cast<APiece>(actor);
+		ACombatPiece* piece = Cast<ACombatPiece>(actor);
 
 		if (piece)
 			piece->AssignOrder(DuplicateObject(CombatUnitOrder, this));

@@ -67,15 +67,18 @@ void UPlayerInteractionComponent::TickComponent(float DeltaTime, ELevelTick Tick
 			{
 				playerInput.MouseLeftClick = false;
 
-				if (InteractableActorsSelectedGroup.Contains(interactableActor))
+				if (interactable->CanBeGrouped())
 				{
-					InteractableActorsSelectedGroup.Remove(interactableActor);
-					interactable->StopGroupSelectionHover();
-				}
-				else 
-				{
-					InteractableActorsSelectedGroup.Add(interactableActor);
-					interactable->StartGroupSelectionHover();
+					if (InteractableActorsSelectedGroup.Contains(interactableActor))
+					{
+						InteractableActorsSelectedGroup.Remove(interactableActor);
+						interactable->StopGroupSelectionHover();
+					}
+					else 
+					{
+						InteractableActorsSelectedGroup.Add(interactableActor);
+						interactable->StartGroupSelectionHover();
+					}
 				}
 			}
 			else if (!InteractableActorsSelectedGroup.Contains(interactableActor))
