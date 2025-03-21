@@ -85,5 +85,7 @@ public:
 
 	const TArray<AActor*>& GetSelectedGroup() const { return InteractableActorsSelectedGroup; }
 
+	void RemoveInteractable(IInteractable* Interactable);
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

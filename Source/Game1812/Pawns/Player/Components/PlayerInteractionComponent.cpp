@@ -382,6 +382,29 @@ void UPlayerInteractionComponent::SetSelectedGroup(const TArray<TScriptInterface
 	}
 }
 
+void UPlayerInteractionComponent::RemoveInteractable(IInteractable* Interactable)
+{
+	if (!Interactable)
+		return;
+
+	if (CurrentDraggable == Interactable)
+		SetCurrentDraggable(nullptr);
+
+	if (CurrentHovered == Interactable)
+		SetCurrentHovered(nullptr);
+
+	if (CurrentSelected == Interactable)
+		SetCurrentSelected(nullptr);
+
+	if (InteractableActorsSelectedGroup.Remove(Cast<AActor>(Interactable)) == 0)
+		return;
+
+	Interactable->StopGroupSelectionHover();
+
+	if (CurrentDraggable)
+		Interactable->StopDragging();
+}
+
 void UPlayerInteractionComponent::SetCurrentDraggable(IInteractable* NewDraggable)
 {
 	if (CurrentDraggable) 

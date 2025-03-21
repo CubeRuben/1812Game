@@ -1,6 +1,8 @@
 #include "PiecesReturner.h"
 
 #include "../Pieces/Piece.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 #include <Components/BoxComponent.h>
 
@@ -27,19 +29,45 @@ void APiecesReturner::BeginPlay()
 
 void APiecesReturner::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!Cast<APiece>(OtherActor))
+	APiece* const piece = Cast<APiece>(OtherActor);
+
+	if (!piece)
 		return;
 
+	RemoveFromInteraction(piece);
+	ReturnPiece(piece, OtherComp);
+}
+
+void APiecesReturner::RemoveFromInteraction(APiece* Piece)
+{
+	if (!PlayerInteractionComponent.IsValid())
+	{
+		APlayerPawn* const playerPawn = APlayerPawn::GetInstance();
+
+		if (!playerPawn)
+			return;
+
+		PlayerInteractionComponent = playerPawn->GetInteractionComponent();
+
+		if (!PlayerInteractionComponent.IsValid())
+			return;
+	}
+
+	PlayerInteractionComponent->RemoveInteractable(Piece);
+}
+
+void APiecesReturner::ReturnPiece(APiece* Piece, UPrimitiveComponent* PieceRootComponent)
+{
 	FVector offset = FMath::VRand();
 	offset.Z = 0;
 	offset *= RandomOffsetRadius;
-	OtherActor->SetActorLocation(ReturnPoint->GetComponentLocation() + offset);
+	Piece->SetActorLocation(ReturnPoint->GetComponentLocation() + offset);
 
-	FRotator rotation = OtherActor->GetActorRotation();
+	FRotator rotation = Piece->GetActorRotation();
 	rotation.Roll = 0.f;
 	rotation.Pitch = 0.f;
-	OtherActor->SetActorRotation(rotation);
+	Piece->SetActorRotation(rotation);
 
-	OtherComp->SetPhysicsLinearVelocity(FVector::ZeroVector);
-	OtherComp->SetPhysicsAngularVelocityInRadians(FVector::ZeroVector);
+	PieceRootComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	PieceRootComponent->SetPhysicsAngularVelocityInRadians(FVector::ZeroVector);
 }
