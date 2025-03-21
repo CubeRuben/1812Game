@@ -6,6 +6,8 @@
 #include "../../Pawns/Unit/Units/CombatUnit.h"
 #include "../../Pawns/Unit/Components/UnitMovementComponent.h"
 #include "../../Pawns/Unit/Orders/UnitOrder.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 #include "Kismet/KismetArrayLibrary.h"
 
@@ -71,6 +73,8 @@ void UStepEnemyMovement::TimerEnd()
 
 void UStepEnemyMovement::StepStart()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(false);
+
 	MoveEnemyUnits();
 	RevealArea();
 
@@ -79,5 +83,7 @@ void UStepEnemyMovement::StepStart()
 
 void UStepEnemyMovement::StepEnd()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(true);
+
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }

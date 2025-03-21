@@ -4,6 +4,8 @@
 #include "../../CossacksGameState.h"
 #include "../../Pawns/Unit/Units/CombatUnit.h"
 #include "../../Pawns/Unit/Components/UnitMovementComponent.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 UStepCombatUnitsMovement::UStepCombatUnitsMovement()
 {
@@ -25,6 +27,8 @@ void UStepCombatUnitsMovement::OnUnitMovementEnd(ABaseUnit* Unit)
 
 void UStepCombatUnitsMovement::StepStart()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(false);
+
 	ACossacksGameState* gameState = GetWorld()->GetGameState<ACossacksGameState>();
 	
 	if (!gameState)
@@ -38,5 +42,7 @@ void UStepCombatUnitsMovement::StepStart()
 
 void UStepCombatUnitsMovement::StepEnd()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(true);
+
 	UUnitMovementComponent::RemoveOnMovementEndGlobalHandler(DelegateHandle);
 }

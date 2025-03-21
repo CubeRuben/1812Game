@@ -34,6 +34,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float RangeForCloseOrders;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool AllowedToSendOrders;
+
 	TEMPLATE_EVENT_DELEGATE(FOrdersSendDelegate, OrdersSend);
 
 	virtual void BeginPlay() override;
@@ -45,14 +48,19 @@ public:
 
 	void AddOrderToAssign(class UCombatUnitOrder* UnitOrder, class ABaseUnit* Unit);
 
+	bool IsAllowedToSendOrders() const { return AllowedToSendOrders; }
+	void SetAllowedToSendOrders(bool NewAllowedToSendOrders) { AllowedToSendOrders = NewAllowedToSendOrders; }
+
+	bool HaveAnyOrders();
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static AHeadQuarters* GetInstance();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool HaveAnyOrders();
+	bool HaveAnyAdjutants();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool HaveAnyAdjutants();
+	bool SendOrdersAvailable();
 
 	UFUNCTION(BlueprintCallable)
 	void SendOrders();

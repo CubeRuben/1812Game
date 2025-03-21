@@ -12,7 +12,8 @@ AHeadQuarters* AHeadQuarters::GetInstance()
 	return Instance;
 }
 
-AHeadQuarters::AHeadQuarters()
+AHeadQuarters::AHeadQuarters() :
+	AllowedToSendOrders(true)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -58,6 +59,9 @@ void AHeadQuarters::RemoveAdjutantUnit(AAdjutantUnit* AdjutantUnit)
 
 void AHeadQuarters::SendOrders()
 {
+	if (!SendOrdersAvailable())
+		return;
+
 	OnOrdersSendEvent.Broadcast();
 
 	for (int i = 0; i < UnitOrders.Num();) 
@@ -136,6 +140,11 @@ ABaseUnit* AHeadQuarters::SpawnUnit(TSubclassOf<ABaseUnit> UnitClass)
 bool AHeadQuarters::HaveAnyOrders()
 {
 	return UnitOrders.Num() != 0;
+}
+
+bool AHeadQuarters::SendOrdersAvailable()
+{
+	return HaveAnyOrders() && AllowedToSendOrders;
 }
 
 bool AHeadQuarters::HaveAnyAdjutants()

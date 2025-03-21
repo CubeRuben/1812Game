@@ -4,6 +4,8 @@
 #include "../../Actors/Pieces/ScoutPiece.h"
 #include "../../Actors/Pieces/Components/PieceOutlineComponent.h"
 #include "../../CossacksGameState.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 UStepScoutPieceMove::UStepScoutPieceMove()
 {
@@ -38,12 +40,16 @@ void UStepScoutPieceMove::StepStart()
 {
 	SetPiecesOutlineEnabled(true); 
 
+	Manager->GetPlayerPawn()->GetInteractionComponent()->AddInteractableClassToWhitelist(AScoutPiece::StaticClass());
+
 	DelegateHandle = APiece::AddOnAddedToMapGlobalHandler(FPieceGlobalEventDelegate::FDelegate::CreateUObject(this, &UStepScoutPieceMove::PieceAddedToMap));
 }
 
 void UStepScoutPieceMove::StepEnd()
 {
 	SetPiecesOutlineEnabled(false);
+
+	Manager->GetPlayerPawn()->GetInteractionComponent()->RemoveInteractableClassFromWhitelist(AScoutPiece::StaticClass());
 
 	APiece::RemoveOnAddedToMapGlobalHandler(DelegateHandle);
 }

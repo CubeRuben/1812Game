@@ -15,6 +15,12 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere)
+	TWeakObjectPtr<class UStepCombatPiecePlace> PreviousStep; 
+
+	UPROPERTY(EditAnywhere)
+	TSet<TWeakObjectPtr<class ACombatPiece>> OverlappedPieces;
+
 	FDelegateHandle DelegateHandle;
 
 	void OrderAssigned(class APiece* Piece);

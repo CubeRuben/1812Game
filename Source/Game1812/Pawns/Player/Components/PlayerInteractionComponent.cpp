@@ -6,19 +6,18 @@
 #include "InteractableSortable.h"
 
 
-UPlayerInteractionComponent::UPlayerInteractionComponent()
+UPlayerInteractionComponent::UPlayerInteractionComponent() :
+	AllowedToInteract(true), AllowedToDrag(true), AllowedToSelect(true)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	CurrentDraggable = nullptr;
 	CurrentHovered = nullptr;
 
-	InteractionDistance = 500.f;
-	DraggingHeight = 150.f;
-	AltDraggingHeight = 50.f;
-	RotateSpeed = 100.f;
-
-	AllowedToInteract = true;
+	InteractionDistance = 500.0f;
+	DraggingHeight = 150.0f;
+	AltDraggingHeight = 50.0f;
+	RotateSpeed = 100.0f;
 }
 
 void UPlayerInteractionComponent::BeginPlay()
@@ -343,6 +342,70 @@ bool UPlayerInteractionComponent::GetFormationOffsetArray(int FormationType, int
 	}
 }
 
+void UPlayerInteractionComponent::SetAllowedToInteract(bool NewAllowedToInteract)
+{
+	AllowedToInteract = NewAllowedToInteract;
+
+	if (!AllowedToInteract)
+		ClearSelectedGroup();
+}
+
+void UPlayerInteractionComponent::SetAllowedToDrag(bool NewAllowedToDrag)
+{
+	AllowedToDrag = NewAllowedToDrag;
+
+	if (!AllowedToDrag && CurrentDraggable != nullptr)
+		SetCurrentDraggable(nullptr);
+}
+
+void UPlayerInteractionComponent::SetAllowedToSelect(bool NewAllowedToSelect)
+{
+	AllowedToSelect = NewAllowedToSelect;
+
+	if (!AllowedToSelect && CurrentSelected != nullptr)
+		SetCurrentSelected(nullptr);
+}
+
+void UPlayerInteractionComponent::AddInteractableClassToWhitelist(TSubclassOf<UObject> Class)
+{
+	InteractableClassesWhitelist.Add(Class);
+}
+
+void UPlayerInteractionComponent::RemoveInteractableClassFromWhitelist(TSubclassOf<UObject> Class)
+{
+	InteractableClassesWhitelist.Remove(Class);
+}
+
+bool UPlayerInteractionComponent::IsInteractableClassAllowed(IInteractable* Object)
+{
+	return IsInteractableClassAllowed(Cast<UObject>(Object));
+}
+
+bool UPlayerInteractionComponent::IsInteractableClassAllowed(UObject* Object)
+{
+	if (!Object)
+		return false;
+
+	if (InteractableClassesWhitelist.IsEmpty())
+		return true;
+
+	for (TSubclassOf<UObject>& classPtr : InteractableClassesWhitelist)
+	{
+		if (!classPtr.Get())
+			continue;
+
+		if (Object->IsA(classPtr))
+			return true;
+	}
+
+	return false;
+}
+
+bool UPlayerInteractionComponent::IsInteractableClassAllowed(TScriptInterface<class IInteractable> Interactable)
+{
+	return IsInteractableClassAllowed(Interactable.GetObject());
+}
+
 void UPlayerInteractionComponent::ClearSelectedGroup()
 {
 	for (AActor* el : InteractableActorsSelectedGroup)
@@ -420,6 +483,12 @@ void UPlayerInteractionComponent::SetCurrentDraggable(IInteractable* NewDraggabl
 		}
 	}
 
+	if (!AllowedToDrag || !IsInteractableClassAllowed(NewDraggable))
+	{
+		CurrentDraggable = nullptr;
+		return;
+	}
+
 	if (NewDraggable) 
 	{
 		NewDraggable->StartDragging();
@@ -441,6 +510,12 @@ void UPlayerInteractionComponent::SetCurrentHovered(IInteractable* NewHovered)
 	if (CurrentHovered)
 		CurrentHovered->StopCursorHover();
 
+	if (!IsInteractableClassAllowed(NewHovered))
+	{
+		CurrentHovered = nullptr;
+		return;
+	}
+
 	if (NewHovered)
 		NewHovered->StartCursorHover();
 
@@ -451,6 +526,12 @@ void UPlayerInteractionComponent::SetCurrentSelected(IInteractable* NewSelected)
 {
 	if (CurrentSelected)
 		CurrentSelected->SelectionRemoved();
+
+	if (!AllowedToSelect || !IsInteractableClassAllowed(NewSelected)) 
+	{
+		CurrentSelected = nullptr;
+		return;
+	}
 
 	if (NewSelected)
 		NewSelected->Selected();
@@ -491,8 +572,11 @@ void UPlayerInteractionComponent::FindInteractableAtCursor(AActor*& Actor, class
 	if (!hit.GetActor()) 
 		return;
 
-	Actor = hit.GetActor();
-	Interactable = Cast<IInteractable>(Actor);
+	if (IsInteractableClassAllowed(hit.GetActor())) 
+	{
+		Actor = hit.GetActor();
+		Interactable = Cast<IInteractable>(Actor);
+	}
 }
 
 FVector UPlayerInteractionComponent::GetSurfaceUnderActor(AActor* Actor)

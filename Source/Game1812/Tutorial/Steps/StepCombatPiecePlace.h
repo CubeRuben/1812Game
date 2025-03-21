@@ -32,6 +32,8 @@ protected:
 
 public:
 
+	const TSet<TWeakObjectPtr<class ACombatPiece>>& GetOverlappedPieces() const { return OverlappedPieces; }
+
 	void StepStart() override;
 	void StepEnd() override;
 

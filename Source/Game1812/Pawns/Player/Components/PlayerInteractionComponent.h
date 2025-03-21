@@ -46,18 +46,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction Limits")
 	bool AllowedToInteract;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction Limits")
+	bool AllowedToDrag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction Limits")
+	bool AllowedToSelect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction Limits", meta = (MustImplement = "Interactable"))
+	TArray<TSubclassOf<UObject>> InteractableClassesWhitelist;
+
 	class IInteractable* CurrentDraggable;
 	class IInteractable* CurrentHovered;
 	class IInteractable* CurrentSelected;
-
 
 	UPROPERTY(BlueprintAssignable)
 	FMultipleSelectionDelegate OnMultipleSelectionStart;
 	
 	UPROPERTY(BlueprintAssignable)
 	FMultipleSelectionDelegate OnMultipleSelectionEnd;
-
-	
 
 	virtual void BeginPlay() override;
 
@@ -76,7 +82,21 @@ public:
 	void SetCurrentSelected(class IInteractable* NewSelected);
 
 	bool IsAllowedToInteract() const { return AllowedToInteract; }
-	void SetAllowedToInteract(bool NewAllowedToInteract) { AllowedToInteract = NewAllowedToInteract; }
+	void SetAllowedToInteract(bool NewAllowedToInteract);
+
+	bool IsAllowedToDrag() const { return AllowedToDrag; }
+	void SetAllowedToDrag(bool NewAllowedToDrag);
+
+	bool IsAllowedToSelect() const { return AllowedToSelect; }
+	void SetAllowedToSelect(bool NewAllowedToSelect);
+
+	void AddInteractableClassToWhitelist(TSubclassOf<UObject> Class);
+	void RemoveInteractableClassFromWhitelist(TSubclassOf<UObject> Class);
+	bool IsInteractableClassAllowed(class IInteractable* Interactable);
+	bool IsInteractableClassAllowed(UObject* Object);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsInteractableClassAllowed(TScriptInterface<class IInteractable> Interactable);
 
 	void ClearSelectedGroup();
 

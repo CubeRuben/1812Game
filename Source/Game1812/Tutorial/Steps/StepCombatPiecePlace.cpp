@@ -3,6 +3,8 @@
 #include "../TutorialManager.h"
 #include "../TutorialCombatPiecesTrigger.h"
 #include "../../Actors/Pieces/CombatPiece.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 UStepCombatPiecePlace::UStepCombatPiecePlace() :
 	RequiredNumberOfPieces(0)
@@ -30,6 +32,8 @@ void UStepCombatPiecePlace::PieceOverlapEnd(ACombatPiece* Piece)
 
 void UStepCombatPiecePlace::StepStart()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToSelect(false);
+
 	if (!TriggerActor.IsValid())
 		return;
 
@@ -41,11 +45,14 @@ void UStepCombatPiecePlace::StepStart()
 
 void UStepCombatPiecePlace::StepEnd()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToSelect(true);
+
 	if (!TriggerActor.IsValid())
 		return;
 
-	TriggerActor->SetTriggerActive(false);
-
 	TriggerActor->RemoveOnPieceOverlapBeginHandler(OverlapBeginDelegateHandle);
 	TriggerActor->RemoveOnPieceOverlapEndHandler(OverlapEndDelegateHandle);
+
+	TriggerActor->SetTriggerActive(false);
+
 }

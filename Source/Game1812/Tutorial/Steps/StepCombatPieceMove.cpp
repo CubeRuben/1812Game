@@ -27,7 +27,7 @@ void UStepCombatPieceMove::SetPiecesOutlineEnabled(bool OutlineEnabled)
 
 	for (const TObjectPtr<ACombatPiece>& combatPiece : combatPieces)
 	{
-		if (combatPiece.IsNull())
+		if (!combatPiece)
 			continue;
 
 		combatPiece->GetOutlineComponent()->SetAttentionEnabled(OutlineEnabled);

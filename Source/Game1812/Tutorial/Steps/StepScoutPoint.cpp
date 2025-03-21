@@ -2,6 +2,9 @@
 
 #include "../TutorialManager.h"
 #include "../TutorialScoutDiscoverPoint.h"
+#include "../../Actors/Pieces/ScoutPiece.h"
+#include "../../Pawns/Player/PlayerPawn.h"
+#include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
 UStepScoutPoint::UStepScoutPoint() :
 	PointsCounter(0)
@@ -20,6 +23,8 @@ void UStepScoutPoint::OnPointDiscover()
 
 void UStepScoutPoint::StepStart()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->AddInteractableClassToWhitelist(AScoutPiece::StaticClass());
+
 	for (TWeakObjectPtr<ATutorialScoutDiscoverPoint> point : PointsToDiscover) 
 	{
 		if (!point.IsValid())
@@ -34,6 +39,8 @@ void UStepScoutPoint::StepStart()
 
 void UStepScoutPoint::StepEnd()
 {
+	Manager->GetPlayerPawn()->GetInteractionComponent()->RemoveInteractableClassFromWhitelist(AScoutPiece::StaticClass());
+
 	for (TWeakObjectPtr<ATutorialScoutDiscoverPoint> point : PointsToDiscover)
 	{
 		if (!point.IsValid())
