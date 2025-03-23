@@ -155,11 +155,6 @@ UUnitOrder* AScoutUnit::GetCurrentOrder()
 	return CurrentOrder;
 }
 
-UUnitMovementComponent* AScoutUnit::GetMovementComponent()
-{
-	return MovementComponent;
-}
-
 float AScoutUnit::GetMovementSpeed() const
 {
 	return MovementSpeed * GetTerrainModifiers().MovementSpeedModifier;

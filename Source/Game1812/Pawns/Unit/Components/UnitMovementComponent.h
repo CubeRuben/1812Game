@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementStartDelegate);
 UDELEGATE(BlueprintAuthorityOnly)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementEndDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveDelegate, float, Distance);\
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoveDelegate, float, Distance);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMovementEndStaticDelegate, class ABaseUnit*);
 
@@ -61,6 +61,7 @@ protected:
 	TEMPLATE_GLOBAL_EVENT_DELEGATE(FOnMovementEndStaticDelegate, MovementEnd);
 
 	FVector GetNextPathPoint();
+	FVector GetNextPathPoint(const FVector& ActorLocation);
 	FVector GetLastPathPoint();
 
 	FVector ProjectPointToMap(const FVector& Point);
@@ -69,15 +70,17 @@ protected:
 
 	void MoveAlongPath(float DeltaTime);
 
-	void UpdateMovement(float DeltaTime);
+	float UpdateMovement(float DeltaTime);
 
 	void RotatePawn(float DeltaTime, float RotationYaw);
-	void MovePawn(float DeltaTime, const FVector& Location);
 
 	void UpdatePath();
 
 	void CheckMovementStart();
 	void CheckMovementEnd();
+
+	float GetMovementSpeed();
+	float GetRotationSpeed();
 
 public:	
 
@@ -93,7 +96,7 @@ public:
 
 	void SetFormationMovement(class UFormationMovement* NewFormationMovement);
 
-	bool IsMoving();
+	bool IsMoving() const;
 
 	void MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);
 	void ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);

@@ -58,7 +58,7 @@ public:
 	//
 
 	virtual class UBoxComponent* GetColliderComponent() { return BoxComponent; };
-	virtual class UUnitMovementComponent* GetMovementComponent() { return nullptr; };
+	virtual class UUnitMovementComponent* GetMovementComponent() { return MovementComponent; };
 
 	virtual float GetMovementSpeed() const { return 0.f; };
 	virtual float GetRotationSpeed() const { return 0.f; };

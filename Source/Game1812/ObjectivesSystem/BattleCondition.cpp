@@ -3,6 +3,7 @@
 #include "BattleObjectivesManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "../CossacksGameMode.h"
+#include "../Pawns/Unit/Units/EscortConvoyUnit.h"
 
 bool UBattleCondition::Condition(ABattleObjectivesManager* BattleObjectivesManager)
 {
@@ -131,3 +132,32 @@ bool UCasualtiesBattleCondition::Condition(ABattleObjectivesManager* BattleObjec
 	return ratio > CasualtyPercentage;
 }
 
+
+
+UEscortConvoySuccessfulBattleCondition::UEscortConvoySuccessfulBattleCondition()
+{
+	ConvoyUnit = nullptr;
+}
+
+bool UEscortConvoySuccessfulBattleCondition::Condition(ABattleObjectivesManager* BattleObjectivesManager)
+{
+	if (ConvoyUnit.IsValid())
+		return ConvoyUnit->IsPathFinished();
+
+	return false;
+}
+
+
+
+UEscortConvoyFailBattleCondition::UEscortConvoyFailBattleCondition()
+{
+	ConvoyUnit = nullptr;
+}
+
+bool UEscortConvoyFailBattleCondition::Condition(ABattleObjectivesManager* BattleObjectivesManager)
+{
+	if (ConvoyUnit.IsValid())
+		return ConvoyUnit->IsDead();
+
+	return true;
+}

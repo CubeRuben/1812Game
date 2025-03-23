@@ -8,12 +8,11 @@
 
 FOnMovementEndStaticDelegate UUnitMovementComponent::OnMovementEndGlobalEvent = FOnMovementEndStaticDelegate();
 
-UUnitMovementComponent::UUnitMovementComponent()
+UUnitMovementComponent::UUnitMovementComponent() :
+	UnitPawn(nullptr), TargetLocation(FVector::ZeroVector), TargetRotation(0.0f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	TargetLocation = FVector::ZeroVector;
-	bIsMoving = false;
 	bMustRotateToTargetRotation = false;
 
 	Path = nullptr;
@@ -31,117 +30,113 @@ void UUnitMovementComponent::BeginPlay()
 		DestroyComponent();
 
 	TargetLocation = UnitPawn->GetActorLocation();
+	TargetRotation = UnitPawn->GetActorRotation().Yaw;
 }
 
 void UUnitMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!bIsMoving) 
+	if (bIsMoving)
 	{
-		if (bMustRotateToTargetRotation) 
-		{
-			const float rotation = (FRotator(0.f, TargetRotation, 0.f) - UnitPawn->GetActorRotation()).Yaw;
-
-			RotatePawn(DeltaTime, rotation);
-		}
-
+		MoveAlongPath(DeltaTime);
 		return;
 	}
-	
-	MoveAlongPath(DeltaTime);
+
+	if (bMustRotateToTargetRotation) 
+	{
+		const float rotation = (FRotator(0.0f, TargetRotation, 0.0f) - UnitPawn->GetActorRotation()).Yaw;
+		RotatePawn(DeltaTime, rotation);
+	}
 }
 
 void UUnitMovementComponent::MoveAlongPath(float DeltaTime)
 {
-	if (!Path || !Path->IsValid())
-		return;
-
-	const FVector startLocation = UnitPawn->GetActorLocation();
-
-	UpdateMovement(DeltaTime);
-
-	//Check if bound, because sqrt is costly operation
-	if (OnMove.IsBound()) 
+	if (!Path || !Path->IsValid()) 
 	{
-		const float movedDistance = FVector::DistSquared2D(startLocation, UnitPawn->GetActorLocation());
-		OnMove.Broadcast(movedDistance);
+		StopMoving();
+		return;
 	}
+
+	const float deltaDistance = UpdateMovement(DeltaTime);
+
+	OnMove.Broadcast(deltaDistance);
 
 	CheckMovementEnd();
 }
 
-void UUnitMovementComponent::UpdateMovement(float DeltaTime) 
+float UUnitMovementComponent::UpdateMovement(float DeltaTime) 
 {
-	const FVector targetPoint = GetNextPathPoint();
+	FVector targetPoint = GetNextPathPoint();
 
 	const FVector movementDirection = (targetPoint - UnitPawn->GetActorLocation()).GetSafeNormal2D();
+	
 	const float rotationYaw = FQuat::FindBetween(UnitPawn->GetActorForwardVector(), movementDirection).Rotator().Yaw;
-
 	RotatePawn(DeltaTime, rotationYaw);
 
-	if (FMath::Abs(rotationYaw) < 5.0f)
-		MovePawn(DeltaTime, targetPoint);
-}
+	if (FMath::Abs(rotationYaw) > 5.0f)
+		return 0.0f;
 
-void UUnitMovementComponent::MovePawn(float DeltaTime, const FVector& Location)
-{
+	const float deltaDistance = GetMovementSpeed() * DeltaTime;
+	float leftDeltaDistance = deltaDistance;
+
 	const FVector actorLocation = UnitPawn->GetActorLocation();
-
-	const FVector delta = (Location - actorLocation) * FVector(1, 1, 0);
-	const FVector direction = delta.GetSafeNormal();
-
-	float movementSpeed = UnitPawn->GetMovementSpeed();
-
-	if (FormationMovement) 
-	{
-		movementSpeed = FMath::Min(movementSpeed, FormationMovement->GetMovementSpeed());
-	}
-
-	const FVector movementDelta = direction * movementSpeed * DeltaTime;
-
 	FVector newActorLocation;
 
-	if (movementDelta.SizeSquared2D() > delta.SizeSquared2D())
+	for (int i = 0; i < 25; i++)
 	{
-		newActorLocation = Location;
-	}
-	else
-	{
-		newActorLocation = actorLocation + movementDelta;
+		const FVector delta = targetPoint - actorLocation;
+		const FVector direction = delta.GetSafeNormal2D();
+		const FVector movementDelta = direction * deltaDistance;
+
+		if (movementDelta.SizeSquared2D() > delta.SizeSquared2D())
+		{
+			newActorLocation = targetPoint;
+			leftDeltaDistance -= delta.Size2D();
+		}
+		else
+		{
+			newActorLocation = actorLocation + movementDelta;
+			leftDeltaDistance = 0.0f;
+			break;
+		}
+
+		targetPoint = GetNextPathPoint(newActorLocation);
+
+		if ((targetPoint - newActorLocation).IsNearlyZero())
+			break;
 	}
 
 	FHitResult hit;
 
-	GetWorld()->LineTraceSingleByChannel(hit, newActorLocation + FVector(0.0f, 0.0f, 250.f), newActorLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
+	const FVector startPoint = newActorLocation + FVector(0.0f, 0.0f, 250.f);
+	const FVector endPoint = newActorLocation - FVector(0.0f, 0.0f, 250.f);
+
+	GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECollisionChannel::ECC_GameTraceChannel1);
 
 	if (hit.bBlockingHit)
-	{
 		newActorLocation = hit.Location;
-	}
 
 	UnitPawn->SetActorLocation(newActorLocation);
+
+	return deltaDistance - leftDeltaDistance;
 }
 
 void UUnitMovementComponent::RotatePawn(float DeltaTime, float RotationYaw)
 {
-	float rotationSpeed = UnitPawn->GetRotationSpeed();
-
-	if (FormationMovement)
-	{
-		if (rotationSpeed > FormationMovement->GetRotationSpeed())
-			rotationSpeed = FormationMovement->GetRotationSpeed();
-	}
-
+	const float rotationSpeed = GetRotationSpeed();
 	const float rotationDelta = FMath::Sign(RotationYaw) * DeltaTime * rotationSpeed;
 	const float limitedRotation = FMath::Clamp(rotationDelta, -FMath::Abs(RotationYaw), FMath::Abs(RotationYaw));
 
-	UnitPawn->AddActorLocalRotation(FRotator(0, limitedRotation, 0));
+	UnitPawn->AddActorLocalRotation(FRotator(0.0f, limitedRotation, 0.0f));
 }
 
 void UUnitMovementComponent::MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType)
 {
-	if (LastTimeOfMoveAssign + 1.f > GetWorld()->GetTimeSeconds())
+	const float cooldownTime = LastTimeOfMoveAssign + 1.0f;
+	const float worldTime = GetWorld()->GetTimeSeconds();
+
+	if (cooldownTime > worldTime)
 		return;
 
 	ForceMoveTo(MoveToLocation, MovementType);
@@ -150,20 +145,11 @@ void UUnitMovementComponent::MoveTo(const FVector& MoveToLocation, EUnitMovement
 void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType)
 {
 	if (MovementType == EUnitMovementType::Attack) 
-	{
 		FormationMovement = nullptr;
-	}
-		
 
 	bMustRotateToTargetRotation = false;
-	FVector moveToLocation = ProjectPointToMap(MoveToLocation);
-
-	if (TargetLocation == moveToLocation) 
-	{
-		return;
-	}
-
-	TargetLocation = moveToLocation;
+	TargetLocation = ProjectPointToMap(MoveToLocation);
+	LastTimeOfMoveAssign = GetWorld()->GetTimeSeconds();
 
 	CheckMovementStart();
 
@@ -172,8 +158,9 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 		UpdatePath();
 		LastTimeOfMoveAssign = GetWorld()->GetTimeSeconds();
 	}
-	else
+	else 
 	{
+		Path = nullptr;
 		OnMovementEnd.Broadcast();
 	}
 }
@@ -189,9 +176,7 @@ void UUnitMovementComponent::StopMoving()
 	TargetLocation = ProjectPointToMap(UnitPawn->GetActorLocation());
 
 	if (bIsMoving) 
-	{
 		OnMovementEnd.Broadcast();
-	}
 
 	bIsMoving = false;
 }
@@ -200,12 +185,15 @@ FVector UUnitMovementComponent::ProjectPointToMap(const FVector& Point)
 {
 	FHitResult hit;
 
-	GetWorld()->LineTraceSingleByChannel(hit, Point, Point - FVector(0, 0, 4000.f), ECollisionChannel::ECC_GameTraceChannel1);
+	const FVector startPoint = Point + FVector(0.0f, 0.0f, 1000.0f);
+	const FVector endPoint = Point - FVector(0.0f, 0.0f, 4000.0f);
 
-	if (!hit.bBlockingHit)
-		return Point;
+	GetWorld()->LineTraceSingleByChannel(hit, startPoint, endPoint, ECollisionChannel::ECC_GameTraceChannel1);
 
-	return hit.Location;
+	if (hit.bBlockingHit)
+		return hit.Location;
+
+	return Point;
 }
 
 void UUnitMovementComponent::UpdatePath()
@@ -216,7 +204,7 @@ void UUnitMovementComponent::UpdatePath()
 
 void UUnitMovementComponent::CheckMovementStart()
 {
-	if (FVector::DistSquaredXY(TargetLocation, UnitPawn->GetActorLocation()) < 5.f)
+	if (FVector::DistSquared2D(TargetLocation, UnitPawn->GetActorLocation()) < 5.0f)
 		return;
 
 	bIsMoving = true;
@@ -225,7 +213,7 @@ void UUnitMovementComponent::CheckMovementStart()
 
 void UUnitMovementComponent::CheckMovementEnd()
 {
-	if (FVector::DistSquaredXY(GetLastPathPoint(), UnitPawn->GetActorLocation()) > 5.f)
+	if (FVector::DistSquared2D(GetLastPathPoint(), UnitPawn->GetActorLocation()) > 5.0f)
 		return;
 
 	bIsMoving = false;
@@ -233,18 +221,43 @@ void UUnitMovementComponent::CheckMovementEnd()
 	OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 }
 
+float UUnitMovementComponent::GetMovementSpeed()
+{
+	const float unitMovementSpeed = UnitPawn->GetMovementSpeed();
+
+	if (FormationMovement)
+		return FMath::Min(unitMovementSpeed, FormationMovement->GetMovementSpeed());
+
+	return unitMovementSpeed;
+}
+
+float UUnitMovementComponent::GetRotationSpeed()
+{
+	const float unitRotationSpeed = UnitPawn->GetRotationSpeed();
+
+	if (FormationMovement)
+		return FMath::Min(unitRotationSpeed, FormationMovement->GetMovementSpeed());
+
+	return unitRotationSpeed;
+}
+
 FVector UUnitMovementComponent::GetNextPathPoint()
 {
+	return GetNextPathPoint(UnitPawn->GetActorLocation());
+}
+
+FVector UUnitMovementComponent::GetNextPathPoint(const FVector& ActorLocation)
+{
 	if (!Path || Path->PathPoints.IsEmpty())
-		return UnitPawn->GetActorLocation();
+		return ActorLocation;
 
 	if (!Path->PathPoints.IsValidIndex(CurrentFollowingSegmentIndex))
 	{
 		CurrentFollowingSegmentIndex = 0;
-		return UnitPawn->GetActorLocation();
+		return ActorLocation;
 	}
 
-	if (FVector::DistSquaredXY(Path->PathPoints[CurrentFollowingSegmentIndex], UnitPawn->GetActorLocation()) < 10.f)
+	if (FVector::DistSquaredXY(Path->PathPoints[CurrentFollowingSegmentIndex], ActorLocation) < 10.f)
 	{
 		if ((Path->PathPoints.Num() - 1) != CurrentFollowingSegmentIndex)
 			CurrentFollowingSegmentIndex++;
@@ -271,7 +284,7 @@ void UUnitMovementComponent::SetFormationMovement(UFormationMovement* NewFormati
 	FormationMovement = NewFormationMovement;
 }
 
-bool UUnitMovementComponent::IsMoving()
+bool UUnitMovementComponent::IsMoving() const
 {
 	return bIsMoving;
 }

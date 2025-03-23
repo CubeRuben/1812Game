@@ -56,8 +56,6 @@ public:
 	float PredictMovementTime();
 
 	//ABaseUnit class override
-	class UUnitMovementComponent* GetMovementComponent() override;
-
 	float GetMovementSpeed() const override;
 	float GetRotationSpeed() const override;
 

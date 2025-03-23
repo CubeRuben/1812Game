@@ -152,3 +152,37 @@ public:
 
 	FText GetFormattedText() override { return FText::Format(UIText, { CasualtyPercentage }); }
 };
+
+UCLASS(meta = (DisplayName = "Escort Convoy Successful"))
+class GAME1812_API UEscortConvoySuccessfulBattleCondition : public UBattleCondition
+{
+	GENERATED_BODY()
+
+public:
+
+	UEscortConvoySuccessfulBattleCondition();
+
+protected:
+
+	UPROPERTY(EditAnywhere)
+	TWeakObjectPtr<class AEscortConvoyUnit> ConvoyUnit;
+
+	bool Condition(class ABattleObjectivesManager* BattleObjectivesManager) override;
+};
+
+UCLASS(meta = (DisplayName = "Escort Convoy Fail"))
+class GAME1812_API UEscortConvoyFailBattleCondition : public UBattleCondition
+{
+	GENERATED_BODY()
+
+public:
+
+	UEscortConvoyFailBattleCondition();
+
+protected:
+
+	UPROPERTY(EditAnywhere)
+	TWeakObjectPtr<class AEscortConvoyUnit> ConvoyUnit;
+
+	bool Condition(class ABattleObjectivesManager* BattleObjectivesManager) override;
+};

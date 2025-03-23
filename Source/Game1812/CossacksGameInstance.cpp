@@ -6,7 +6,7 @@
 #include "Actors/UnitPathArrow.h"
 #include "Actors/GhostPiece.h"
 #include "Actors/EnemyPiece.h"
-
+#include "Actors/ConvoyPiece.h"
 
 UClass* UCossacksGameInstance::GetCombatUnitPieceClass() const
 {
@@ -36,4 +36,9 @@ UClass* UCossacksGameInstance::GetGhostPieceClass() const
 UClass* UCossacksGameInstance::GetEnemyPieceClass() const
 {
 	return EnemyPieceClass.Get();
+}
+
+UClass* UCossacksGameInstance::GetEscortConvoyPieceClass() const
+{
+	return EscortConvoyPieceClass.Get();
 }

@@ -30,6 +30,9 @@ public:
 	TSubclassOf<class AEnemyPiece> EnemyPieceClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class AConvoyPiece> EscortConvoyPieceClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UMaterialInterface* PieceMapMarkerMaterial;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -48,6 +51,7 @@ public:
 	UClass* GetUnitPathArrowClass() const;
 	UClass* GetGhostPieceClass() const;
 	UClass* GetEnemyPieceClass() const;
+	UClass* GetEscortConvoyPieceClass() const;
 
 	UMaterialInterface* GetPieceMapMarkerMaterial() const { return PieceMapMarkerMaterial; }
 	UMaterialInterface* GetDeadPieceMaterial() const { return DeadPieceMaterial; };
