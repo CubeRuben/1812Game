@@ -59,6 +59,7 @@ void AEscortConvoyUnit::OnMovementEnd()
 		return;
 	}
 
+	FollowPoints[CurrentFollowPointIndex]->OnConvoyArrived();
 	MoveToPoint(CurrentFollowPointIndex + 1);
 }
 

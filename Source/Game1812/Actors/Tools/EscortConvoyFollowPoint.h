@@ -15,8 +15,15 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<class ACombatUnit*> EnemyCombatUnits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RandomEnemyOffset;
+
 	virtual void BeginPlay() override;
 
 public:	
 
+	void OnConvoyArrived();
 };
