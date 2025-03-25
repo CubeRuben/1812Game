@@ -76,7 +76,7 @@ void AAdjutantUnit::OnMovementComplete()
 			return;
 		}
 
-		MovementComponent->ForceMoveTo(ordersSender->GetOwner()->GetActorLocation(), EUnitMovementType::Move);
+		MovementComponent->MoveToActor(ordersSender->GetOwner());
 		return;
 	}
 

@@ -165,6 +165,19 @@ void UUnitMovementComponent::ForceMoveTo(const FVector& MoveToLocation, EUnitMov
 	}
 }
 
+void UUnitMovementComponent::MoveToActor(AActor* Actor)
+{
+	if (!Actor)
+		return;
+
+	TargetActor = Actor;
+
+	ForceMoveTo(Actor->GetActorLocation());
+
+	if (bIsMoving)
+		GetWorld()->GetTimerManager().SetTimer(UpdatePathTimerHandle, this, &UUnitMovementComponent::UpdatePathToActor, 1.0f, true, 1.0f);
+}
+
 void UUnitMovementComponent::RotateTo(float FinishRotation)
 {
 	TargetRotation = FinishRotation;
@@ -178,6 +191,7 @@ void UUnitMovementComponent::StopMoving()
 	if (bIsMoving) 
 		OnMovementEnd.Broadcast();
 
+	GetWorld()->GetTimerManager().ClearTimer(UpdatePathTimerHandle);
 	bIsMoving = false;
 }
 
@@ -202,6 +216,18 @@ void UUnitMovementComponent::UpdatePath()
 	Path = UNavigationSystemV1::FindPathToLocationSynchronously(UnitPawn, UnitPawn->GetActorLocation(), TargetLocation, UnitPawn);
 }
 
+void UUnitMovementComponent::UpdatePathToActor()
+{
+	if (!TargetActor) 
+	{
+		GetWorld()->GetTimerManager().ClearTimer(UpdatePathTimerHandle);
+		return;
+	}
+
+	TargetLocation = TargetActor->GetActorLocation();
+	UpdatePath();
+}
+
 void UUnitMovementComponent::CheckMovementStart()
 {
 	if (FVector::DistSquared2D(TargetLocation, UnitPawn->GetActorLocation()) < 5.0f)
@@ -217,6 +243,7 @@ void UUnitMovementComponent::CheckMovementEnd()
 		return;
 
 	bIsMoving = false;
+	GetWorld()->GetTimerManager().ClearTimer(UpdatePathTimerHandle);
 	OnMovementEnd.Broadcast();
 	OnMovementEndGlobalEvent.Broadcast(UnitPawn);
 }

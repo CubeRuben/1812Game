@@ -39,6 +39,11 @@ protected:
 	FVector TargetLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Movement")
+	AActor* TargetActor;
+
+	FTimerHandle UpdatePathTimerHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Movement")
 	bool bMustRotateToTargetRotation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Unit Movement")
@@ -75,6 +80,8 @@ protected:
 	void RotatePawn(float DeltaTime, float RotationYaw);
 
 	void UpdatePath();
+	
+	void UpdatePathToActor();
 
 	void CheckMovementStart();
 	void CheckMovementEnd();
@@ -98,8 +105,9 @@ public:
 
 	bool IsMoving() const;
 
-	void MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);
-	void ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType);
+	void MoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType = EUnitMovementType::Move);
+	void ForceMoveTo(const FVector& MoveToLocation, EUnitMovementType MovementType = EUnitMovementType::Move);
+	void MoveToActor(AActor* Actor);
 	void RotateTo(float FinishRotation);
 	void StopMoving();
 

@@ -82,7 +82,7 @@ void AScoutUnit::OnMovementComplete()
 
 	if (squaredDistanceToOrdersSender > squaredDistanceToReturn)
 	{
-		MovementComponent->ForceMoveTo(ordersSender->GetOwner()->GetActorLocation(), EUnitMovementType::Move);
+		MovementComponent->MoveToActor(ordersSender->GetOwner());
 		return;
 	}
 
