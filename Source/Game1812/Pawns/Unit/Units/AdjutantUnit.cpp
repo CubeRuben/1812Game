@@ -6,10 +6,11 @@
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitReportComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
-#include "../../../Actors/HeadQuarters.h"
+#include "../../../OrdersSenderComponent.h"
 #include "../../../ReportSystem/ReportSpawner.h"
 
-AAdjutantUnit::AAdjutantUnit()
+AAdjutantUnit::AAdjutantUnit() :
+	Contained(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -42,27 +43,40 @@ void AAdjutantUnit::AssignOrder(UUnitOrder* NewOrder)
 	MoveToNextTarget();
 }
 
+void AAdjutantUnit::OnBeingAddedToOrdersSender()
+{
+	Contained = true;
+	MovementComponent->StopMoving();
+	SetActorHiddenInGame(true);
+}
+
+void AAdjutantUnit::OnBeingRemovedFromOrdersSender()
+{
+	Contained = false;
+	SetActorHiddenInGame(false);
+}
+
 void AAdjutantUnit::OnMovementComplete()
 {
-	if (IsOnDeathCooldown())
+	if (IsOnDeathCooldown() || Contained)
 		return;
 
 	if (Orders.IsEmpty())
 	{
-		AHeadQuarters* headQuarters = AHeadQuarters::GetInstance();
+		UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-		if (!headQuarters)
+		if (!ordersSender)
 			return;
 
-		if (IsInReachToInteractWithActor(headQuarters)) 
+		if (IsInReachToInteractWithActor(ordersSender->GetOwner()))
 		{
-			headQuarters->AddAdjutantUnit(this);
+			ordersSender->ReturnAdjutantUnit(this);
 			GiveReport();
 			OnReturnToHQ();
 			return;
 		}
 
-		MovementComponent->ForceMoveTo(headQuarters->GetActorLocation(), EUnitMovementType::Move);
+		MovementComponent->ForceMoveTo(ordersSender->GetOwner()->GetActorLocation(), EUnitMovementType::Move);
 		return;
 	}
 
@@ -87,12 +101,12 @@ void AAdjutantUnit::MoveToNextTarget()
 {
 	if (Orders.IsEmpty()) 
 	{
-		AHeadQuarters* headQuarters = AHeadQuarters::GetInstance();
+		UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-		if (!headQuarters)
+		if (!ordersSender)
 			return;
 
-		MovementComponent->ForceMoveTo(headQuarters->GetActorLocation(), EUnitMovementType::Move);
+		MovementComponent->ForceMoveTo(ordersSender->GetOwner()->GetActorLocation(), EUnitMovementType::Move);
 		return;
 	}
 
@@ -145,19 +159,19 @@ float AAdjutantUnit::ApplyDamage(IDamageable* Attacker, float Amount)
 
 void AAdjutantUnit::ForceReturnToHQ()
 {
-	AHeadQuarters* headQuarters = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (!headQuarters)
+	if (!ordersSender)
 	{
 		Destroy();
 		return;
 	}
 
-	headQuarters->RemoveAdjutantUnit(this);
+	ordersSender->TakeAdjutantUnit(this);
 	GetWorldTimerManager().SetTimer(DeathCooldownTimer, this, &AAdjutantUnit::OnDeathCooldownEnd, DeathCooldown);
 
 	Orders.Empty();
-	SetActorLocation(headQuarters->GetActorLocation());
+	SetActorLocation(ordersSender->GetOwner()->GetActorLocation());
 	MovementComponent->StopMoving();
 
 	CollectedReports.Clear();
@@ -165,10 +179,10 @@ void AAdjutantUnit::ForceReturnToHQ()
 
 void AAdjutantUnit::OnDeathCooldownEnd()
 {
-	AHeadQuarters* headQuarters = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (headQuarters)
-		headQuarters->AddAdjutantUnit(this);
+	if (ordersSender)
+		ordersSender->ReturnAdjutantUnit(this);
 }
 
 void AAdjutantUnit::GiveReport()

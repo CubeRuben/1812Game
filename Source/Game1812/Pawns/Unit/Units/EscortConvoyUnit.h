@@ -21,6 +21,9 @@ public:
 
 protected:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UOrdersSenderComponent* OrdersSenderComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<class AEscortConvoyFollowPoint*> FollowPoints;
 
@@ -45,7 +48,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool PathFinished;
 
-	FTimerHandle TimerHandle;
+	FTimerHandle StartTimeoutTimerHandle;
+	FTimerHandle FogOfWarTimerHandle;
 
 	ADD_ESCORT_CONVOY_EVENT(ConvoyMovementFinish);
 	ADD_ESCORT_CONVOY_EVENT(ConvoyDeath);

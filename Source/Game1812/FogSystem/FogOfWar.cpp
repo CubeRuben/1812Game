@@ -51,7 +51,6 @@ AFogOfWar::AFogOfWar()
 
 	AffectActors = true;
 
-	HeadQuartersRange = 8.0f;
 	ScoutRange = 5.0f;
 	ScoutRevealTime = 50.0f;
 }
@@ -74,13 +73,13 @@ void AFogOfWar::BeginPlay()
 	FogDynamicMaterial = UMaterialInstanceDynamic::Create(FogMaterialAsset, this);
 	FogDecalComponent->SetDecalMaterial(FogDynamicMaterial);
 
-	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AFogOfWar::AddConstantDiscoveredArea));
+	UpdateFogTexture();
 }
-
-void AFogOfWar::AddConstantDiscoveredArea()
+void AFogOfWar::SetConstantDiscoveredArea(FVector WorldLocation, float Range)
 {
-	if (AHeadQuarters::GetInstance())
-		ApplyCircularBrushToImage(ConstantDiscoveredArea, LocationToIndex(AHeadQuarters::GetInstance()->GetActorLocation()), HeadQuartersRange, FVector4f::One());
+	ConstantDiscoveredArea.Clear(FVector4f::Zero());
+
+	ApplyCircularBrushToImage(ConstantDiscoveredArea, LocationToIndex(WorldLocation), Range, FVector4f::One());
 
 	UpdateFogTexture();
 }

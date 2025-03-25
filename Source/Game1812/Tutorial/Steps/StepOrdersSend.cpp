@@ -1,7 +1,7 @@
 #include "StepOrdersSend.h"
 
 #include "../TutorialManager.h"
-#include "../../Actors/HeadQuarters.h"
+#include "../../OrdersSenderComponent.h"
 #include "../../Pawns/Player/PlayerPawn.h"
 #include "../../Pawns/Player/Components/PlayerInteractionComponent.h"
 
@@ -19,22 +19,22 @@ void UStepOrdersSend::StepStart()
 {
 	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(false);
 
-	AHeadQuarters* const hq = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (!hq)
+	if (!ordersSender)
 		return;
 
-	DelegateHandle = hq->AddOnOrdersSendHandler(FOrdersSendDelegate::FDelegate::CreateUObject(this, &UStepOrdersSend::OnOrderSend));
+	DelegateHandle = ordersSender->AddOnOrdersSendHandler(FOrdersSendDelegate::FDelegate::CreateUObject(this, &UStepOrdersSend::OnOrderSend));
 }
 
 void UStepOrdersSend::StepEnd()
 {
 	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToInteract(true);
 
-	AHeadQuarters* const hq = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (!hq)
+	if (!ordersSender)
 		return;
 
-	hq->RemoveOnOrdersSendHandler(DelegateHandle);
+	ordersSender->RemoveOnOrdersSendHandler(DelegateHandle);
 }

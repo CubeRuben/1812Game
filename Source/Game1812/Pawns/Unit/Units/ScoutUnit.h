@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float RotationSpeed;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool Contained;
+
 	TImageBuilder<FVector4f> DiscoveredArea;
 
 	UPROPERTY(BlueprintAssignable)
@@ -61,6 +64,11 @@ public:
 
 	class UUnitOrder* GetCurrentOrder();
 	void AssignOrder(class UUnitOrder* NewOrder);
+
+	void OnBeingAddedToOrdersSender() override;
+	void OnBeingRemovedFromOrdersSender() override;
+
+	bool IsAffectedByFog() override { return !Contained; }
 	//
 
 	//IDamageable Interface

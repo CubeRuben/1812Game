@@ -3,7 +3,7 @@
 #include "EnemyUnitController.h"
 #include "../Units/CombatUnit.h"
 #include "../Orders/UnitOrder.h"
-#include "../../../Actors/HeadQuarters.h"
+#include "../../../OrdersSenderComponent.h"
 #include "../../../CossacksGameMode.h"
 
 UCombatFormation::UCombatFormation()
@@ -284,12 +284,12 @@ void AEnemyAI::CreateFormations(const TArray<AEnemyUnitController*>& Controllers
 
 float AEnemyAI::GetRotationToHQ(const FVector& Location)
 {
-	AHeadQuarters* hq = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (!hq)
+	if (!ordersSender)
 		return 180.f;
 
-	return FRotator(FQuat::FindBetween(FVector::XAxisVector, hq->GetActorLocation() - Location)).Yaw;
+	return FRotator(FQuat::FindBetween(FVector::XAxisVector, ordersSender->GetOwner()->GetActorLocation() - Location)).Yaw;
 }
 
 

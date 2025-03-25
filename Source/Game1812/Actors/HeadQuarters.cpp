@@ -1,153 +1,18 @@
 #include "HeadQuarters.h"
 
-#include "../Pawns/Unit/BaseUnit.h"
-#include "../Pawns/Unit/Units/CombatUnit.h"
-#include "../Pawns/Unit/Units/AdjutantUnit.h"
-#include "../CossacksGameInstance.h"
+#include "../OrdersSenderComponent.h"
+#include "../FogSystem/FogOfWar.h"
 
-AHeadQuarters* AHeadQuarters::Instance = nullptr;
-
-AHeadQuarters* AHeadQuarters::GetInstance()
+AHeadQuarters::AHeadQuarters()
 {
-	return Instance;
-}
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 
-AHeadQuarters::AHeadQuarters() :
-	AllowedToSendOrders(true)
-{
-	PrimaryActorTick.bCanEverTick = false;
-
-	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root"));
-
-	AdjutantsAmount = 3;
-	RangeForCloseOrders = 50.f;
+	OrdersSenderComponent = CreateDefaultSubobject<UOrdersSenderComponent>(TEXT("Orders Sender Component"));
 }
 
 void AHeadQuarters::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 	
-	Instance = this;
-
-	UCossacksGameInstance* gameInstance = GetGameInstance<UCossacksGameInstance>();
-
-	if (!gameInstance)
-		return;
-
-	for (int i = 0; i < AdjutantsAmount; i++) 
-	{
-		ABaseUnit* unit = SpawnUnit(gameInstance->GetAdjutantUnitClass());
-
-		AAdjutantUnit* adjutantUnit = Cast<AAdjutantUnit>(unit);
-
-		if (adjutantUnit) 
-		{
-			AvailableAdjutants.Add(adjutantUnit);
-		}
-	}
-}
-
-void AHeadQuarters::AddAdjutantUnit(AAdjutantUnit* AdjutantUnit)
-{
-	AvailableAdjutants.Add(AdjutantUnit);
-}
-
-void AHeadQuarters::RemoveAdjutantUnit(AAdjutantUnit* AdjutantUnit)
-{
-	AvailableAdjutants.Remove(AdjutantUnit);
-}
-
-void AHeadQuarters::SendOrders()
-{
-	if (!SendOrdersAvailable())
-		return;
-
-	OnOrdersSendEvent.Broadcast();
-
-	for (int i = 0; i < UnitOrders.Num();) 
-	{
-		//Remove order, if unit is dead
-		if (!UnitOrders[i].Unit.IsValid()) 
-		{
-			UnitOrders.RemoveAt(i);
-			continue;
-		}
-
-		const FVector unitLocation = UnitOrders[i].Unit->GetActorLocation();
-		const float distance = FVector::DistSquared2D(unitLocation, GetActorLocation());
-
-		if (FMath::Pow(RangeForCloseOrders, 2) > distance)
-		{
-			UnitOrders[i].Unit->AssignOrder(UnitOrders[i].UnitOrder);
-			UnitOrders.RemoveAt(i);
-			continue;
-		}
-
-		i++;
-	}
-
-	if (!HaveAnyAdjutants() || !HaveAnyOrders())
-		return;
-
-	UAdjutantUnitOrder* unitOrder = NewObject<UAdjutantUnitOrder>();
-	unitOrder->SentOrdersToUnits = UnitOrders;
-
-	AvailableAdjutants[0]->AssignOrder(unitOrder);
-	AvailableAdjutants.RemoveAt(0);
-
-	UnitOrders.Empty();
-}
-
-void AHeadQuarters::AddOrderToAssign(class UCombatUnitOrder* UnitOrder, ABaseUnit* Unit)
-{
-	UnitOrders.RemoveAll([&](const FAssignedCombatUnitOrder& el) { return el.Unit == Unit; });
-
-	UnitOrders.Add(FAssignedCombatUnitOrder(UnitOrder, Unit));
-}
-
-ABaseUnit* AHeadQuarters::SpawnUnit(TSubclassOf<ABaseUnit> UnitClass)
-{
-	FVector point = GetActorLocation();
-
-	FActorSpawnParameters spawnParams;
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	ABaseUnit* unit = GetWorld()->SpawnActor<ABaseUnit>(UnitClass.Get(), point, FRotator(0, GetActorRotation().Yaw, 0), spawnParams);
-
-	if (unit->IsA(ACombatUnit::StaticClass()))
-	{
-		const float offset = 75.0f;
-
-		point.X += FMath::FRandRange(-offset, offset);
-		point.Y += FMath::FRandRange(-offset, offset);
-
-		point.Z += 25.0f;
-
-		unit->SetActorLocation(point);
-
-		UCombatUnitOrder* const order = Cast<UCombatUnitOrder>(unit->GetCurrentOrder());
-
-		if (order) 
-		{
-			order->Location = point;
-			unit->AssignOrder(order);
-		}
-	}
-
-	return unit;
-}
-
-bool AHeadQuarters::HaveAnyOrders()
-{
-	return UnitOrders.Num() != 0;
-}
-
-bool AHeadQuarters::SendOrdersAvailable()
-{
-	return HaveAnyOrders() && AllowedToSendOrders;
-}
-
-bool AHeadQuarters::HaveAnyAdjutants()
-{
-	return !AvailableAdjutants.IsEmpty();
+	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(OrdersSenderComponent, &UOrdersSenderComponent::UpdateFogOfWar));
 }

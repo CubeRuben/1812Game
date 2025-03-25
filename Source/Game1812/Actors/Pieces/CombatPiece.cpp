@@ -3,9 +3,10 @@
 #include "Components/PieceCombatStatsComponent.h"
 #include "Components/PieceCombatOrderWidgetComponent.h"
 #include "../../Pawns/Unit/Units/CombatUnit.h"
+#include "../../Pawns/Unit/Orders/UnitOrder.h"
 #include "../../DataAssets/CombatUnitDataAsset.h"
 #include "../../CossacksGameInstance.h"
-#include "../HeadQuarters.h"
+#include "../../OrdersSenderComponent.h"
 
 #include <Components/BoxComponent.h>
 
@@ -41,7 +42,7 @@ void ACombatPiece::AssignOrder(UUnitOrder* UnitOrder)
 {
 	Super::AssignOrder(UnitOrder);
 
-	UCombatUnitOrder* combatUnitOrder = Cast<UCombatUnitOrder>(UnitOrder);
+	UCombatUnitOrder* const combatUnitOrder = Cast<UCombatUnitOrder>(UnitOrder);
 
 	if (!combatUnitOrder)
 		return;
@@ -49,8 +50,10 @@ void ACombatPiece::AssignOrder(UUnitOrder* UnitOrder)
 	combatUnitOrder->Location = GetActorLocation();
 	combatUnitOrder->YawRotation = GetActorRotation().Yaw;
 
-	if (AHeadQuarters::GetInstance() && Unit.IsValid())
-		AHeadQuarters::GetInstance()->AddOrderToAssign(combatUnitOrder, Unit.Get());
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (ordersSender && Unit.IsValid())
+		ordersSender->AddAssignedOrder(combatUnitOrder, Unit.Get());
 }
 
 int ACombatPiece::GetPriority() const

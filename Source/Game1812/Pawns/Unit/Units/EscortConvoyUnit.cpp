@@ -1,6 +1,7 @@
 #include "EscortConvoyUnit.h"
 
 #include "../Components/UnitMovementComponent.h"
+#include "../../../OrdersSenderComponent.h"
 #include "../../../Actors/Tools/EscortConvoyFollowPoint.h"
 #include "../../../Actors/ConvoyPiece.h"
 #include "../../../CossacksGameInstance.h"
@@ -8,14 +9,15 @@
 AEscortConvoyUnit::AEscortConvoyUnit() :
 	CurrentFollowPointIndex(0), HealthPoints(1500.f), Defense(25.0f), MovementSpeed(5.0f), RotationSpeed(5.0f), StartTimeout(5.0f), PathFinished(false)
 {
-
+	OrdersSenderComponent = CreateDefaultSubobject<UOrdersSenderComponent>(TEXT("Orders Sender Component"));
 }
 
 void AEscortConvoyUnit::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEscortConvoyUnit::StartMovement, StartTimeout, false);
+	GetWorld()->GetTimerManager().SetTimer(StartTimeoutTimerHandle, this, &AEscortConvoyUnit::StartMovement, StartTimeout, false);
+	GetWorld()->GetTimerManager().SetTimer(FogOfWarTimerHandle, OrdersSenderComponent, &UOrdersSenderComponent::UpdateFogOfWar, 2.5f, true);
 
 	MovementComponent->OnMovementEnd.AddDynamic(this, &AEscortConvoyUnit::OnMovementEnd);
 
@@ -40,7 +42,7 @@ void AEscortConvoyUnit::SpawnProjectionPiece()
 
 void AEscortConvoyUnit::StartMovement()
 {
-	TimerHandle.Invalidate();
+	StartTimeoutTimerHandle.Invalidate();
 
 	MoveToPoint(0);
 }
@@ -62,6 +64,8 @@ void AEscortConvoyUnit::OnMovementEnd()
 	FollowPoints[CurrentFollowPointIndex]->OnConvoyArrived();
 	MoveToPoint(CurrentFollowPointIndex + 1);
 }
+
+
 
 float AEscortConvoyUnit::ApplyDamage(IDamageable* Attacker, float Amount)
 {

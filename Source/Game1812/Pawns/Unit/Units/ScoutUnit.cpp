@@ -1,12 +1,14 @@
 #include "ScoutUnit.h"
 
 #include "../Orders/UnitOrder.h"
+#include "../../../OrdersSenderComponent.h"
 #include "../../../FogSystem/FogOfWar.h"
 #include "../../../Actors/HeadQuarters.h"
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
 
-AScoutUnit::AScoutUnit() 
+AScoutUnit::AScoutUnit() :
+	Contained(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -18,32 +20,15 @@ void AScoutUnit::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (ordersSender)
+		ordersSender->AddContainedUnit(this);
+
 	DiscoveredArea.SetDimensions(AFogOfWar::GetInstance()->GetDimensions());
 	DiscoveredArea.Clear(FVector4f::Zero());
 
 	MovementComponent->OnMovementEnd.AddDynamic(this, &AScoutUnit::OnMovementComplete);
-}
-
-void AScoutUnit::OnMovementComplete() 
-{
-	if (ExplorationLocations.IsEmpty())
-	{
-		if (OnMovementEnd.IsBound())
-			OnMovementEnd.Broadcast();
-
-		if (!AFogOfWar::GetInstance())
-			return;
-
-		AFogOfWar::GetInstance()->AddDiscoveredArea(DiscoveredArea);
-		DiscoveredArea.Clear(FVector4f::Zero());
-
-		OnReturnToHQ();
-		return;
-	}
-
-	FVector location;
-	ExplorationLocations.Dequeue(location);
-	MovementComponent->ForceMoveTo(location, EUnitMovementType::Move);
 }
 
 void AScoutUnit::Tick(float DeltaTime)
@@ -52,11 +37,68 @@ void AScoutUnit::Tick(float DeltaTime)
 
 	if (MovementComponent->IsMoving())
 	{
-		if (!AFogOfWar::GetInstance())
+		AFogOfWar* const fogOfWar = AFogOfWar::GetInstance();
+
+		if (!fogOfWar)
 			return;
 
-		ApplyCircularBrushToImage(DiscoveredArea, AFogOfWar::GetInstance()->LocationToIndex(GetActorLocation()), AFogOfWar::GetInstance()->GetScoutRange(), FVector4f::One());
+		ApplyCircularBrushToImage(DiscoveredArea, fogOfWar->LocationToIndex(GetActorLocation()), fogOfWar->GetScoutRange(), FVector4f::One());
 	}
+}
+
+void AScoutUnit::OnBeingAddedToOrdersSender()
+{
+	Contained = true;
+	MovementComponent->StopMoving();
+	SetActorHiddenInGame(true);
+}
+
+void AScoutUnit::OnBeingRemovedFromOrdersSender()
+{
+	Contained = false;
+	SetActorHiddenInGame(false);
+}
+
+void AScoutUnit::OnMovementComplete()
+{
+	if (Contained)
+		return;
+
+	if (!ExplorationLocations.IsEmpty())
+	{
+		FVector location;
+		ExplorationLocations.Dequeue(location);
+		MovementComponent->ForceMoveTo(location, EUnitMovementType::Move);
+		return;
+	}
+
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (!ordersSender)
+		return;
+
+	const float squaredDistanceToOrdersSender = FVector::DistSquared2D(GetActorLocation(), ordersSender->GetOwner()->GetActorLocation());
+	const float squaredDistanceToReturn = FMath::Square(15.0f);
+
+	if (squaredDistanceToOrdersSender > squaredDistanceToReturn)
+	{
+		MovementComponent->ForceMoveTo(ordersSender->GetOwner()->GetActorLocation(), EUnitMovementType::Move);
+		return;
+	}
+
+	ordersSender->AddContainedUnit(this);
+
+	OnMovementEnd.Broadcast();
+	OnReturnToHQ();
+
+	AFogOfWar* const fogOfWar = AFogOfWar::GetInstance();
+
+	if (!fogOfWar)
+		return;
+
+	fogOfWar->AddDiscoveredArea(DiscoveredArea);
+
+	DiscoveredArea.Clear(FVector4f::Zero());
 }
 
 float AScoutUnit::PredictMovementTime()
@@ -105,12 +147,15 @@ void AScoutUnit::AssignOrder(UUnitOrder* NewOrder)
 	if (MovementComponent->IsMoving())
 		return;
 
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (ordersSender)
+		ordersSender->RemoveContainedUnit(this);
+
 	for (const FVector& location : CurrentOrder->ExplorationLocations)
 	{
 		ExplorationLocations.Enqueue(location);
 	}
-
-	ExplorationLocations.Enqueue(AHeadQuarters::GetInstance()->GetActorLocation());
 
 	if (OnMovementStart.IsBound())
 		OnMovementStart.Broadcast();

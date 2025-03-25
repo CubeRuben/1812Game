@@ -3,8 +3,8 @@
 #include "../Piece.h"
 #include "../ScoutPiece.h"
 #include "../../../CossacksGameInstance.h"
+#include "../../../OrdersSenderComponent.h"
 #include "../../UnitPathArrow.h"
-#include "../../HeadQuarters.h"
 #include "../../GhostPiece.h"
 
 UPiecePredictedPathComponent::UPiecePredictedPathComponent()
@@ -12,6 +12,7 @@ UPiecePredictedPathComponent::UPiecePredictedPathComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bIsScout = false;
+	PathStartPoint = FVector::ZeroVector;
 }
 
 void UPiecePredictedPathComponent::BeginPlay()
@@ -30,16 +31,6 @@ void UPiecePredictedPathComponent::BeginPlay()
 	
 	OwnerPiece->AddOnOrderAssignHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::ApplyArrow));
 	OwnerPiece->AddOnUnitDeathHandler(FPieceEventDelegate::FDelegate::CreateUObject(this, &UPiecePredictedPathComponent::DestroyArrow));
-
-	GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UPiecePredictedPathComponent::InitStartPoint));
-}
-
-void UPiecePredictedPathComponent::InitStartPoint()
-{
-	AHeadQuarters* hq = AHeadQuarters::GetInstance();
-
-	if (hq)
-		PathStartPoint = hq->GetActorLocation() + FVector(0.f, 0.f, 100.f);
 }
 
 void UPiecePredictedPathComponent::SpawnArrow()
@@ -53,10 +44,6 @@ void UPiecePredictedPathComponent::SpawnArrow()
 	const UCossacksGameInstance* gameInstance = GetWorld()->GetGameInstanceChecked<UCossacksGameInstance>();
 	UnitPathArrow = GetWorld()->SpawnActor<AUnitPathArrow>(gameInstance->GetUnitPathArrowClass(), FVector::ZeroVector, FRotator::ZeroRotator);
 
-	if (!UnitPathArrow.IsValid())
-		return;
-
-	UnitPathArrow->SetStartPoint(PathStartPoint);
 }
 
 void UPiecePredictedPathComponent::SpawnGhostPiece(const FVector& Location)
@@ -79,20 +66,27 @@ void UPiecePredictedPathComponent::BuildArrow()
 	if (!UnitPathArrow.IsValid())
 		return;
 
-	if (GhostPieces.IsEmpty()) 
-	{
-		FVector location = PathStartPoint;
-		location.Z = OwnerPiece->GetActorLocation().Z;
-		SpawnGhostPiece(location);
-	}
-
 	if (bIsScout)
 	{
+		SetStartPointAtOrdersSender();
+
+		UnitPathArrow->SetStartPoint(PathStartPoint);
 		UnitPathArrow->SetEndPoint(OwnerPiece->GetActorLocation(), false, true);
 	}
 	else 
 	{
+		if (PathStartPoint.IsNearlyZero())
+			SetStartPointAtOrdersSender();
+
+		UnitPathArrow->SetStartPoint(PathStartPoint);
 		UnitPathArrow->SetEndPoint(OwnerPiece->GetActorLocation(), true);
+	}
+
+	if (GhostPieces.IsEmpty())
+	{
+		FVector location = PathStartPoint;
+		location.Z = OwnerPiece->GetActorLocation().Z;
+		SpawnGhostPiece(location);
 	}
 }
 
@@ -128,6 +122,13 @@ void UPiecePredictedPathComponent::ApplyArrow()
 		PathStartPoint = OwnerPiece->GetActorLocation();
 }
 
+void UPiecePredictedPathComponent::SetStartPointAtOrdersSender()
+{
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (ordersSender)
+		PathStartPoint = ordersSender->GetOwner()->GetActorLocation() + FVector(0.0f, 0.0f, 100.f);
+}
 
 void UPiecePredictedPathComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

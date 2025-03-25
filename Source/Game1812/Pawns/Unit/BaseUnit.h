@@ -68,6 +68,9 @@ public:
 	virtual ETeam GetTeam() const { return Team; };
 	virtual ECombatUnitType GetUnitType() const { return ECombatUnitType::None; };
 
+	virtual void OnBeingAddedToOrdersSender() {};
+	virtual void OnBeingRemovedFromOrdersSender() {};
+
 	const struct FUnitTerrainModifiers& GetTerrainModifiers() const;
 
 	

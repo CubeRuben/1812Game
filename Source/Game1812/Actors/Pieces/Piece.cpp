@@ -4,7 +4,7 @@
 #include "../../Pawns/Unit/Units/CombatUnit.h"
 #include "../../UI/BaseOrderWidget.h"
 #include "../../CossacksGameInstance.h"
-#include "../HeadQuarters.h"
+#include "../../OrdersSenderComponent.h"
 #include "../PaperMap.h"
 #include "../UnitPathArrow.h"
 
@@ -114,10 +114,12 @@ void APiece::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 void APiece::SpawnUnit()
 {
-	if (!AHeadQuarters::GetInstance())
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
+
+	if (!ordersSender)
 		return;
 	
-	Unit = AHeadQuarters::GetInstance()->SpawnUnit(UnitClass);
+	Unit = ordersSender->SpawnUnit(UnitClass);
 	Unit->SetOwnerPiece(this);
 
 	OnUnitSpawnEvent.Broadcast();

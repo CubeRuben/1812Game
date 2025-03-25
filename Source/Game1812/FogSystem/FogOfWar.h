@@ -54,9 +54,6 @@ protected:
 	bool AffectActors;
 
 	UPROPERTY(EditAnywhere)
-	float HeadQuartersRange;
-
-	UPROPERTY(EditAnywhere)
 	float ScoutRange;
 
 	UPROPERTY(EditAnywhere)
@@ -82,8 +79,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void AddConstantDiscoveredArea();
-
 	void UpdateFogTexture();
 	void UpdateDiscoveredAreas();
 
@@ -94,6 +89,9 @@ protected:
 	static void AddTextureToTexture(TImageBuilder<FVector4f>& MainImage, const TImageBuilder<FVector4f>& Image);
 
 public:	
+
+	void SetConstantDiscoveredArea(FVector WorldLocation, float Range);
+	void ClearConstantDiscoveredArea();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static AFogOfWar* GetInstance();

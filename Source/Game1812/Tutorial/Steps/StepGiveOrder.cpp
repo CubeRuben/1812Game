@@ -2,7 +2,7 @@
 
 #include "StepCombatPiecePlace.h"
 #include "../TutorialManager.h"
-#include "../../Actors/HeadQuarters.h"
+#include "../../OrdersSenderComponent.h"
 #include "../../Actors/Pieces/Piece.h"
 #include "../../Actors/Pieces/CombatPiece.h"
 #include "../../Pawns/Player/PlayerPawn.h"
@@ -31,10 +31,10 @@ void UStepGiveOrder::StepStart()
 	if (PreviousStep.IsValid())
 		OverlappedPieces = PreviousStep->GetOverlappedPieces();
 
-	AHeadQuarters* const hq = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (hq)
-		hq->SetAllowedToSendOrders(false);
+	if (ordersSender)
+		ordersSender->SetAllowedToSendOrders(false);
 
 	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToDrag(false);
 
@@ -43,10 +43,10 @@ void UStepGiveOrder::StepStart()
 
 void UStepGiveOrder::StepEnd()
 {
-	AHeadQuarters* const hq = AHeadQuarters::GetInstance();
+	UOrdersSenderComponent* const ordersSender = UOrdersSenderComponent::GetInstance();
 
-	if (hq)
-		hq->SetAllowedToSendOrders(true);
+	if (ordersSender)
+		ordersSender->SetAllowedToSendOrders(true);
 
 	Manager->GetPlayerPawn()->GetInteractionComponent()->SetAllowedToDrag(true);
 

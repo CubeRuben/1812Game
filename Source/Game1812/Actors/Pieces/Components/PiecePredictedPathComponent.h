@@ -39,7 +39,8 @@ protected:
 	void DestroyArrow();
 	void ApplyArrow();
 
-	void InitStartPoint();
+	void SetStartPointAtOrdersSender();
+
 public:	
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

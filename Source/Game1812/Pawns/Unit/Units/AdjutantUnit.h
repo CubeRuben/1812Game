@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float DeathCooldown;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool Contained;
+
 	FTimerHandle DeathCooldownTimer;
 
 	UPROPERTY(VisibleAnywhere)
@@ -75,6 +78,11 @@ public:
 
 	class UUnitOrder* GetCurrentOrder();
 	void AssignOrder(class UUnitOrder* NewOrder);
+
+	void OnBeingAddedToOrdersSender() override;
+	void OnBeingRemovedFromOrdersSender() override;
+
+	bool IsAffectedByFog() override { return !Contained; }
 	//
 
 	//IDamageable Interface
