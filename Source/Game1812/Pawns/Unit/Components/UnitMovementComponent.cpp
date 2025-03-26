@@ -74,7 +74,7 @@ float UUnitMovementComponent::UpdateMovement(float DeltaTime)
 	const float rotationYaw = FQuat::FindBetween(UnitPawn->GetActorForwardVector(), movementDirection).Rotator().Yaw;
 	RotatePawn(DeltaTime, rotationYaw);
 
-	if (FMath::Abs(rotationYaw) > 5.0f)
+	if (FMath::Abs(rotationYaw) > 90.0f)
 		return 0.0f;
 
 	const float deltaDistance = GetMovementSpeed() * DeltaTime;
@@ -214,6 +214,9 @@ void UUnitMovementComponent::UpdatePath()
 {
 	CurrentFollowingSegmentIndex = 0;
 	Path = UNavigationSystemV1::FindPathToLocationSynchronously(UnitPawn, UnitPawn->GetActorLocation(), TargetLocation, UnitPawn);
+
+	if (Path)
+		Path->EnableDebugDrawing(true);
 }
 
 void UUnitMovementComponent::UpdatePathToActor()
@@ -230,7 +233,7 @@ void UUnitMovementComponent::UpdatePathToActor()
 
 void UUnitMovementComponent::CheckMovementStart()
 {
-	if (FVector::DistSquared2D(TargetLocation, UnitPawn->GetActorLocation()) < 5.0f)
+	if (FVector::DistSquared2D(TargetLocation, UnitPawn->GetActorLocation()) < 7.5f)
 		return;
 
 	bIsMoving = true;
