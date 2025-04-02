@@ -12,19 +12,16 @@
 #include <Kismet/GameplayStatics.h>
 #include <Math/Quat.h>
 
-UUnitCombatComponent::UUnitCombatComponent()
+UUnitCombatComponent::UUnitCombatComponent() :
+	CombatUnitPawn(nullptr),
+	HealthPoints(0.0f),
+	Morale(1.0f),
+	bIsTemporarilyDefeated(false),
+	TimeOfLastAttack(-100.0f),
+	TimeOfLastTakenDamage(-100.0f),
+	TargetedEnemy(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	CombatUnitPawn = nullptr;
-	TargetedEnemy = nullptr;
-
-	HealthPoints = 0.f;
-	Morale = 1.f;
-	bIsTemporarilyDefeated = false;
-
-	TimeOfLastAttack = -100.f;
-	TimeOfLastTakenDamage = -100.f;
 }
 
 void UUnitCombatComponent::BeginPlay()
