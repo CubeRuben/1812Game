@@ -21,6 +21,28 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float GameMinutesPerRealSecond;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class USoundBase* BattleStartSFX;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class USoundBase* BattleMusic;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UAudioComponent* BattleMusicComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UWorld> NextLevel;
+
+	virtual void BeginPlay() override;
+
+	void InitCutScenes();
+
+	void OnLevelStartCutSceneEnd();
+	void OnLevelFinishCutSceneEnd();
+
+	UFUNCTION()
+	void OnWin();
+
 public:
 
 	void Tick(float DeltaTime) override;

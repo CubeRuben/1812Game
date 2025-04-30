@@ -6,6 +6,11 @@
 #include "MediaPlayer.h"
 #include "MediaSource.h"
 
+#include <Kismet/GameplayStatics.h>
+
+TWeakObjectPtr<ACutScenePlayer> ACutScenePlayer::LevelStartCutScenePlayer = nullptr;
+TWeakObjectPtr<ACutScenePlayer> ACutScenePlayer::LevelFinishCutScenePlayer = nullptr;
+
 ACutScenePlayer::ACutScenePlayer() :
 	MediaSoundComponent(nullptr),
 	CutSceneWidget(nullptr),
@@ -17,6 +22,9 @@ ACutScenePlayer::ACutScenePlayer() :
 	PrimaryActorTick.bTickEvenWhenPaused = true;
 
 	MediaSoundComponent = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("Media Sound Component"));
+	MediaSoundComponent->bIsUISound = true;
+	MediaSoundComponent->PrimaryComponentTick.bTickEvenWhenPaused = true;
+	MediaSoundComponent->PrimaryComponentTick.bCanEverTick = true;
 	RootComponent = MediaSoundComponent;
 }
 
@@ -26,8 +34,15 @@ void ACutScenePlayer::BeginPlay()
 	
 	if (Type == ECutSceneType::OnLevelStart)
 	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ACutScenePlayer::StartPlaying);
-		return;
+		LevelStartCutScenePlayer = this;
+	}
+	else if (Type == ECutSceneType::OnLevelFinish) 
+	{
+		LevelFinishCutScenePlayer = this;
+	}
+	else if (Type == ECutSceneType::OnGameStart) 
+	{
+		StartPlaying();
 	}
 }
 
@@ -43,7 +58,7 @@ void ACutScenePlayer::StartPlaying()
 		return;
 
 	CutSceneMediaPlayer->OpenSource(CutSceneMediaSource);
-
+	
 	if (!CutSceneWidgetClass)
 		return;
 	
@@ -52,22 +67,19 @@ void ACutScenePlayer::StartPlaying()
 	if (!CutSceneWidget)
 		return;
 
-	CutSceneMediaPlayer->Rewind();
-
 	CutSceneWidget->AddToViewport();
 	CutSceneWidget->StartPlaying(this);
 	MediaSoundComponent->SetMediaPlayer(CutSceneMediaPlayer);
 
+	CutSceneMediaPlayer->Rewind();
 	CutSceneMediaPlayer->Play();
 
 	CutSceneMediaPlayer->OnEndReached.AddDynamic(this, &ACutScenePlayer::StopPlaying);
 
 	APlayerController* const controller = GetWorld()->GetFirstPlayerController();
 
-	if (!controller)
-		return;
-
-	controller->SetPause(true);
+	if (controller)
+		controller->SetPause(true);
 }
 
 void ACutScenePlayer::StopPlaying()
@@ -80,6 +92,13 @@ void ACutScenePlayer::StopPlaying()
 	if (controller)
 		controller->SetPause(false);
 
-	Destroy();
+	CutSceneMediaPlayer->Pause();
+	CutSceneMediaPlayer->Close();
+
+	OnCutSceneEnd.ExecuteIfBound();
+	//Destroy();
+
+	if (Type == ECutSceneType::OnGameStart)
+		UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), NextLevel);
 }
 
