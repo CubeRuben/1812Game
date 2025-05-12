@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "UnitVisualBaseComponent.h"
 #include "UnitCombatVisualComponent.generated.h"
 
 UCLASS()
-class GAME1812_API UUnitCombatVisualComponent : public UActorComponent
+class GAME1812_API UUnitCombatVisualComponent : public UUnitVisualBaseComponent
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,6 @@ protected:
 	TArray<FVector> MeshesOffsets;
 
 	virtual void BeginPlay() override;
-	virtual void BeginDestroy() override;
 
 	void UpdateFormationOffsets(int Number, float Offset);
 
@@ -43,7 +42,7 @@ public:
 
 	TArray<class IFogAffected*>* GetFogAffectedComponents();
 
-	void UpdateVisual(float DeltaTime);
+	void UpdateVisual(float DeltaTime) override;
 
 	void Init(class UCombatUnitDataAsset* UnitCombatStats);
 		

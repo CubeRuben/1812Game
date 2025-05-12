@@ -28,16 +28,6 @@ void UUnitCombatVisualComponent::BeginPlay()
 	CombatUnitPawn->GetCombatComponent()->OnHealthPointsChange.AddUObject(this, &UUnitCombatVisualComponent::OnHealthPointsChange);
 }
 
-void UUnitCombatVisualComponent::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	AGlobalUnitCombatVisual* const instance = AGlobalUnitCombatVisual::GetInstance();
-
-	if (instance)
-		instance->RemoveVisualComponent(this);
-}
-
 TArray<IFogAffected*>* UUnitCombatVisualComponent::GetFogAffectedComponents()
 {
 	return &FogAffectedComponents;

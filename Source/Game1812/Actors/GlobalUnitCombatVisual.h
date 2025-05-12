@@ -17,7 +17,7 @@ protected:
 
 	static AGlobalUnitCombatVisual* Instance;
 
-	TArray<TWeakObjectPtr<class UUnitCombatVisualComponent>> VisualComponents;
+	TArray<TWeakObjectPtr<class UUnitVisualBaseComponent>> VisualComponents;
 
 	TArray<TWeakObjectPtr<class UUnitCombatMeshComponent>> MeshComponents;
 
@@ -35,8 +35,8 @@ public:
 	static AGlobalUnitCombatVisual* GetInstance() { return Instance; }
 	static AGlobalUnitCombatVisual* GetInstance(UWorld* World);
 
-	void AddVisualComponent(class UUnitCombatVisualComponent* NewVisualComponent, const TArray<class UUnitCombatMeshComponent*>& NewMeshComponents);
-	void RemoveVisualComponent(class UUnitCombatVisualComponent* VisualComponentToRemove);
+	void AddVisualComponent(class UUnitVisualBaseComponent* NewVisualComponent, const TArray<class UUnitCombatMeshComponent*>& NewMeshComponents);
+	void RemoveVisualComponent(class UUnitVisualBaseComponent* VisualComponentToRemove);
 
 	virtual void Tick(float DeltaTime) override;
 

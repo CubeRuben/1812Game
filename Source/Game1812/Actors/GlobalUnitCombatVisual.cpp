@@ -41,7 +41,7 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	for (TWeakObjectPtr<UUnitCombatVisualComponent>& component : VisualComponents)
+	for (TWeakObjectPtr<UUnitVisualBaseComponent>& component : VisualComponents)
 	{
 		if (!component.IsValid())
 			continue;
@@ -107,13 +107,13 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 	}
 }
 
-void AGlobalUnitCombatVisual::AddVisualComponent(UUnitCombatVisualComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
+void AGlobalUnitCombatVisual::AddVisualComponent(UUnitVisualBaseComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
 {
 	VisualComponents.Add(NewVisualComponent);
 	MeshComponents.Append(NewMeshComponents);
 }
 
-void AGlobalUnitCombatVisual::RemoveVisualComponent(UUnitCombatVisualComponent* VisualComponentToRemove)
+void AGlobalUnitCombatVisual::RemoveVisualComponent(UUnitVisualBaseComponent* VisualComponentToRemove)
 {
 	VisualComponents.Remove(VisualComponentToRemove);
 }
