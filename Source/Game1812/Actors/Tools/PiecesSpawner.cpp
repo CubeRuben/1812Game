@@ -4,53 +4,59 @@
 #include "../Pieces/ScoutPiece.h"
 #include "../Pieces/CombatPiece.h"
 
-APiecesSpawner::APiecesSpawner()
+APiecesSpawner::APiecesSpawner() :
+	PieceToSpawn(EPieceToSpawn::COMBAT),
+	CombatUnitData(nullptr),
+	Amount(0),
+	SpawnOffset(0.0f)
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root Component"));
-
-	PieceToSpawn = EPieceToSpawn::COMBAT;
-	CombatUnitData = nullptr;
-	SpawnInterval = 40.f;
 }
 
-void APiecesSpawner::BeginPlay()
+void APiecesSpawner::SpawnPieces()
 {
-	Super::BeginPlay();
-
 	const int SideLength = FMath::CeilToInt(FMath::Sqrt((float)Amount));
 
-	for (int x = 0, i = 0; x < SideLength; x++) 
+	const FVector centerOffset = FVector(1.0f, 1.0f, 0.0f) * SpawnOffset * 0.5f;
+	const FVector gridOffset = FVector(1.0f, 1.0f, 0.0f) * (SideLength * 0.5f) * SpawnOffset;
+	const FVector rootLocation = GetActorLocation();
+	const FVector totalOffset = centerOffset - gridOffset + rootLocation;
+
+	for (int x = 0, i = 0; x < SideLength; x++)
 	{
 		for (int y = 0; (y < SideLength) && (i < Amount); y++, i++)
 		{
-			const FVector SpawnLocation = FVector(x, y, 0) * SpawnInterval;
-			const FVector CenterOffset = FVector(1, 1, 0) * SpawnInterval / 2.f;
-			const FVector GridOffset = FVector(1, 1, 0) * (SideLength / 2.f) * SpawnInterval;
-
-			SpawnPiece(SpawnLocation + CenterOffset - GridOffset + GetActorLocation());
+			const FVector spawnLocation = FVector(x, y, 0.0f) * SpawnOffset;
+			SpawnPiece(spawnLocation + totalOffset);
 		}
 	}
 }
 
 void APiecesSpawner::SpawnPiece(const FVector& Location)
 {
-	UCossacksGameInstance* gameInstance = GetGameInstance<UCossacksGameInstance>();
+	UCossacksGameInstance* const gameInstance = GetGameInstance<UCossacksGameInstance>();
 
 	if (!gameInstance)
 		return;
 
-	switch (PieceToSpawn)
+	const FRotator randomRotation(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
+
+	if (PieceToSpawn == EPieceToSpawn::COMBAT)
 	{
-	case EPieceToSpawn::SCOUT:
+		ACombatPiece* const combatPiece = GetWorld()->SpawnActor<ACombatPiece>(gameInstance->GetCombatUnitPieceClass(), Location, randomRotation);
+
+		if (!combatPiece)
+			return;
+
+		combatPiece->SetCombatUnitData(CombatUnitData);
+
+		return;
+	}
+	
+	if (PieceToSpawn == EPieceToSpawn::SCOUT) 
+	{
 		GetWorld()->SpawnActor<AScoutPiece>(gameInstance->GetScoutUnitPieceClass(), Location, FRotator::ZeroRotator);
-		break;
 
-	case EPieceToSpawn::COMBAT:
-		ACombatPiece* piece = GetWorld()->SpawnActor<ACombatPiece>(gameInstance->GetCombatUnitPieceClass(), Location, FRotator::ZeroRotator);
-
-		if (piece)
-			piece->SetCombatUnitData(CombatUnitData);
-
-		break;
+		return;
 	}
 }

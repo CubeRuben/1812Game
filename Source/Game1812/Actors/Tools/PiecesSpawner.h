@@ -22,19 +22,19 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EPieceToSpawn PieceToSpawn;
 
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "PieceToSpawn==EPieceToSpawn::Combat"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "PieceToSpawn==EPieceToSpawn::Combat"))
 	class UCombatUnitDataAsset* CombatUnitData;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Amount;
 
-	UPROPERTY(EditAnywhere)
-	float SpawnInterval;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnOffset;
 
-	virtual void BeginPlay() override;
-	
+	UFUNCTION(BlueprintCallable)
+	void SpawnPieces();
 	void SpawnPiece(const FVector& Location);
 };
