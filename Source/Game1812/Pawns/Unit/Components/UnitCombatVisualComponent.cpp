@@ -1,7 +1,7 @@
 #include "UnitCombatVisualComponent.h"
 
 #include "UnitCombatComponent.h"
-#include "UnitCombatMeshComponent.h"
+#include "UnitVisualMeshComponent.h"
 #include "../Units/CombatUnit.h"
 #include "../../../DataAssets/CombatUnitDataAsset.h"
 #include "../../../Actors/GlobalUnitCombatVisual.h"
@@ -88,9 +88,6 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 	if (!UnitCombatStats)
 		return;
 
-	if (!AGlobalUnitCombatVisual::GetInstance(GetWorld()))
-		return;
-
 	const FCombatUnitVisual& combatUnitVisual = UnitCombatStats->GetCombatUnitVisual();
 	const FCombatUnitStats& combatUnitStats = UnitCombatStats->GetCombatUnitStats();
 
@@ -104,16 +101,10 @@ void UUnitCombatVisualComponent::Init(UCombatUnitDataAsset* UnitCombatStats)
 	for (int i = 0; i < meshesNumber; i++) 
 	{
 		const FName componentName(componentBaseName + FString::FromInt(i));
-		UUnitCombatMeshComponent* component = NewObject<UUnitCombatMeshComponent>(GetOwner(), UUnitCombatMeshComponent::StaticClass(), componentName);
-		
+		UUnitVisualMeshComponent* component = CreateVisualComponent(componentName, combatUnitVisual.GetUnitMesh());
+
 		if (!component)
 			return;
-		
-		component->RegisterComponent();
-		component->SetStaticMesh(combatUnitVisual.GetUnitMesh());
-		component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		GetOwner()->AddInstanceComponent(component);
 		
 		UnitMeshComponents[i] = component;
 		FogAffectedComponents[i] = component;
@@ -228,7 +219,7 @@ void UUnitCombatVisualComponent::ReviveMeshes(int NumberToRevive)
 		const int deadMeshesIndex = deadMeshesLastIndex - i;
 		const int aliveMeshesIndex = aliveMeshesNum + i;
 
-		UUnitCombatMeshComponent* const component = DeadUnitMeshComponents[deadMeshesIndex];
+		UUnitVisualMeshComponent* const component = DeadUnitMeshComponents[deadMeshesIndex];
 
 		component->SetVisibility(true);
 
@@ -258,7 +249,7 @@ void UUnitCombatVisualComponent::KillMeshes(int NumberToKill)
 	{
 		const int aliveMeshesIndex = meshesLastIndex - i;
 
-		UUnitCombatMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
+		UUnitVisualMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
 
 		component->SetVisibility(false);
 
@@ -288,7 +279,7 @@ void UUnitCombatVisualComponent::SpawnDeadMeshes(int Number)
 	for (int i = 0; i < Number; i++)
 	{
 		const int aliveMeshesIndex = meshesLastIndex - i;
-		UUnitCombatMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
+		UUnitVisualMeshComponent* const component = UnitMeshComponents[aliveMeshesIndex];
 
 		deadUnitsVisual->AddDeadMesh(component->GetComponentLocation(), combatUnitVisual);
 	}

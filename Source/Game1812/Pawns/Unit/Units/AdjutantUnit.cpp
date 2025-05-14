@@ -6,20 +6,20 @@
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitReportComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
+#include "../Components/UnitSingleVisualComponent.h"
 #include "../../../OrdersSenderComponent.h"
 #include "../../../ReportSystem/ReportSpawner.h"
 
 AAdjutantUnit::AAdjutantUnit() :
+	MovementSpeed(100.0f),
+	RotationSpeed(160.0f),
+	MinDistanceToGiveOrder(15.0f),
+	DeathCooldown(15.0f),
 	Contained(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	MovementSpeed = 100.f;
-	RotationSpeed = 160.f;
-
-	MinDistanceToGiveOrder = 15.f;
-
-	DeathCooldown = 15.f;
+	VisualComponent = CreateDefaultSubobject<UUnitSingleVisualComponent>(TEXT("Visual Component"));
 }
 
 void AAdjutantUnit::BeginPlay()

@@ -27,6 +27,9 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UUnitSingleVisualComponent* VisualComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UScoutUnitOrder* CurrentOrder;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -15,7 +15,10 @@ public:
 
 protected:
 
+	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
+
+	class UUnitVisualMeshComponent* CreateVisualComponent(const FName& Name, UStaticMesh* Mesh);
 
 public:
 

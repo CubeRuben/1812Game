@@ -18,10 +18,10 @@ protected:
 	class ACombatUnit* CombatUnitPawn;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UUnitCombatMeshComponent*> UnitMeshComponents;
+	TArray<class UUnitVisualMeshComponent*> UnitMeshComponents;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<class UUnitCombatMeshComponent*> DeadUnitMeshComponents;
+	TArray<class UUnitVisualMeshComponent*> DeadUnitMeshComponents;
 
 	TArray<class IFogAffected*> FogAffectedComponents;
 

@@ -6,14 +6,16 @@
 #include "../../../Actors/HeadQuarters.h"
 #include "../Components/UnitMovementComponent.h"
 #include "../Components/UnitTerrainModifiersComponent.h"
+#include "../Components/UnitSingleVisualComponent.h"
 
 AScoutUnit::AScoutUnit() :
+	MovementSpeed(100.0f),
+	RotationSpeed(160.0f),
 	Contained(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	MovementSpeed = 100;
-	RotationSpeed = 160;
+	VisualComponent = CreateDefaultSubobject<UUnitSingleVisualComponent>(TEXT("Visual Component"));
 }
 
 void AScoutUnit::BeginPlay() 

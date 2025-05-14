@@ -3,16 +3,16 @@
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
 #include "../../../FogSystem/FogAffected.h"
-#include "UnitCombatMeshComponent.generated.h"
+#include "UnitVisualMeshComponent.generated.h"
 
 UCLASS()
-class GAME1812_API UUnitCombatMeshComponent : public UStaticMeshComponent, public IFogAffected
+class GAME1812_API UUnitVisualMeshComponent : public UStaticMeshComponent, public IFogAffected
 {
 	GENERATED_BODY()
 
 public:
 
-	UUnitCombatMeshComponent();
+	UUnitVisualMeshComponent();
 
 	//IFogAffected Interface
 	void OnBeingCoveredInFog() override { SetVisibility(false); }

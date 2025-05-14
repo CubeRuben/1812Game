@@ -1,7 +1,7 @@
 #include "GlobalUnitCombatVisual.h"
 
 #include "../Pawns/Unit/Components/UnitCombatVisualComponent.h"
-#include "../Pawns/Unit/Components/UnitCombatMeshComponent.h"
+#include "../Pawns/Unit/Components/UnitVisualMeshComponent.h"
 
 AGlobalUnitCombatVisual* AGlobalUnitCombatVisual::Instance = nullptr;
 
@@ -51,12 +51,12 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 
 	for (int a = 0; a < MeshComponents.Num(); a++) 
 	{
-		UUnitCombatMeshComponent* const component1 = MeshComponents[a].Get();
+		UUnitVisualMeshComponent* const component1 = MeshComponents[a].Get();
 
 		//Remove all nullptr to unit's meshes, cleanup here, because it's faster to find nullptr, that ptr in given array
 		if (!component1)
 		{
-			MeshComponents.RemoveAll([](TWeakObjectPtr<UUnitCombatMeshComponent>& el) { return el == nullptr; });
+			MeshComponents.RemoveAll([](TWeakObjectPtr<UUnitVisualMeshComponent>& el) { return el == nullptr; });
 			a--;
 			continue;
 		}
@@ -66,7 +66,7 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 
 		for (int b = a + 1; b < MeshComponents.Num(); b++)
 		{
-			UUnitCombatMeshComponent* const component2 = MeshComponents[b].Get();
+			UUnitVisualMeshComponent* const component2 = MeshComponents[b].Get();
 
 			if (!component2 || !component2->IsVisible())
 				continue;
@@ -91,7 +91,7 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 		}
 	}
 
-	for (TWeakObjectPtr<UUnitCombatMeshComponent>& component : MeshComponents)
+	for (TWeakObjectPtr<UUnitVisualMeshComponent>& component : MeshComponents)
 	{
 		if (!component.IsValid() || !component->IsVisible())
 			continue;
@@ -100,14 +100,20 @@ void AGlobalUnitCombatVisual::Tick(float DeltaTime)
 
 		const FVector componentLocation = component->GetComponentLocation();
 		
-		GetWorld()->LineTraceSingleByChannel(hit, componentLocation + FVector(0.0f, 0.0f, 250.f), componentLocation - FVector(0.0f, 0.0f, 250.f), ECollisionChannel::ECC_GameTraceChannel1);
+		GetWorld()->LineTraceSingleByChannel(hit, componentLocation + FVector(0.0f, 0.0f, 250.0f), componentLocation - FVector(0.0f, 0.0f, 250.0f), ECollisionChannel::ECC_GameTraceChannel1);
 
 		if (hit.bBlockingHit)
 			component->SetWorldLocation(hit.Location);
 	}
 }
 
-void AGlobalUnitCombatVisual::AddVisualComponent(UUnitVisualBaseComponent* NewVisualComponent, const TArray<UUnitCombatMeshComponent*>& NewMeshComponents)
+void AGlobalUnitCombatVisual::AddVisualComponent(UUnitVisualBaseComponent* NewVisualComponent, UUnitVisualMeshComponent* NewMeshComponent)
+{
+	VisualComponents.Add(NewVisualComponent);
+	MeshComponents.Add(NewMeshComponent);
+}
+
+void AGlobalUnitCombatVisual::AddVisualComponent(UUnitVisualBaseComponent* NewVisualComponent, const TArray<UUnitVisualMeshComponent*>& NewMeshComponents)
 {
 	VisualComponents.Add(NewVisualComponent);
 	MeshComponents.Append(NewMeshComponents);
