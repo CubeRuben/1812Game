@@ -25,12 +25,6 @@ protected:
 	class USoundBase* BattleStartSFX;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class USoundBase* BattleMusic;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UAudioComponent* BattleMusicComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UWorld> NextLevel;
 
 	virtual void BeginPlay() override;

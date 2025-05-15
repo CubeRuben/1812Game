@@ -12,6 +12,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <Math/Quat.h>
 
+FOnBattleBeginGlobalDelegate UUnitCombatComponent::OnBattleBeginGlobal = FOnBattleBeginGlobalDelegate();
+
 UUnitCombatComponent::UUnitCombatComponent() :
 	CombatUnitPawn(nullptr),
 	HealthPoints(0.0f),
@@ -306,6 +308,8 @@ float UUnitCombatComponent::ApplyDamage(IDamageable* Attacker, float DamageAmoun
 {
 	//Attack back
 	TryAttack(Attacker);
+
+	OnBattleBeginGlobal.Broadcast(CombatUnitPawn->IsCoveredInFog());
 
 	//Calculate total damage with defense
 	const float totalDamage = FMath::Max(1, DamageAmount);

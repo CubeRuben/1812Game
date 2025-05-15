@@ -1,6 +1,7 @@
 #include "CossacksGameMode.h"
 
 #include "Actors/CutScenePlayer.h"
+#include "Actors/MusicManager.h"
 #include "ObjectivesSystem/BattleObjectivesManager.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -9,9 +10,7 @@
 ACossacksGameMode::ACossacksGameMode() :
 	GameTime(0.0f),
 	GameMinutesPerRealSecond(5.0f / 60.0f),
-	BattleStartSFX(nullptr),
-	BattleMusic(nullptr),
-	BattleMusicComponent(nullptr)
+	BattleStartSFX(nullptr)
 {
 
 }
@@ -49,10 +48,9 @@ void ACossacksGameMode::InitCutScenes()
 void ACossacksGameMode::OnLevelStartCutSceneEnd()
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), BattleStartSFX);
-	BattleMusicComponent = UGameplayStatics::CreateSound2D(GetWorld(), BattleMusic);
 
-	if (BattleMusicComponent)
-		BattleMusicComponent->Play();
+	if (AMusicManager::GetInstance())
+		AMusicManager::GetInstance()->StartPlayingMusic();
 }
 
 void ACossacksGameMode::OnLevelFinishCutSceneEnd()
@@ -62,8 +60,8 @@ void ACossacksGameMode::OnLevelFinishCutSceneEnd()
 
 void ACossacksGameMode::OnWin()
 {
-	if (BattleMusicComponent)
-		BattleMusicComponent->Stop();
+	if (AMusicManager::GetInstance())
+		AMusicManager::GetInstance()->StopPlayingMusic();
 
 	ACutScenePlayer* cutScenePlayer2 = ACutScenePlayer::GetLevelFinishCutScenePlayer();
 

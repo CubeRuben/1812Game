@@ -17,6 +17,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTemporarilyDefeatDelegate);
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthPointsChangeDelegate, float, bool);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnBattleBeginGlobalDelegate, bool);
+
 UCLASS(Blueprintable, BlueprintType)
 class GAME1812_API UUnitCombatComponent : public UActorComponent
 {
@@ -80,6 +82,8 @@ protected:
 	bool IsInReachToReorganize(ACombatUnit* OtherUnit);
 	
 public:	
+
+	static FOnBattleBeginGlobalDelegate OnBattleBeginGlobal;
 
 	FOnHealthPointsChangeDelegate OnHealthPointsChange;
 
