@@ -56,7 +56,9 @@ public:
 
 	void Tick(float DeltaTime) override;
 
+	float GetGameTimeSeconds() const;
 	float GetGameTimeMinutes() const;
+	float GetGameTimeHours() const;
 
 	UFUNCTION(BlueprintCallable)
 	void GoToNextLevel();

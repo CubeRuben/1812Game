@@ -97,9 +97,19 @@ void ACossacksGameMode::Tick(float DeltaTime)
 	GameTime += DeltaTime * GameMinutesPerRealSecond;
 }
 
+float ACossacksGameMode::GetGameTimeSeconds() const
+{
+	return GameTime * 60.0f;
+}
+
 float ACossacksGameMode::GetGameTimeMinutes() const
 {
 	return GameTime;
+}
+
+float ACossacksGameMode::GetGameTimeHours() const
+{
+	return GameTime / 60.0f;
 }
 
 void ACossacksGameMode::GoToNextLevel()
