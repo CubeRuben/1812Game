@@ -55,14 +55,33 @@ public:
 
 	FOnCutSceneEndDelegate OnCutSceneEnd;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static ACutScenePlayer* GetLevelStartCutScenePlayer() { return LevelStartCutScenePlayer.Get(); }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static ACutScenePlayer* GetLevelFinishCutScenePlayer() { return LevelFinishCutScenePlayer.Get(); }
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
 	void StartPlaying();
 
 	UFUNCTION(BlueprintCallable)
 	void StopPlaying();
 
 };
+
+//UCLASS()
+//class GAME1812_API UCutScenePlayerFunctionLibrary : public UBlueprintFunctionLibrary
+//{
+//	GENERATED_BODY()
+//
+//	UFUNCTION(BlueprintCallable, BlueprintPure)
+//	static bool HaveValidInteractable(FInteractableTarget Other) { return Other.HaveValidInteractable(); }
+//
+//	UFUNCTION(BlueprintCallable, BlueprintPure)
+//	static bool IsDirectInteraction(FInteractableTarget Other) { return Other.GetIsDirectInteraction(); }
+//
+//	UFUNCTION(BlueprintCallable, BlueprintPure)
+//	static FString GetInteractableName(FInteractableTarget Other);
+//};

@@ -12,7 +12,7 @@ enum class EBattleState : uint8
 {
 	OnGoing,
 	Win,
-	Lose
+	Lost
 };
 
 UCLASS()
@@ -76,4 +76,9 @@ public:
 	float GetEnemyStartHP() const { return EnemyStartHP; };
 	float GetEnemyTakenCasualties() const { return EnemyTakenCasualties; };
 
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Debug")
+	void ForceBattleWin();
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Debug")
+	void ForceBattleLost();
 };

@@ -3,6 +3,7 @@
 #include "Actors/CutScenePlayer.h"
 #include "Actors/MusicManager.h"
 #include "ObjectivesSystem/BattleObjectivesManager.h"
+#include "Blueprint/UserWidget.h"
 
 #include <Kismet/GameplayStatics.h>
 #include <Components/AudioComponent.h>
@@ -10,7 +11,9 @@
 ACossacksGameMode::ACossacksGameMode() :
 	GameTime(0.0f),
 	GameMinutesPerRealSecond(5.0f / 60.0f),
-	BattleStartSFX(nullptr)
+	BattleStartSFX(nullptr),
+
+	BattleFinishWidget(nullptr)
 {
 
 }
@@ -26,6 +29,7 @@ void ACossacksGameMode::InitCutScenes()
 {
 	ABattleObjectivesManager* objectivesManager = ABattleObjectivesManager::GetInstance();
 	objectivesManager->OnBattleWin.AddDynamic(this, &ACossacksGameMode::OnWin);
+	objectivesManager->OnBattleLost.AddDynamic(this, &ACossacksGameMode::OnLost);
 
 	ACutScenePlayer* cutScenePlayer2 = ACutScenePlayer::GetLevelFinishCutScenePlayer();
 	if (cutScenePlayer2)
@@ -55,7 +59,7 @@ void ACossacksGameMode::OnLevelStartCutSceneEnd()
 
 void ACossacksGameMode::OnLevelFinishCutSceneEnd()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), NextLevel);
+	GoToNextLevel();
 }
 
 void ACossacksGameMode::OnWin()
@@ -63,16 +67,27 @@ void ACossacksGameMode::OnWin()
 	if (AMusicManager::GetInstance())
 		AMusicManager::GetInstance()->StopPlayingMusic();
 
-	ACutScenePlayer* cutScenePlayer2 = ACutScenePlayer::GetLevelFinishCutScenePlayer();
+	if (BattleFinishWidget)
+		return;
 
-	if (cutScenePlayer2) 
-	{
-		cutScenePlayer2->StartPlaying();
-	}
-	else 
-	{
-		OnLevelFinishCutSceneEnd();
-	}
+	BattleFinishWidget = CreateWidget(GetWorld(), WinWidgetClass.Get());
+
+	if (BattleFinishWidget)
+		BattleFinishWidget->AddToViewport();
+}
+
+void ACossacksGameMode::OnLost()
+{
+	if (AMusicManager::GetInstance())
+		AMusicManager::GetInstance()->StopPlayingMusic();
+
+	if (BattleFinishWidget)
+		return;
+
+	BattleFinishWidget = CreateWidget(GetWorld(), LostWidgetClass.Get());
+
+	if (BattleFinishWidget)
+		BattleFinishWidget->AddToViewport();
 }
 
 void ACossacksGameMode::Tick(float DeltaTime)
@@ -85,4 +100,9 @@ void ACossacksGameMode::Tick(float DeltaTime)
 float ACossacksGameMode::GetGameTimeMinutes() const
 {
 	return GameTime;
+}
+
+void ACossacksGameMode::GoToNextLevel()
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), NextLevel);
 }

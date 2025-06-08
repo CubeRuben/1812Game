@@ -35,6 +35,8 @@ void ABattleObjectivesManager::BeginPlay()
 
 	Instance = this;
 
+	BattleState = EBattleState::OnGoing;
+
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ABattleObjectivesManager::PreInit);
 }
 
@@ -84,7 +86,7 @@ void ABattleObjectivesManager::Tick(float DeltaTime)
 	{
 		//GEngine->AddOnScreenDebugMessage(100, 15.f, FColor::Red, "Lose");
 		OnBattleLost.Broadcast();
-		BattleState = EBattleState::Lose;
+		BattleState = EBattleState::Lost;
 	}
 	else if (WinCondition && WinCondition->GetState())
 	{
@@ -93,4 +95,16 @@ void ABattleObjectivesManager::Tick(float DeltaTime)
 		BattleState = EBattleState::Win;
 	}
 
+}
+
+void ABattleObjectivesManager::ForceBattleWin()
+{
+	OnBattleWin.Broadcast();
+	BattleState = EBattleState::Win;
+}
+
+void ABattleObjectivesManager::ForceBattleLost()
+{
+	OnBattleLost.Broadcast();
+	BattleState = EBattleState::Lost;
 }
