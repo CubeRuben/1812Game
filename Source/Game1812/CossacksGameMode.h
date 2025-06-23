@@ -37,7 +37,10 @@ protected:
 	UUserWidget* BattleFinishWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText BattleTip;
+	FText BattleWinTip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText BattleLostTip;
 
 	virtual void BeginPlay() override;
 
